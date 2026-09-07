@@ -1,0 +1,10 @@
+{
+  "description": "Connects users with Hà Nội Xanh's environmental initiatives through interactive maps, engaging content, and easy contact options for community involvement.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

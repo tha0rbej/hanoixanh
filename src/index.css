@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Space+Grotesk:wght@400..700&display=swap');
+@import 'tailwindcss';
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-display: 'Space Grotesk', sans-serif;
+
+    /* Theme inspired by clean river/waterway restoration & Hanoi Xanh tones */
+    --color-hnx-green-dark: #0f382c;
+    --color-hnx-green: #15803d;
+    --color-hnx-green-light: #22c55e;
+    --color-hnx-emerald: #059669;
+    --color-hnx-lime: #84cc16;
+    --color-hnx-orange: #f97316;
+    --color-hnx-orange-bright: #ff6b00;
+    --color-hnx-bg: #f8faf9;
+    --color-hnx-surface: #ffffff;
+    --color-hnx-text: #111827;
+    --color-hnx-text-muted: #4b5563;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-hnx-bg);
+    color: var(--color-hnx-text);
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
+  }
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
