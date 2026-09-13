@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hà Nội Xanh - Vì Một Hà Nội Xanh Sạch Đẹp</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- Thư viện bản đồ Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: #f7f9f7;
+            color: #173d2b;
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+        header {
+            height: 90px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            border-bottom: 2px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 2000;
+        }
+
+        .logo-area { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 16px; line-height: 1.2; color: #0c5c31; }
+        .logo-area img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #e0e0e0; object-fit: cover; background-color: #f3f7f4; }
+
+        nav { scrollbar-width: none; }
+        nav::-webkit-scrollbar { display: none; }
+        nav ul { list-style: none; display: flex; align-items: center; gap: 25px; }
+        nav ul li a { color: #4a5568; font-size: 13px; font-weight: 800; text-align: center; display: inline-block; transition: 0.3s; position: relative; padding-bottom: 6px; line-height: 1.4; white-space: nowrap; }
+        nav ul li a:hover, nav ul li a.active { color: #129c50; }
+        nav ul li a.active::after { content: ""; position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); width: 100%; height: 3px; background-color: #129c50; border-radius: 2px; }
+
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+
+        .btn-join { background: #035c2e; color: white; padding: 10px 22px; border-radius: 30px; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; }
+
+        .donate-btn {
+            background: #EF4444; 
+            color: white; padding: 10px 22px; border-radius: 30px; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 6px; letter-spacing: 0.5px; transition: background 0.3s ease;
+        }
+        .donate-btn:hover { background: #DC2626; }
+
+        .search-box { display: flex; align-items: center; gap: 8px; border: 1px solid #d1d5db; border-radius: 30px; padding: 8px 16px; background: #fff; height: 40px; }
+        .search-box i { color: #8da4be; font-size: 14px; }
+        .search-box input { width: 100px; border: none; outline: none; font-size: 13px; font-family: inherit; }
+        .search-box input::placeholder { color: #9ca3af; }
+
+        .btn-login { color: #035c2e; border: 1.5px solid #035c2e; padding: 9px 22px; border-radius: 30px; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; background: transparent; }
+
+        /* =========================
+           HERO
+        ========================= */
+        .hero { min-height: 650px; background: #173d2b; position: relative; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 100px 5% 150px; }
+        .hero-bg-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; filter: brightness(0.5); }
+        .hero h1, .hero p, .hero-actions, .stats-container { position: relative; z-index: 2; }
+        .hero h1 { font-size: 58px; line-height: 1.1; margin-bottom: 20px; font-weight: 900; }
+        .hero h1 span { color: #63d89a; }
+        .hero > p { max-width: 700px; font-size: 17px; color: #dcebe2; margin-bottom: 30px; }
+        .hero-actions { display: flex; gap: 15px; margin-bottom: 70px; }
+
+        .btn-green { display: inline-flex; align-items: center; gap: 8px; background: #16a05d; color: white; padding: 13px 20px; border-radius: 8px; font-size: 14px; font-weight: 700; transition: 0.3s; }
+        .btn-green:hover { background: #0d7c46; transform: translateY(-2px); }
+
+        .btn-outline { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.7); color: white; padding: 13px 20px; border-radius: 8px; font-size: 14px; font-weight: 700; transition: 0.3s; }
+        .btn-outline:hover { background: white; color: #173d2b; }
+
+        /* STATS */
+        .stats-container { width: 90%; max-width: 1100px; position: absolute; bottom: -60px; left: 50%; transform: translateX(-50%); display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; z-index: 10; }
+        .stat-card { background: #ffffff; color: #173d2b; padding: 40px 15px; border-radius: 12px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .stat-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15); }
+        .stat-card h3 { font-size: 38px; color: #0f8a52; margin-bottom: 5px; font-weight: 900; }
+        .stat-card p { font-size: 11px; font-weight: 800; color: #687970; text-transform: uppercase; }
+
+        /* =========================
+           COMMON & SECTION
+        ========================= */
+        section { padding-left: 5%; padding-right: 5%; }
+        .badge { display: inline-block; padding: 6px 12px; border-radius: 20px; background: #e6f5ec; color: #0f8a52; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; }
+
+        /* MISSION */
+        .mission-content { max-width: 1250px; margin: 0 auto; padding: 70px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; margin-top: 50px; }
+        .mission-text h2 { font-size: 38px; line-height: 1.2; margin: 18px 0; }
+        .mission-text > p { color: #617168; font-size: 15px; margin-bottom: 25px; }
+        .mission-list { list-style: none; display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px; }
+        .mission-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: #43564b; }
+        .mission-list i { color: #13a15c; margin-top: 4px; }
+        .nonprofit-box { display: flex; gap: 12px; padding: 15px; background: #f0f7f2; border-radius: 10px; align-items: center; }
+        .nonprofit-box > i { color: #f2b84b; font-size: 20px; }
+        .nonprofit-box strong { font-size: 14px; }
+        .mission-image { position: relative; }
+        .mission-img-main { width: 100%; height: 380px; object-fit: cover; border-radius: 16px; background-color: #f1f6f3; }
+        .image-caption { position: absolute; bottom: 15px; left: 15px; right: 15px; background: rgba(255,255,255,0.94); padding: 12px 15px; border-radius: 10px; }
+        .image-caption span { color: #0f8a52; font-weight: 800; }
+        .image-caption p { font-size: 13px; color: #405248; }
+
+        /* ACTIVITIES */
+        .activities-section { background: #f0f5f1; padding-top: 70px; padding-bottom: 70px; }
+        .section-header { text-align: center; max-width: 750px; margin: 0 auto 40px; }
+        .section-header h2 { font-size: 34px; margin-bottom: 10px; }
+        .section-header p { color: #65766c; font-size: 14px; }
+        .cards-grid { max-width: 1250px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
+        .activity-card-mission { background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 5px 20px rgba(21,55,38,0.07); }
+        .comparison-img { height: 240px; position: relative; display: grid; grid-template-columns: 1fr 1fr; }
+        .side { position: relative; overflow: hidden; background-color: #e8eee9; }
+        .side img { width: 100%; height: 100%; object-fit: cover; }
+        .tag-badge { position: absolute; top: 12px; z-index: 5; padding: 5px 9px; border-radius: 5px; color: white; font-size: 10px; font-weight: 800; }
+        .tag-badge.red { left: 12px; background: #d94a4a; }
+        .tag-badge.green { right: 12px; background: #159457; }
+        .vs-circle { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 38px; height: 38px; border-radius: 50%; background: white; color: #173d2b; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; z-index: 6; box-shadow: 0 3px 10px rgba(0,0,0,0.15); }
+        .card-body { padding: 18px; }
+        .card-meta { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; color: #849189; margin-bottom: 8px; }
+        .trash-weight { color: #e57b28; font-weight: 700; }
+        .card-body h4 { font-size: 18px; margin-bottom: 15px; }
+        .card-btn { color: #0f8a52; font-size: 12px; font-weight: 800; }
+
+        /* SCHEDULE */
+        .schedule-section { padding-top: 75px; padding-bottom: 75px; background: white; }
+        .schedule-grid { max-width: 1250px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
+        .schedule-card { border: 1px solid #e2e9e4; border-radius: 12px; padding: 25px; background: #fff; }
+        .schedule-status { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .status-tag { padding: 5px 9px; border-radius: 5px; font-size: 10px; font-weight: 800; }
+        .status-tag.opening { background: #e4f6ec; color: #16854d; }
+        .status-tag.upcoming { background: #fff2d8; color: #b27813; }
+        .status-tag.preparing { background: #e7eef7; color: #446b9c; }
+        .volunteers-count { font-size: 10px; color: #748078; }
+        .schedule-card h3 { font-size: 19px; margin-bottom: 18px; }
+        .schedule-info { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .schedule-info li { font-size: 13px; color: #5d6e64; display: flex; gap: 10px; }
+        .schedule-info i { color: #159457; width: 15px; }
+        .view-all-btn { display: block; width: fit-content; margin: 30px auto 0; color: #0f8a52; font-size: 13px; font-weight: 800; }
+
+        /* =========================
+           MAP SECTION 
+        ========================= */
+        .map-section { padding: 70px 5%; background: #f7f9f7; border-top: 1px solid #e5e7eb; }
+        .map-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; flex-wrap: wrap; gap: 20px; max-width: 1250px; margin-left: auto; margin-right: auto; }
+        .map-title-area { max-width: 600px; }
+        .map-title-area h2 { font-size: 34px; color: #111; margin: 15px 0 10px; line-height: 1.2; font-weight: 800; }
+        .map-title-area p { color: #65766c; font-size: 15px; }
+        .map-filters { display: flex; gap: 15px; }
+        .map-search { display: flex; align-items: center; border: 1px solid #d1d5db; border-radius: 8px; padding: 10px 15px; background: #fff; }
+        .map-search i { color: #9ca3af; margin-right: 10px; }
+        .map-search input { border: none; outline: none; font-size: 14px; width: 250px; font-family: inherit; }
+        .map-select { border: 1px solid #d1d5db; border-radius: 8px; padding: 10px 15px; font-size: 14px; outline: none; color: #333; background: #fff; cursor: pointer; font-family: inherit; }
+
+        .map-container { max-width: 1250px; margin: 0 auto; display: flex; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden; height: 700px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); background: white; }
+        .map-sidebar { width: 400px; background: #fff; display: flex; flex-direction: column; border-right: 1px solid #e5e7eb; flex-shrink: 0; z-index: 100; }
+        .sidebar-header { display: flex; justify-content: space-between; padding: 20px 25px; border-bottom: 1px solid #e5e7eb; font-size: 12px; font-weight: 700; color: #6b7280; }
+        .sidebar-list { overflow-y: auto; padding: 20px 25px; display: flex; flex-direction: column; gap: 15px; }
+        .sidebar-list::-webkit-scrollbar { width: 6px; }
+        .sidebar-list::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .sidebar-list::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+
+        .map-card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px; background: #fff; cursor: pointer; transition: 0.3s; }
+        .map-card.active { border: 2px solid #10b981 !important; background: #f2fbf7; }
+        .map-card.warning { border: 1px solid #fde047; }
+        .map-card.completed { border: 1px solid #93c5fd; }
+        .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .card-top h4 { font-size: 15px; color: #111; max-width: 70%; line-height: 1.3; font-weight: 700; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+        .status-badge.cleaning { background: #d1fae5; color: #065f46; }
+        .status-badge.need-help { background: #fef3c7; color: #b45309; }
+        .status-badge.done { background: #dbeafe; color: #1d4ed8; }
+        .status-badge.upcoming { background: #f3e8ff; color: #7e22ce; }
+        .map-card .loc { font-size: 12px; color: #6b7280; margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
+        .card-stats { display: flex; justify-content: space-between; font-size: 12px; color: #9ca3af; }
+        .card-stats strong { display: block; margin-top: 4px; font-size: 13px; }
+        .card-stats .volunteers strong { color: #065f46; }
+        .card-stats .trash strong { color: #ea580c; }
+
+        /* BẢN ĐỒ LEAFLET CONTAINER */
+        .map-view { flex: 1; position: relative; background: #022c22; }
+        #real-map { width: 100%; height: 100%; z-index: 1; }
+        .leaflet-tile { filter: brightness(0.6) sepia(1) hue-rotate(100deg) saturate(2); }
+
+        .map-overlay-top { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 1000; }
+        .map-btn { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 15px; border-radius: 8px; font-size: 12px; font-weight: 600; backdrop-filter: blur(4px); display: flex; align-items: center; gap: 8px; cursor: pointer; }
+
+        /* GIM BẢN ĐỒ CỦA LEAFLET */
+        .custom-leaflet-icon { background: transparent; border: none; }
+        .pin { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: bold; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; transition: 0.3s; background: #047857; margin-top: -16px; margin-left: -16px; }
+        .pin:hover, .pin.active { transform: scale(1.15); background: #ea580c; z-index: 100; width: 40px; height: 40px; font-size: 16px; margin-top: -20px; margin-left: -20px; }
+
+        .map-tooltip { position: absolute; background: #111827; color: white; padding: 8px 15px; border-radius: 8px; font-size: 13px; font-weight: 600; white-space: nowrap; top: -45px; left: 50%; transform: translateX(-50%); box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 20; display: none; }
+        .map-tooltip::after { content: ""; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); border-width: 6px 6px 0; border-style: solid; border-color: #111827 transparent transparent transparent; }
+        .pin.active .map-tooltip, .pin:hover .map-tooltip { display: block; }
+
+        /* KHUNG CHÚ THÍCH DƯỚI BẢN ĐỒ */
+        .map-legend { position: absolute; bottom: 130px; left: 20px; background: #111827; color: white; padding: 10px 15px; border-radius: 8px; font-size: 12px; display: flex; gap: 15px; align-items: center; z-index: 1000; }
+        .map-legend strong { color: #9ca3af; margin-right: 5px; }
+        .map-legend .legend-item { display: flex; align-items: center; gap: 6px; }
+        .map-legend i.circle { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .map-legend i.blue { background: #3b82f6; }
+        .map-legend i.green { background: #10b981; }
+        .map-legend i.yellow { background: #f59e0b; }
+        .map-legend i.purple { background: #a855f7; }
+
+        /* THẺ DETAIL NỔI Ở DƯỚI BẢN ĐỒ */
+        .map-detail-card { position: absolute; bottom: 20px; left: 20px; right: 20px; background: white; border-radius: 12px; padding: 15px; display: flex; gap: 15px; align-items: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 1000; transition: 0.3s; }
+        .map-detail-card img { width: 80px; height: 80px; border-radius: 8px; object-fit: cover; background: #eee; }
+        .map-detail-card .info { flex: 1; }
+        .map-detail-card .tags { margin-bottom: 5px; }
+        .map-detail-card .badge-loc { background: #d1fae5; color: #065f46; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .map-detail-card .date { font-size: 12px; color: #6b7280; margin-left: 10px; }
+        .map-detail-card h3 { font-size: 16px; margin: 0 0 5px 0; color: #111; }
+        .map-detail-card p { font-size: 13px; color: #4b5563; margin: 0; }
+        .map-detail-card .action { display: flex; align-items: center; gap: 20px; text-align: right; }
+        .map-detail-card .amount { font-size: 12px; color: #6b7280; }
+        .map-detail-card .amount strong { color: #ea580c; font-size: 18px; display: block; margin-top: 2px; }
+        .btn-thamgia { background: #10b981; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.3s; }
+        .btn-thamgia:hover { background: #059669; }
+
+        /* =========================
+           DONATE
+        ========================= */
+        .donate-section { background: #173d2b; color: white; padding-top: 70px; padding-bottom: 70px; }
+        .donate-container { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 0.8fr; gap: 70px; align-items: center; }
+        .donate-info h2 { font-size: 38px; line-height: 1.2; margin: 18px 0; }
+        .donate-info > p { color: #cbdad1; font-size: 14px; max-width: 650px; margin-bottom: 25px; }
+        .bank-details { border-top: 1px solid rgba(255,255,255,0.12); padding-top: 18px; }
+        .bank-details p { font-size: 13px; color: #d4e1da; margin-bottom: 7px; }
+        .bank-details span { color: white; font-weight: 700; }
+        .donate-qr { text-align: center; }
+        .qr-img { width: 220px; height: 220px; object-fit: contain; border: 3px dashed rgba(255,255,255,0.7); background: #ffffff; margin: 0 auto 25px; display: block; }
+        .donate-qr h4 { font-size: 18px; margin-bottom: 5px; }
+
+        /* =========================
+           NEWS & STORIES (TIN TỨC)
+        ========================= */
+        .news-section { background: #f0f5f1; padding-top: 75px; padding-bottom: 75px; }
+        .news-grid { max-width: 1250px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        .news-card { background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 5px 20px rgba(21,55,38,0.05); transition: transform 0.3s ease; }
+        .news-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(21,55,38,0.1); }
+        .news-img { width: 100%; height: 200px; object-fit: cover; }
+        .news-body { padding: 25px 20px; }
+        .news-meta { display: flex; gap: 15px; font-size: 12px; color: #6b7280; margin-bottom: 12px; }
+        .news-meta span { display: flex; align-items: center; gap: 5px; }
+        .news-title { font-size: 18px; line-height: 1.4; margin-bottom: 10px; font-weight: 800; }
+        .news-title a { color: #111; transition: color 0.3s; }
+        .news-title a:hover { color: #10b981; }
+        .news-desc { font-size: 14px; color: #4b5563; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .read-more { font-size: 13px; color: #0f8a52; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; }
+        .read-more i { font-size: 10px; transition: transform 0.3s; }
+        .news-card:hover .read-more i { transform: translateX(3px); }
+
+        /* =========================
+           FOOTER
+        ========================= */
+        .footer { background: #10291e; color: white; padding: 60px 5% 25px; }
+        .footer-grid { max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 1fr 0.8fr 1fr; gap: 50px; padding-bottom: 40px; }
+        .footer-col h4 { font-size: 16px; margin-bottom: 15px; }
+        .footer-col > p { color: #b9c7bf; font-size: 13px; line-height: 1.7; }
+        .message-form { display: flex; margin: 15px 0; }
+        .message-form input { flex: 1; border: none; outline: none; padding: 11px; font-size: 12px; border-radius: 6px 0 0 6px; font-family: inherit; }
+        .message-form button { border: none; background: #159457; color: white; padding: 0 15px; border-radius: 0 6px 6px 0; font-weight: 700; cursor: pointer; font-family: inherit; }
+        .footer-logo-area { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; margin-bottom: 15px; }
+        .footer-logo-area img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #2d4a3e; object-fit: cover; background-color: #f3f7f4; }
+        .footer-logo-area span { color: #10b981; }
+        .social-links { display: flex; gap: 12px; margin-top: 20px; }
+        .social-links a { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.08); color: white; text-decoration: none; transition: background 0.3s; font-size: 16px; }
+        .social-links a:hover { background: #10b981; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 15px; }
+        .footer-links a { color: #d1d5db; text-decoration: none; transition: color 0.3s; font-size: 14px; }
+        .footer-links a:hover { color: #10b981; }
+        .contact-info { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+        .contact-info li { display: flex; gap: 15px; align-items: flex-start; font-size: 14px; }
+        .contact-info i { color: #e91e63; font-size: 16px; margin-top: 2px; }
+        .contact-info i.fa-envelope { color: #fff; font-size: 14px; margin-top: 3px; }
+        .footer-bottom { max-width: 1300px; margin: 0 auto; padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #6b7280; }
+        .footer-bottom-links a { color: #6b7280; text-decoration: none; margin-left: 20px; transition: color 0.3s; }
+        .footer-bottom-links a:hover { color: #10b981; }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+        @media (max-width: 1100px) { nav ul { gap: 15px; } .header-actions { gap: 7px; } .search-box { display: none; } .hero h1 { font-size: 48px; } }
+        @media (max-width: 900px) {
+            header { height: auto; min-height: 75px; flex-wrap: wrap; padding: 15px 5%; gap: 15px; }
+            nav { order: 3; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            nav ul { justify-content: flex-start; min-width: max-content; padding: 0 10px 5px 5px; }
+            .mission-content, .donate-container { grid-template-columns: 1fr; }
+            .cards-grid, .schedule-grid, .news-grid { grid-template-columns: 1fr 1fr; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .donate-container { gap: 40px; }
+            .map-container { flex-direction: column-reverse; height: auto; }
+            .map-sidebar { width: 100%; border-right: none; border-top: 1px solid #e5e7eb; max-height: 400px; }
+            .map-view { height: 500px; }
+            .map-header { flex-direction: column; align-items: flex-start; }
+            .map-legend { display: none; }
+            .map-detail-card { flex-wrap: wrap; }
+            .map-detail-card .action { width: 100%; justify-content: space-between; }
+        }
+        @media (max-width: 768px) {
+            .hero { min-height: 720px; padding-top: 80px; }
+            .hero h1 { font-size: 40px; }
+            .hero > p { font-size: 14px; }
+            .hero-actions { flex-direction: column; width: 100%; max-width: 300px; }
+            .hero-actions a { justify-content: center; }
+            .stats-container { width: 90%; grid-template-columns: repeat(2, 1fr); }
+            .stat-card { border-radius: 12px; } 
+            .mission-content { padding: 50px 0; }
+            .mission-text h2 { font-size: 30px; }
+            .mission-img-main { height: 280px; }
+            .cards-grid, .schedule-grid, .news-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; gap: 35px; }
+            .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
+            .map-overlay-top { flex-direction: column; align-items: flex-end; }
+        }
+        @media (max-width: 480px) {
+            .header-actions .btn-join { display: none; }
+            .header-actions .donate-btn { font-size: 10px; padding: 9px 10px; }
+            .hero { min-height: 730px; }
+            .hero h1 { font-size: 32px; }
+            .stats-container { gap: 8px; }
+            .stat-card { padding: 15px 8px; }
+            .stat-card h3 { font-size: 24px; }
+            .stat-card p { font-size: 9px; }
+            .mission-img-main { height: 230px; }
+            .qr-img { width: 180px; height: 180px; }
+            .footer { padding-left: 6%; padding-right: 6%; }
+            .map-filters { flex-direction: column; width: 100%; }
+            .map-search input { width: 100%; }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- =====================================================
+     HEADER 
+===================================================== -->
+<header>
+    <div class="logo-area">
+        <img src="logo.jpg" alt="Logo Hà Nội Xanh">
+        <span>HÀ NỘI<br>XANH</span>
+    </div>
+
+    <nav>
+        <ul>
+            <li><a href="../../" target="_parent" class="active">Trang chủ</a></li>
+            <li><a href="../../ve-ha-noi-xanh" target="_parent">Về Hà Nội Xanh</a></li>
+            <li><a href="../../chien-dich" target="_parent">Chiến dịch</a></li>
+            <li><a href="../../tac-dong" target="_parent">Tác động cộng đồng</a></li>
+            <li><a href="../../tin-tuc" target="_parent">Tin tức & câu chuyện</a></li>
+        </ul>
+    </nav>
+
+    <div class="header-actions">
+        <a href="#" onclick="event.preventDefault(); window.parent.postMessage({type:'hnx:navigate', path:'/tham-gia'}, '*')" class="btn-join">THAM GIA</a>
+        <a href="#quyen-tang" onclick="event.preventDefault(); document.getElementById('quyen-tang')?.scrollIntoView({behavior:'smooth'});" class="donate-btn">
+            <i class="fa-regular fa-heart"></i>
+            QUYÊN TẶNG
+        </a>
+        <a href="#" onclick="event.preventDefault(); window.parent.postMessage({type:'hnx:auth-open', tab:'login'}, '*')" class="btn-login">ĐĂNG NHẬP</a>
+    </div>
+</header>
+
+<!-- =====================================================
+     HERO / BANNER
+===================================================== -->
+<section class="hero">
+    <img class="hero-bg-img" src="trangchu1.jpg" alt="Banner Hà Nội Xanh">
+    <h1>
+        VÌ MỘT HÀ NỘI<br>
+        <span>XANH – SẠCH – ĐẸP</span>
+    </h1>
+    <p>
+        Hà Nội Xanh là nhóm tình nguyện trẻ chung tay làm sạch
+        môi trường sống và lan tỏa lối sống xanh.
+    </p>
+    <div class="hero-actions">
+        <a href="../../chien-dich" target="_parent" class="btn-green">
+            <i class="fa-solid fa-map-location-dot"></i>
+            Xem Bản Đồ Hoạt Động
+        </a>
+        <a href="../../tham-gia" target="_parent" class="btn-outline">
+            <i class="fa-solid fa-calendar-days"></i>
+            Đăng Ký Tình Nguyện
+        </a>
+    </div>
+    <div class="stats-container">
+        <div class="stat-card">
+            <h3>250+</h3>
+            <p>BUỔI RA QUÂN</p>
+        </div>
+        <div class="stat-card">
+            <h3>1,200+</h3>
+            <p>TẤN RÁC VỚT ĐƯỢC</p>
+        </div>
+        <div class="stat-card">
+            <h3>15,000+</h3>
+            <p>TÌNH NGUYỆN VIÊN</p>
+        </div>
+        <div class="stat-card">
+            <h3>40+</h3>
+            <p>TUYẾN SÔNG ĐƯỢC HỒI SINH</p>
+        </div>
+    </div>
+</section>
+
+<!-- =====================================================
+     MISSION
+===================================================== -->
+<section style="margin-top: 60px;">
+    <div class="mission-content">
+        <div class="mission-text">
+            <span class="badge">SỨ MỆNH CỘNG ĐỒNG</span>
+            <h2>Khôi phục lại màu xanh trong lành cho từng góc sông Hà Nội</h2>
+            <p>
+                Được thành lập từ tình yêu môi trường sâu sắc,
+                nhóm Hà Nội Xanh quy tụ những bạn trẻ không ngại
+                khó khăn, lội nước sâu dọn sạch bùn bẩn, rác thải
+                tại sông Tô Lịch, sông Nhuệ, sông Lử, sông Sét...
+            </p>
+            <ul class="mission-list">
+                <li>
+                    <i class="fa-regular fa-circle-check"></i>
+                    <span>Dọn dẹp rác thải trực tiếp tại các điểm nóng sông hồ ô nhiễm nặng.</span>
+                </li>
+                <li>
+                    <i class="fa-regular fa-circle-check"></i>
+                    <span>Tuyên truyền nâng cao ý thức phân loại rác cho cư dân hai bên bờ sông.</span>
+                </li>
+                <li>
+                    <i class="fa-regular fa-circle-check"></i>
+                    <span>Tái chế rác thải nhựa và trồng bổ sung cây xanh ven bờ.</span>
+                </li>
+            </ul>
+            <div class="nonprofit-box">
+                <i class="fa-solid fa-star"></i>
+                <div>
+                    <strong>100% Tinh thần phi lợi nhuận & tự nguyện</strong>
+                    <p style="font-size:13px; color:#666; margin-top:2px;">Tất cả kinh phí và hoạt động được công khai minh bạch.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mission-image">
+            <img class="mission-img-main" src="trangchu2.jpg" alt="Hoạt động Hà Nội Xanh">
+            <div class="image-caption">
+                <span style="font-size:11px;">HÌNH ẢNH THỰC TẾ</span>
+                <p>Các tình nguyện viên trầm mình vớt rác trên dòng sông Tô Lịch</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- =====================================================
+     HOẠT ĐỘNG NỔI BẬT
+===================================================== -->
+<section class="activities-section">
+    <div class="section-header">
+        <h2>HOẠT ĐỘNG NỔI BẬT</h2>
+        <p>So sánh hình ảnh Thực trạng trước khi dọn dẹp và Thành quả sau khi Hà Nội Xanh hoàn thành chiến dịch.</p>
+    </div>
+    
+    <div class="cards-grid">
+        <div class="activity-card-mission">
+            <div class="comparison-img">
+                <span class="tag-badge red">TRƯỚC</span>
+                <div class="side before"><img src="truoc.jpg" alt="Ảnh trước dọn dẹp"></div>
+                <div class="vs-circle">VS</div>
+                <span class="tag-badge green">SAU</span>
+                <div class="side after"><img src="sau.jpg" alt="Ảnh sau dọn dẹp"></div>
+            </div>
+            <div class="card-body">
+                <div class="card-meta">
+                    <span>Đợt 12 – Tháng 08/2026</span>
+                    <span class="trash-weight">3.5 Tấn rác thải</span>
+                </div>
+                <h4>Sông Tô Lịch – Cầu Giấy</h4>
+                <a href="../../chien-dich" target="_parent" class="card-btn">XEM CHI TIẾT ĐIỂM NÀY &rarr;</a>
+            </div>
+        </div>
+
+        <div class="activity-card-mission">
+            <div class="comparison-img">
+                <span class="tag-badge red">TRƯỚC</span>
+                <div class="side before"><img src="truoc.jpg" alt="Ảnh trước dọn dẹp"></div>
+                <div class="vs-circle">VS</div>
+                <span class="tag-badge green">SAU</span>
+                <div class="side after"><img src="sau.jpg" alt="Ảnh sau dọn dẹp"></div>
+            </div>
+            <div class="card-body">
+                <div class="card-meta">
+                    <span>Đợt 08 – Tháng 07/2026</span>
+                    <span class="trash-weight">4.2 Tấn rác thải</span>
+                </div>
+                <h4>Sông Lừ – Khương Trung</h4>
+                <a href="../../chien-dich" target="_parent" class="card-btn">XEM CHI TIẾT ĐIỂM NÀY &rarr;</a>
+            </div>
+        </div>
+
+        <div class="activity-card-mission">
+            <div class="comparison-img">
+                <span class="tag-badge red">TRƯỚC</span>
+                <div class="side before"><img src="truoc.jpg" alt="Ảnh trước dọn dẹp"></div>
+                <div class="vs-circle">VS</div>
+                <span class="tag-badge green">SAU</span>
+                <div class="side after"><img src="sau.jpg" alt="Ảnh sau dọn dẹp"></div>
+            </div>
+            <div class="card-body">
+                <div class="card-meta">
+                    <span>Đợt 15 – Tháng 08/2026</span>
+                    <span class="trash-weight">2.8 Tấn rác thải</span>
+                </div>
+                <h4>Sông Sét – Định Công</h4>
+                <a href="../../chien-dich" target="_parent" class="card-btn">XEM CHI TIẾT ĐIỂM NÀY &rarr;</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- =====================================================
+     LỊCH RA QUÂN
+===================================================== -->
+<section class="schedule-section">
+    <div class="section-header">
+        <h2>Lịch ra quân & Điểm nóng cần viện trợ</h2>
+        <p>Đăng ký tham gia ngay cùng Hà Nội Xanh cuối tuần này để chung tay mang lại diện mạo mới cho các dòng sông.</p>
+    </div>
+    
+    <div class="schedule-grid">
+        <div class="schedule-card">
+            <div class="schedule-status">
+                <span class="status-tag opening">Đang mở đăng ký</span>
+                <span class="volunteers-count"><i class="fa-solid fa-user-group"></i> 50 Tình nguyện viên</span>
+            </div>
+            <h3>Dọn dẹp Sông Lừ – Khương Trung</h3>
+            <ul class="schedule-info">
+                <li><i class="fa-regular fa-calendar"></i> Chủ Nhật, 30/08/2026</li>
+                <li><i class="fa-regular fa-clock"></i> 07:30 - 11:30</li>
+                <li><i class="fa-solid fa-location-dot"></i> Cầu Khương Đình, Thanh Xuân</li>
+            </ul>
+            <a href="../../tham-gia" target="_parent" class="btn-green" style="justify-content:center;width:100%;">Đăng ký tham gia ngay &rarr;</a>
+        </div>
+
+        <div class="schedule-card">
+            <div class="schedule-status">
+                <span class="status-tag upcoming">Sắp diễn ra</span>
+                <span class="volunteers-count"><i class="fa-solid fa-user-group"></i> 80 Tình nguyện viên</span>
+            </div>
+            <h3>Chiến dịch Sông Tô Lịch xanh</h3>
+            <ul class="schedule-info">
+                <li><i class="fa-regular fa-calendar"></i> Thứ Bảy, 05/09/2026</li>
+                <li><i class="fa-regular fa-clock"></i> 08:00 - 12:00</li>
+                <li><i class="fa-solid fa-location-dot"></i> Đoạn Hoàng Quốc Việt, Cầu Giấy</li>
+            </ul>
+            <a href="../../tham-gia" target="_parent" class="btn-green" style="justify-content:center;width:100%;">Đăng ký tham gia ngay &rarr;</a>
+        </div>
+
+        <div class="schedule-card">
+            <div class="schedule-status">
+                <span class="status-tag preparing">Chuẩn bị</span>
+                <span class="volunteers-count"><i class="fa-solid fa-user-group"></i> 30 Tình nguyện viên</span>
+            </div>
+            <h3>Trồng cây ven Sông Kim Ngưu</h3>
+            <ul class="schedule-info">
+                <li><i class="fa-regular fa-calendar"></i> Chủ Nhật, 12/09/2026</li>
+                <li><i class="fa-regular fa-clock"></i> 08:00 - 11:00</li>
+                <li><i class="fa-solid fa-location-dot"></i> Cầu Mai Động, Hai Bà Trưng</li>
+            </ul>
+            <a href="../../tham-gia" target="_parent" class="btn-green" style="justify-content:center;width:100%;">Đăng ký tham gia ngay &rarr;</a>
+        </div>
+    </div>
+    
+    <a href="../../chien-dich" target="_parent" class="view-all-btn">Xem tất cả lịch ra quân &rarr;</a>
+</section>
+
+<!-- =====================================================
+     BẢN ĐỒ TƯƠNG TÁC THỰC TẾ
+===================================================== -->
+<section class="map-section">
+    <div class="map-header">
+        <div class="map-title-area">
+            <span class="badge">BẢN ĐỒ TƯƠNG TÁC</span>
+            <h2>Bản đồ tuyến sông & Điểm nóng Hà Nội Xanh</h2>
+            <p>Theo dõi tiến độ dọn dẹp thực tế, khối lượng rác vớt được và các điểm chuẩn bị ra quân.</p>
+        </div>
+        
+        <div class="map-filters">
+            <div class="map-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Tìm theo khu vực hoặc tên sông">
+            </div>
+            <select class="map-select">
+                <option>Tất cả quận/huyện</option>
+                <option>Quận Cầu Giấy</option>
+                <option>Quận Thanh Xuân</option>
+                <option>Quận Nam Từ Liêm</option>
+                <option>Quận Hoàng Mai</option>
+                <option>Quận Hai Bà Trưng</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="map-container">
+        <!-- CỘT TRÁI: Danh sách điểm dọn dẹp -->
+        <div class="map-sidebar">
+            <div class="sidebar-header">
+                <span>DANH SÁCH ĐIỂM DỌN DẸP (5)</span>
+                <span>TRẠNG THÁI</span>
+            </div>
+            
+            <div class="sidebar-list">
+                <!-- Thẻ 1 -->
+                <div class="map-card active" data-id="1">
+                    <div class="card-top">
+                        <h4>Sông Tô Lịch – Đoạn Hoàng Quốc Việt</h4>
+                        <span class="status-badge cleaning">Đang dọn dẹp</span>
+                    </div>
+                    <div class="loc"><i class="fa-solid fa-location-dot"></i> Quận Cầu Giấy</div>
+                    <div class="card-stats">
+                        <div class="volunteers">Tình nguyện viên:<strong>45 người</strong></div>
+                        <div class="trash">Rác gom được:<strong>1.2 Tấn</strong></div>
+                    </div>
+                </div>
+
+                <!-- Thẻ 2 -->
+                <div class="map-card warning" data-id="2">
+                    <div class="card-top">
+                        <h4>Sông Lừ – Khương Trung</h4>
+                        <span class="status-badge need-help">Cần viện trợ</span>
+                    </div>
+                    <div class="loc"><i class="fa-solid fa-location-dot"></i> Quận Thanh Xuân</div>
+                    <div class="card-stats">
+                        <div class="volunteers">Tình nguyện viên:<strong style="color: #111;">60 người</strong></div>
+                        <div class="trash">Rác gom được:<strong>2.5 Tấn</strong></div>
+                    </div>
+                </div>
+
+                <!-- Thẻ 3 -->
+                <div class="map-card completed" data-id="3">
+                    <div class="card-top">
+                        <h4>Kênh Nhuệ – Từ Liêm</h4>
+                        <span class="status-badge done">Hoàn thành</span>
+                    </div>
+                    <div class="loc"><i class="fa-solid fa-location-dot"></i> Quận Nam Từ Liêm</div>
+                    <div class="card-stats">
+                        <div class="volunteers">Tình nguyện viên:<strong style="color: #111;">85 người</strong></div>
+                        <div class="trash">Rác gom được:<strong style="color: #ea580c;">4.1 Tấn</strong></div>
+                    </div>
+                </div>
+
+                <!-- Thẻ 4 -->
+                <div class="map-card" data-id="4">
+                    <div class="card-top">
+                        <h4>Sông Sét – Định Công</h4>
+                        <span class="status-badge cleaning">Đang dọn dẹp</span>
+                    </div>
+                    <div class="loc"><i class="fa-solid fa-location-dot"></i> Quận Hoàng Mai</div>
+                    <div class="card-stats">
+                        <div class="volunteers">Tình nguyện viên:<strong style="color: #111;">50 người</strong></div>
+                        <div class="trash">Rác gom được:<strong style="color: #ea580c;">1.8 Tấn</strong></div>
+                    </div>
+                </div>
+                
+                <!-- Thẻ 5 -->
+                <div class="map-card" data-id="5">
+                    <div class="card-top">
+                        <h4>Sông Kim Ngưu – Mai Động</h4>
+                        <span class="status-badge upcoming">Sắp ra quân</span>
+                    </div>
+                    <div class="loc"><i class="fa-solid fa-location-dot"></i> Quận Hai Bà Trưng</div>
+                    <div class="card-stats">
+                        <div class="volunteers">Tình nguyện viên:<strong style="color: #111;">30 người</strong></div>
+                        <div class="trash">Rác gom được:<strong style="color: #ea580c;">0 Tấn</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CỘT PHẢI: Khung Bản Đồ Leaflet -->
+        <div class="map-view">
+            <!-- Div chứa bản đồ thực -->
+            <div id="real-map"></div>
+            
+            <div class="map-overlay-top">
+                <div class="map-btn">
+                    <i class="fa-solid fa-circle" style="color: #10b981; font-size: 10px;"></i>
+                    25+ ĐIỂM ĐANG THEO DÕI
+                </div>
+                <div class="map-btn">
+                    <i class="fa-solid fa-layer-group"></i> 
+                    Bản đồ vệ tinh sông ngòi
+                </div>
+            </div>
+
+            <!-- KHUNG CHÚ THÍCH -->
+            <div class="map-legend">
+                <strong>CHÚ THÍCH:</strong>
+                <div class="legend-item"><i class="circle blue"></i> Đã xử lý</div>
+                <div class="legend-item"><i class="circle green"></i> Đang dọn dẹp</div>
+                <div class="legend-item"><i class="circle yellow"></i> Cần viện trợ</div>
+                <div class="legend-item"><i class="circle purple"></i> Sắp ra quân</div>
+            </div>
+
+            <!-- THẺ THÔNG TIN CHI TIẾT DƯỚI BẢN ĐỒ -->
+            <div class="map-detail-card" id="detail-card">
+                <img src="trangchu3.jpg" alt="Hình ảnh khu vực">
+                <div class="info">
+                    <div class="tags">
+                        <span class="badge-loc" id="detail-tag-loc">Cầu Giấy</span>
+                        <span class="date" id="detail-date">Cập nhật: 28/08/2026</span>
+                    </div>
+                    <h3 id="detail-title">Sông Tô Lịch – Đoạn Hoàng Quốc Việt</h3>
+                    <p>Trưởng nhóm: <strong id="detail-leader">Nguyễn Văn Hùng</strong></p>
+                </div>
+                <div class="action">
+                    <div class="amount">
+                        Đã vớt:
+                        <strong id="detail-amount">1.2 Tấn</strong>
+                    </div>
+                    <button class="btn-thamgia">Tham Gia Ngay</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- =====================================================
+     DONATE / QR
+===================================================== -->
+<section class="donate-section" id="quyen-tang">
+    <div class="donate-container">
+        <div class="donate-info">
+            <span class="badge">CHUNG TAY GÓP SỨC</span>
+            <h2>Ủng hộ quỹ hoạt động của<br>Hà Nội Xanh</h2>
+            <p>
+                Mọi đóng góp của bạn đều được sử dụng 100%
+                cho việc mua sắm dụng cụ dọn rác, đồ bảo hộ
+                an toàn cho tình nguyện viên và các hoạt động
+                trồng cây, tái tạo môi trường.
+                Quỹ luôn được công khai minh bạch hàng tháng.
+            </p>
+            <div class="bank-details">
+                <p>Ngân hàng: <span>MB Bank (Ngân hàng Quân Đội)</span></p>
+                <p>Chủ tài khoản: <span>QUY HA NOI XANH</span></p>
+                <p>Số tài khoản: <span>1234 567 890</span></p>
+                <p>Nội dung chuyển khoản: <span>Hovaten - SDT - Ung ho HN Xanh</span></p>
+            </div>
+        </div>
+
+        <div class="donate-qr">
+            <img class="qr-img" src="qr-donate.png" alt="Mã QR quyên góp">
+            <h4>Quét mã để ủng hộ</h4>
+            <p style="font-size:14px; color:#d1d5db; margin:0; line-height:1.5;">
+                Hỗ trợ thanh toán nhanh qua ứng dụng Ngân hàng, Momo, ZaloPay, VNPay...
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- =====================================================
+     NEWS & STORIES (TIN TỨC VÀ CÂU CHUYỆN)
+===================================================== -->
+<section class="news-section">
+    <div class="section-header">
+        <h2>TIN TỨC & CÂU CHUYỆN</h2>
+        <p>Những nỗ lực cống hiến vì môi trường của Hà Nội Xanh được ghi nhận qua các trang báo và cộng đồng.</p>
+    </div>
+
+    <div class="news-grid">
+        <!-- BÀI BÁO 1 -->
+        <div class="news-card">
+            <img class="news-img" src="news-hanoi-xanh.png" alt="Nhà sáng lập Hà Nội Xanh dọn sông Tô Lịch">
+            <div class="news-body">
+                <div class="news-meta">
+                    <span><i class="fa-regular fa-calendar"></i> 10/09/2026</span>
+                    <span><i class="fa-solid fa-newspaper"></i> VnExpress</span>
+                </div>
+                <h3 class="news-title">
+                    <a href="https://vnexpress.net/nha-sang-lap-ha-noi-xanh-nguoi-dan-nem-rac-khi-chung-toi-don-song-to-lich-5118572.html" target="_blank" rel="noopener">
+                        Nhà sáng lập Hà Nội Xanh kể chuyện dọn sông Tô Lịch
+                    </a>
+                </h3>
+                <p class="news-desc">
+                    Nguyễn Tiến Huy chia sẻ hành trình thành lập Hà Nội Xanh, những nguy hiểm khi trực tiếp xuống sông thu gom rác và kế hoạch mở rộng các điểm xanh tại Thủ đô.
+                </p>
+                <a href="https://vnexpress.net/nha-sang-lap-ha-noi-xanh-nguoi-dan-nem-rac-khi-chung-toi-don-song-to-lich-5118572.html" target="_blank" rel="noopener" class="read-more">
+                    Đọc tiếp <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- BÀI BÁO 2 -->
+        <div class="news-card">
+            <img class="news-img" src="news-air-pollution.jpg" alt="Ô nhiễm không khí tại Hà Nội">
+            <div class="news-body">
+                <div class="news-meta">
+                    <span><i class="fa-regular fa-calendar"></i> 02/12/2025</span>
+                    <span><i class="fa-solid fa-newspaper"></i> VnExpress</span>
+                </div>
+                <h3 class="news-title">
+                    <a href="https://vnexpress.net/ha-noi-khuyen-cao-nguoi-dan-han-che-ra-ngoai-khi-khong-khi-o-nhiem-4989005.html" target="_blank" rel="noopener">
+                        Hà Nội khuyến cáo hạn chế ra ngoài khi không khí ô nhiễm
+                    </a>
+                </h3>
+                <p class="news-desc">
+                    Thành phố khuyến cáo người dân, đặc biệt người già, trẻ em và người có bệnh hô hấp, giảm hoạt động ngoài trời trong những ngày chất lượng không khí xuống thấp.
+                </p>
+                <a href="https://vnexpress.net/ha-noi-khuyen-cao-nguoi-dan-han-che-ra-ngoai-khi-khong-khi-o-nhiem-4989005.html" target="_blank" rel="noopener" class="read-more">
+                    Đọc tiếp <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- BÀI BÁO 3 -->
+        <div class="news-card">
+            <img class="news-img" src="news-waste-hanoi.jpg" alt="Rác thải và phế thải trên đường phố Hà Nội">
+            <div class="news-body">
+                <div class="news-meta">
+                    <span><i class="fa-regular fa-calendar"></i> 17/07/2025</span>
+                    <span><i class="fa-solid fa-newspaper"></i> VOV</span>
+                </div>
+                <h3 class="news-title">
+                    <a href="https://vov.vn/xa-hoi/bit-mui-di-hoc-ne-rac-di-lam-ha-noi-co-bat-luc-truoc-rac-thai-va-phe-thai-post1215281.vov" target="_blank" rel="noopener">
+                        “Bịt mũi” đi học, “né rác” đi làm giữa Hà Nội
+                    </a>
+                </h3>
+                <p class="news-desc">
+                    VOV ghi nhận nhiều điểm đổ trộm rác và phế thải xây dựng trên các tuyến phố, vừa gây ô nhiễm vừa cản trở và đe dọa an toàn giao thông.
+                </p>
+                <a href="https://vov.vn/xa-hoi/bit-mui-di-hoc-ne-rac-di-lam-ha-noi-co-bat-luc-truoc-rac-thai-va-phe-thai-post1215281.vov" target="_blank" rel="noopener" class="read-more">
+                    Đọc tiếp <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- NÚT XEM TẤT CẢ TRAFFIC VỀ TRANG TIN TỨC -->
+    <a href="../../tin-tuc" target="_parent" class="view-all-btn">
+        Xem tất cả tin tức & câu chuyện &rarr;
+    </a>
+</section>
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+<footer class="footer">
+    <div class="footer-grid">
+        <div class="footer-col">
+            <h4>Lời nhắn gửi đến Hà Nội Xanh</h4>
+            <p>Chia sẻ ý kiến, thông điệp bảo vệ môi trường hoặc lời động viên đến đội ngũ TNV!</p>
+            <form class="message-form" onsubmit="sendFeedback(event)">
+                <input id="userMsgInput" type="text" placeholder="Nhập lời nhắn..." required>
+                <button type="submit">Gửi lời nhắn</button>
+            </form>
+            <p style="font-size:13px; color:#9ca3af; margin-top:5px;">Chúng tôi luôn trân trọng mọi đóng góp.</p>
+        </div>
+
+        <div class="footer-col">
+            <div class="footer-logo-area">
+                <img src="logo.jpg" alt="Logo Hà Nội Xanh">
+                HÀ NỘI<span>XANH</span>
+            </div>
+            <p>Cùng nhau hành động nhỏ, tạo nên thay đổi lớn cho môi trường Thủ đô.</p>
+            <div class="social-links">
+                <a href="https://www.facebook.com/share/1E6aH1UrUN/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook Hà Nội Xanh">
+                    <i class="fa-brands fa-facebook-f"></i>
+                </a>
+                <a href="https://www.tiktok.com/@hanoi_xanh?_r=1&_t=ZS-99fpzQzUwz4" target="_blank" rel="noopener noreferrer" aria-label="TikTok Hà Nội Xanh">
+                    <i class="fa-brands fa-tiktok"></i>
+                </a>
+                <a href="https://www.youtube.com/@hanoixanh2022?si=U6zihqHg6KA7Em7Q" aria-label="YouTube Hà Nội Xanh">
+                    <i class="fa-brands fa-youtube"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-col">
+            <h4>Liên kết nhanh</h4>
+            <ul class="footer-links">
+                <li><a href="../../" target="_parent">› Trang chủ</a></li>
+                <li><a href="../../ve-ha-noi-xanh" target="_parent">› Về Hà Nội Xanh</a></li>
+                <li><a href="../../chien-dich" target="_parent">› Chiến dịch</a></li>
+                <li><a href="../../tac-dong" target="_parent">› Tác động cộng đồng</a></li>
+                <li><a href="../../tin-tuc" target="_parent">› Tin tức & câu chuyện</a></li>
+                <li><a href="../../tham-gia" target="_parent">› Tham gia</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4>Liên hệ</h4>
+            <ul class="contact-info">
+                <li><i class="fa-solid fa-phone"></i><span>+84 98 723 18 32</span></li>
+                <li><i class="fa-solid fa-envelope"></i><span>hanoixanhh@gmail.com</span></li>
+                <li><i class="fa-solid fa-location-dot"></i><span>117 Xuân Thủy, Phường Dịch Vọng Hậu,<br>Cầu Giấy, Hà Nội</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <div>&copy; 2026 Hà Nội Xanh. All rights reserved.</div>
+        <div class="footer-bottom-links">
+            <a href="#">Điều khoản sử dụng</a>
+            <a href="#">Chính sách bảo mật</a>
+        </div>
+    </div>
+</footer>
+
+<!-- Thư viện bản đồ Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Script khởi tạo Bản đồ thực và gán tương tác -->
+<script>
+    function sendFeedback(event) {
+        event.preventDefault();
+        const input = document.getElementById('userMsgInput');
+        if (!input.value.trim()) return;
+        alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!');
+        input.value = '';
+    }
+    window.addEventListener('message', function(event) {
+        if (event.data?.type !== 'hnx:auth-state') return;
+        const actions = document.querySelector('.header-actions');
+        if (!actions) return;
+        const loginButton = actions.querySelector('.btn-login');
+        if (loginButton) {
+            loginButton.textContent = event.data.user?.name || 'ĐĂNG NHẬP';
+            loginButton.onclick = function(e) {
+                e.preventDefault();
+                if (!event.data.user) window.parent.postMessage({type:'hnx:auth-open', tab:'login'}, '*');
+            };
+        }
+        let link = document.getElementById('adminDashboardLink');
+        if (event.data.user?.role === 'admin') {
+            if (!link) { link = document.createElement('a'); link.id = 'adminDashboardLink'; link.className = 'btn-login'; link.textContent = 'DASHBOARD'; link.href = '#'; link.onclick = function(e) { e.preventDefault(); window.parent.postMessage({ type: 'hnx:navigate', path: '/admin' }, '*'); }; actions.insertBefore(link, actions.lastElementChild); }
+        } else if (link) link.remove();
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        // 1. Cấu hình các điểm trên bản đồ với tọa độ thực tế tại Hà Nội
+        const locations = {
+            1: {
+                title: "Sông Tô Lịch – Đoạn Hoàng Quốc Việt",
+                shortLoc: "Cầu Giấy",
+                date: "Cập nhật: 28/08/2026",
+                leader: "Nguyễn Văn Hùng",
+                amount: "1.2 Tấn",
+                img: "nhap_link_anh_chi_tiet_1.jpg",
+                coords: [21.0456, 105.7951] 
+            },
+            2: {
+                title: "Sông Lừ – Khương Trung",
+                shortLoc: "Thanh Xuân",
+                date: "Cập nhật: 25/08/2026",
+                leader: "Trần Thị Mai",
+                amount: "2.5 Tấn",
+                img: "nhap_link_anh_chi_tiet_2.jpg",
+                coords: [20.9950, 105.8190] 
+            },
+            3: {
+                title: "Kênh Nhuệ – Từ Liêm",
+                shortLoc: "Nam Từ Liêm",
+                date: "Cập nhật: 20/08/2026",
+                leader: "Lê Văn Tuấn",
+                amount: "4.1 Tấn",
+                img: "nhap_link_anh_chi_tiet_3.jpg",
+                coords: [21.0315, 105.7533] 
+            },
+            4: {
+                title: "Sông Sét – Định Công",
+                shortLoc: "Hoàng Mai",
+                date: "Cập nhật: 30/08/2026",
+                leader: "Phạm Hoàng",
+                amount: "1.8 Tấn",
+                img: "nhap_link_anh_chi_tiet_4.jpg",
+                coords: [20.9830, 105.8420] 
+            },
+            5: {
+                title: "Sông Kim Ngưu – Mai Động",
+                shortLoc: "Hai Bà Trưng",
+                date: "Cập nhật: 01/09/2026",
+                leader: "Vũ Nam",
+                amount: "0 Tấn",
+                img: "nhap_link_anh_chi_tiet_5.jpg",
+                coords: [20.9972, 105.8625] 
+            }
+        };
+
+        const map = L.map('real-map', {zoomControl: false}).setView([21.015, 105.805], 12);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 18,
+        }).addTo(map);
+
+        const markers = {};
+        const cards = document.querySelectorAll(".map-card");
+
+        const detailImg = document.getElementById("detail-img");
+        const detailTagLoc = document.getElementById("detail-tag-loc");
+        const detailDate = document.getElementById("detail-date");
+        const detailTitle = document.getElementById("detail-title");
+        const detailLeader = document.getElementById("detail-leader");
+        const detailAmount = document.getElementById("detail-amount");
+
+        Object.keys(locations).forEach(id => {
+            const loc = locations[id];
+            const iconHTML = `
+                <div class="pin ${id == 1 ? 'active' : ''}" id="pin-${id}" data-id="${id}">
+                    ${id}
+                    <div class="map-tooltip">${loc.title}</div>
+                </div>
+            `;
+            const customIcon = L.divIcon({
+                className: 'custom-leaflet-icon',
+                html: iconHTML,
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
+            });
+            const marker = L.marker(loc.coords, { icon: customIcon }).addTo(map);
+            markers[id] = marker;
+
+            marker.on('click', function() {
+                activateLocation(id);
+            });
+        });
+
+        function activateLocation(id) {
+            document.querySelectorAll('.pin').forEach(pin => {
+                if (pin.getAttribute("data-id") == id) {
+                    pin.classList.add("active");
+                } else {
+                    pin.classList.remove("active");
+                }
+            });
+
+            cards.forEach(card => {
+                if (card.getAttribute("data-id") == id) {
+                    card.classList.add("active");
+                    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    card.classList.remove("active");
+                }
+            });
+
+            const data = locations[id];
+            if (data) {
+                detailImg.src = data.img;
+                detailTagLoc.textContent = data.shortLoc;
+                detailDate.textContent = data.date;
+                detailTitle.textContent = data.title;
+                detailLeader.textContent = data.leader;
+                detailAmount.textContent = data.amount;
+                map.flyTo(data.coords, 14, { animate: true, duration: 1.2 });
+            }
+        }
+
+        cards.forEach(card => {
+            card.addEventListener("click", function() {
+                activateLocation(this.getAttribute("data-id"));
+            });
+        });
+        
+        setTimeout(() => activateLocation(1), 500);
+    });
+</script>
+
+</body>
+</html>
