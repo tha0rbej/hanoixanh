@@ -84,6 +84,11 @@
       height: 42px;
     }
     .btn-login-custom:hover { background: var(--primary-light); }
+    .account-menu { position: relative; display: inline-flex; }
+    .account-menu .account-dropdown { display: none; position: absolute; right: 0; top: calc(100% + 8px); min-width: 150px; padding: 6px; border: 1px solid #d1fae5; border-radius: 10px; background: #fff; box-shadow: 0 8px 24px rgba(0,0,0,.14); z-index: 20; }
+    .account-menu.open .account-dropdown { display: block; }
+    .account-dropdown button { width: 100%; border: 0; border-radius: 7px; background: transparent; padding: 9px 12px; text-align: left; color: #b91c1c; font-weight: 700; cursor: pointer; }
+    .account-dropdown button:hover { background: #fef2f2; }
 
     /* VIEW 1: CHIẾN DỊCH */
     #page-chien-dich { display: block; }
@@ -397,7 +402,7 @@
     <div class="header-actions">
       <a onclick="navigateParent('/tham-gia')" class="btn-join">THAM GIA</a>
       <a href="#" class="donate-btn" onclick="event.preventDefault(); openDonateModal()"><i class="fa-regular fa-heart"></i> QUYÊN TẶNG</a>
-      <a onclick="handleHeaderAuthClick()" class="btn-login" id="headerLoginBtn">ĐĂNG NHẬP</a>
+      <div class="account-menu" id="accountMenu"><a onclick="handleHeaderAuthClick()" class="btn-login" id="headerLoginBtn">ĐĂNG NHẬP</a><div class="account-dropdown"><button type="button" onclick="handleLogout(); document.getElementById('accountMenu').classList.remove('open')">Đăng xuất</button></div></div>
     </div>
   </header>
 
@@ -633,7 +638,6 @@
               <p style="font-size: 14px; color: var(--text-sub);">Mã TNV: <strong>#HNX-0934</strong> | Cấp độ: <span style="color: var(--primary); font-weight: bold;" id="uLevel">Tình nguyện viên tích cực</span></p>
               <div class="profile-btn-group">
                 <button class="btn-edit-profile" onclick="openEditProfileModal()">Chỉnh sửa hồ sơ</button>
-                <button class="btn-logout-profile" onclick="handleLogout()">Đăng xuất</button>
               </div>
             </div>
           </div>
@@ -757,14 +761,6 @@
         <h1>Tin tức và câu chuyện</h1>
         <p>Cùng cập nhật kiến thức, xu hướng môi trường<br>và những hành động xanh vì một Hà Nội bền vững hơn.</p>
         <span style="font-size: 80px;" class="news-hero-icon">🌱</span>
-      </div>
-
-      <div class="news-filter-tabs">
-        <a class="news-filter-btn active">📁 Tất cả</a>
-        <a class="news-filter-btn">🌿 Góc xanh</a>
-        <a class="news-filter-btn">📰 Báo tin tức</a>
-        <a class="news-filter-btn">📦 Ấn phẩm</a>
-        <a class="news-filter-btn">🎙️ Podcast</a>
       </div>
 
       <div class="news-layout">
@@ -1155,12 +1151,9 @@
     }
 
     function handleHeaderAuthClick() {
+      if (currentUser) { document.getElementById('accountMenu')?.classList.toggle('open'); return; }
       if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:auth-open', tab: 'login' }, '*'); return; }
-      if (currentUser) {
-        switchMainView('tac-dong');
-      } else {
-        openAuthModal('login');
-      }
+      openAuthModal('login');
     }
 
     function handleLoginAction(e) {
@@ -1240,6 +1233,7 @@
         loggedOutBox.style.display = 'flex';
         loggedInBox.style.display = 'none';
         loginHeaderBtn.innerText = "ĐĂNG NHẬP";
+        document.getElementById('accountMenu')?.classList.remove('open');
       }
     }
 
