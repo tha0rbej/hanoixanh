@@ -934,6 +934,7 @@
         event.preventDefault();
         const input = document.getElementById('userMsgInput');
         if (!input.value.trim()) return;
+        if (window.parent !== window) window.parent.postMessage({ type: 'hnx:contact-message', description: input.value.trim() }, '*');
         alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!');
         input.value = '';
     }
@@ -946,7 +947,10 @@
             loginButton.textContent = event.data.user?.name || 'ĐĂNG NHẬP';
             loginButton.onclick = function(e) {
                 e.preventDefault();
-                if (!event.data.user) window.parent.postMessage({type:'hnx:auth-open', tab:'login'}, '*');
+                if (!event.data.user) { window.parent.postMessage({type:'hnx:auth-open', tab:'login'}, '*'); return; }
+                let menu = document.getElementById('homeAccountMenu');
+                if (!menu) { menu = document.createElement('button'); menu.id = 'homeAccountMenu'; menu.textContent = 'Đăng xuất'; menu.style.cssText = 'position:absolute;right:0;top:calc(100% + 10px);z-index:20;width:185px;padding:16px;border:1px solid #d1fae5;border-radius:14px;background:#fff;color:#b91c1c;font-weight:700;font-size:13px;line-height:1.2;box-shadow:0 12px 30px rgba(0,0,0,.12);cursor:pointer;text-align:left'; loginButton.parentElement.style.position = 'relative'; loginButton.parentElement.appendChild(menu); menu.onclick = function() { window.parent.postMessage({type:'hnx:signout'}, '*'); menu.remove(); }; }
+                else menu.remove();
             };
         }
         let link = document.getElementById('adminDashboardLink');

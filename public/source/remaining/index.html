@@ -1421,6 +1421,7 @@
         if (currentUser?.role === 'admin' && actions && !link) { link = document.createElement('a'); link.id = 'adminDashboardLink'; link.className = 'btn-login'; link.textContent = 'DASHBOARD'; link.href = '#'; link.onclick = function(e) { e.preventDefault(); window.parent.postMessage({ type: 'hnx:navigate', path: '/admin' }, '*'); }; actions.insertBefore(link, actions.lastElementChild); }
         if (currentUser?.role !== 'admin' && link) link.remove();
       }
+      if (event.data?.type === 'hnx:registered-campaigns') { window.hnxRegisteredCampaigns = event.data.keys || []; }
       if (event.data?.type === 'hnx:campaign-register-result') {
         if (event.data.ok) { document.getElementById('zaloGroupSection').style.display = 'block'; document.getElementById('mBtnJoin').style.display = 'none'; alert('Đăng ký tham gia thành công! Vui lòng quét mã QR hoặc bấm link Zalo bên dưới để vào nhóm.'); } else alert(event.data.message || 'Không thể đăng ký chiến dịch.');
       }
@@ -1435,9 +1436,25 @@
       e.preventDefault();
       const input = document.getElementById('userMsgInput');
       if (!input.value.trim()) return;
+      if (window.parent !== window) window.parent.postMessage({ type: 'hnx:contact-message', description: input.value.trim() }, '*');
       alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!');
       input.value = '';
     }
+
+    window.addEventListener('message', function(event) {
+      if (event.data?.type !== 'hnx:campaigns-data' || !Array.isArray(event.data.campaigns)) return;
+      const groups = { upcoming: document.getElementById('pane-upcoming'), completed: document.getElementById('pane-completed') };
+      groups.upcoming.innerHTML = ''; groups.completed.innerHTML = '';
+      event.data.campaigns.forEach(function(c) {
+        const ended = c.status === 'completed';
+        const pane = ended ? groups.completed : groups.upcoming;
+        const card = document.createElement('div'); card.className = 'camp-card';
+        card.innerHTML = '<div class="card-thumb"><span class="badge-card">' + (ended ? 'Đã diễn ra' : 'Sắp diễn ra') + '</span>' + (c.image_url ? '<img src="' + c.image_url + '" alt="">' : '') + '</div><div class="card-info"><h4></h4><div class="card-meta-line">📍 ' + (c.location || '') + '</div><div class="card-meta-line">📅 ' + new Date(c.start_at).toLocaleString('vi-VN') + '</div><div class="card-desc"></div><div class="card-bottom"><span class="card-members">👥 ' + (c.capacity || '') + ' người tham gia</span><button class="btn-view">Xem chi tiết →</button></div></div>';
+        card.querySelector('h4').textContent = c.title || ''; card.querySelector('.card-desc').textContent = c.description || '';
+        campaignDetails[c.id] = { isCompleted: ended, title: c.title || '', meta: '📍 ' + (c.location || '') + ' | 📅 ' + new Date(c.start_at).toLocaleString('vi-VN'), status: c.pollution_status || c.description || '', action: (c.action_plan || '') + (c.support_equipment ? '\n\n🛡️ Trang bị hỗ trợ: ' + c.support_equipment : '') };
+        card.querySelector('.btn-view').onclick = function() { openDetailModal(c.id); }; pane.appendChild(card);
+      });
+    });
 
     const knownCampaignLocations = [
       { name: "Quận Tây Hồ (Chợ Tứ Liên & Âu Cơ)", keywords: ["tây hồ", "tay ho", "chợ tứ liên", "tứ liên", "âu cơ", "236 âu cơ"], lat: 21.065, lng: 105.820, status: "Đã xử lý", color: "#10b981", desc: "Dọn sạch rác dềnh sau mưa tại Chợ Tứ Liên & Ngõ 236 Âu Cơ.", count: 2 },

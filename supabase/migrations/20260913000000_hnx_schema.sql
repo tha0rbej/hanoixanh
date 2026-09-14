@@ -49,6 +49,31 @@ create table if not exists public.posts (
   category text not null default 'Báo tin tức', status public.content_status not null default 'draft',
   author_id uuid references public.profiles(id), published_at timestamptz, created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
+create table if not exists public.contact_messages (id uuid primary key default gen_random_uuid(), name text not null default '', email text not null, message text not null, user_id uuid references public.profiles(id) on delete set null, status text not null default 'new', created_at timestamptz not null default now());
+create table if not exists public.partners (id uuid primary key default gen_random_uuid(), name text not null, email text, phone text, organization text, status text not null default 'active', created_at timestamptz not null default now());
+create table if not exists public.volunteer_registrations (id uuid primary key default gen_random_uuid(), user_id uuid not null references public.profiles(id) on delete cascade, name text not null, email text not null, phone text, created_at timestamptz not null default now());
+alter table public.volunteer_registrations enable row level security;
+drop policy if exists volunteer_create on public.volunteer_registrations;
+create policy volunteer_create on public.volunteer_registrations for insert with check (user_id = auth.uid());
+drop policy if exists volunteer_admin_read on public.volunteer_registrations;
+create policy volunteer_admin_read on public.volunteer_registrations for select using (public.is_admin() or user_id = auth.uid());
+alter table public.campaigns add column if not exists pollution_status text not null default '';
+alter table public.campaigns add column if not exists action_plan text not null default '';
+alter table public.campaigns add column if not exists support_equipment text not null default '';
+create unique index if not exists one_volunteer_registration_per_user on public.campaign_registrations (user_id);
+create unique index if not exists one_volunteer_per_email on public.volunteer_registrations (lower(email));
+create unique index if not exists one_partner_per_email on public.partners (lower(email)) where email is not null and email <> '';
+insert into public.campaigns (title, description, status, start_at, end_at, location, capacity)
+select 'Ra quân làm sạch kênh mương - Xanh bầu trời', 'Hưởng ứng Ngày Không khí sạch quốc tế. Vớt bèo tây và rác nhựa khơi thông dòng chảy.', 'upcoming', '2026-09-12 06:15:00+07', '2026-09-12 12:00:00+07', 'Đường CN8, P. Xuân Phương, Hà Nội', 100
+where not exists (select 1 from public.campaigns where title = 'Ra quân làm sạch kênh mương - Xanh bầu trời');
+insert into public.campaigns (title, description, status, start_at, end_at, location, capacity, image_url)
+select * from (values
+ ('Dọn dẹp rác đỉnh sau mưa lũ tại Chợ Tứ Liên', 'Sau mưa lớn, rác sinh hoạt tràn vào khu dân cư. Dọn bùn rác và khơi thông lối đi.', 'completed', '2026-07-27 07:00:00+07'::timestamptz, '2026-07-27 12:00:00+07'::timestamptz, 'Chợ Tứ Liên, Tây Hồ, Hà Nội', 45, 'Picture1.jpg'),
+ ('Chủ nhật xanh tại Ngõ 236 Âu Cơ', 'Dọn sạch mặt bằng và vận chuyển rác thải xây dựng ven ngõ.', 'completed', '2026-07-12 06:30:00+07'::timestamptz, '2026-07-12 12:00:00+07'::timestamptz, 'Ngõ 236 Âu Cơ, P. Hồng Hà, Hà Nội', 80, 'Picture10.jpg'),
+ ('Trục vớt bãi rác tự phát bãi bồi Cầu Long Biên', 'Phát quang và thu gom an toàn rác thải lâu năm.', 'completed', '2026-06-15 07:00:00+07'::timestamptz, '2026-06-15 12:00:00+07'::timestamptz, 'Chân Cầu Long Biên, Hoàn Kiếm', 90, 'Picture9.jpg'),
+ ('Chiến dịch Chung tay vì Thủ đô tại Xóm Quán', 'Nạo vét khơi thông dòng chảy và tuyên truyền phân loại rác.', 'completed', '2026-05-31 07:00:00+07'::timestamptz, '2026-05-31 12:00:00+07'::timestamptz, 'Xã Đại Thanh, Hà Nội', 150, 'Picture8.jpg')
+) as seed(title,description,status,start_at,end_at,location,capacity,image_url)
+where not exists (select 1 from public.campaigns c where c.title = seed.title);
 
 create or replace function public.is_admin() returns boolean language sql stable security definer set search_path = public as $$
   select exists (select 1 from public.profiles where id = auth.uid() and role = 'admin');
@@ -69,6 +94,8 @@ alter table public.campaign_registrations enable row level security;
 alter table public.pollution_reports enable row level security;
 alter table public.cleanup_points enable row level security;
 alter table public.posts enable row level security;
+alter table public.contact_messages enable row level security;
+alter table public.partners enable row level security;
 
 drop policy if exists profiles_read on public.profiles;
 create policy profiles_read on public.profiles for select using (id = auth.uid() or public.is_admin());
@@ -103,6 +130,14 @@ drop policy if exists posts_public_read on public.posts;
 create policy posts_public_read on public.posts for select using (status = 'published' or public.is_admin());
 drop policy if exists posts_admin_write on public.posts;
 create policy posts_admin_write on public.posts for all using (public.is_admin()) with check (public.is_admin());
+drop policy if exists contact_messages_create on public.contact_messages;
+create policy contact_messages_create on public.contact_messages for insert with check (true);
+drop policy if exists contact_messages_admin_read on public.contact_messages;
+create policy contact_messages_admin_read on public.contact_messages for select using (public.is_admin());
+drop policy if exists contact_messages_admin_write on public.contact_messages;
+create policy contact_messages_admin_write on public.contact_messages for update using (public.is_admin()) with check (public.is_admin());
+drop policy if exists partners_admin_all on public.partners;
+create policy partners_admin_all on public.partners for all using (public.is_admin()) with check (public.is_admin());
 
 insert into storage.buckets (id, name, public) values ('hnx-media', 'hnx-media', true) on conflict (id) do nothing;
 drop policy if exists hnx_media_public_read on storage.objects;

@@ -4,7 +4,7 @@ import { useAuth } from "./AuthContext"
 import { tableDelete, tableInsert, tableSelect, tableUpdate, uploadPublicFile } from "../lib/supabase"
 
 type Row = Record<string, unknown> & { id: string }
-type Tab = "overview" | "reports" | "campaigns" | "posts" | "points"
+type Tab = "overview" | "messages" | "reports" | "campaigns" | "posts" | "people" | "points"
 
 const emptyCampaign = { title: "", description: "", status: "upcoming", start_at: "", end_at: "", location: "", latitude: "", longitude: "", capacity: "" }
 const emptyPost = { title: "", content: "", excerpt: "", image_url: "", source_name: "", source_url: "", category: "Báo tin tức", status: "draft" }
@@ -19,7 +19,7 @@ export function AdminDashboard({ onLogin }: { onLogin?: () => void }) {
   const [tab, setTab] = useState<Tab>("overview")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const [rows, setRows] = useState<Record<string, Row[]>>({ profiles: [], registrations: [], reports: [], campaigns: [], posts: [], points: [] })
+  const [rows, setRows] = useState<Record<string, Row[]>>({ profiles: [], registrations: [], reports: [], campaigns: [], posts: [], messages: [], partners: [] })
   const [campaign, setCampaign] = useState(emptyCampaign)
   const [post, setPost] = useState(emptyPost)
   const [point, setPoint] = useState(emptyPoint)
@@ -31,15 +31,16 @@ export function AdminDashboard({ onLogin }: { onLogin?: () => void }) {
     if (!session) return
     setLoading(true); setError("")
     try {
-      const [profiles, registrations, reports, campaigns, posts, points] = await Promise.all([
+      const [profiles, registrations, reports, campaigns, posts, messages, partners] = await Promise.all([
         tableSelect<Row>("profiles", "*", session.access_token),
         tableSelect<Row>("campaign_registrations", "*, campaigns(title)", session.access_token, "&order=created_at.desc&limit=50"),
-        tableSelect<Row>("pollution_reports", "*", session.access_token, "&order=created_at.desc&limit=50"),
+        tableSelect<Row>("pollution_reports", "*, profiles(email,full_name)", session.access_token, "&order=created_at.desc&limit=50"),
         tableSelect<Row>("campaigns", "*", session.access_token, "&order=start_at.desc"),
         tableSelect<Row>("posts", "*", session.access_token, "&order=created_at.desc"),
-        tableSelect<Row>("cleanup_points", "*", session.access_token, "&order=created_at.desc"),
+        tableSelect<Row>("contact_messages", "*", session.access_token, "&order=created_at.desc").catch(() => []),
+        tableSelect<Row>("partners", "*", session.access_token, "&order=created_at.desc").catch(() => []),
       ])
-      setRows({ profiles, registrations, reports, campaigns, posts, points })
+      setRows({ profiles, registrations, reports, campaigns, posts, messages, partners })
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Không tải được dữ liệu dashboard.") }
     finally { setLoading(false) }
   }, [session])
@@ -48,7 +49,7 @@ export function AdminDashboard({ onLogin }: { onLogin?: () => void }) {
 
   async function createCampaign(event: FormEvent) {
     event.preventDefault(); if (!session) return
-    try { const payload = { ...campaign, latitude: Number(campaign.latitude), longitude: Number(campaign.longitude), capacity: campaign.capacity ? Number(campaign.capacity) : null }; if (editingCampaignId) await tableUpdate("campaigns", `id=eq.${editingCampaignId}`, payload, session.access_token); else await tableInsert("campaigns", payload, session.access_token); setCampaign(emptyCampaign); setEditingCampaignId(null); await load() }
+    try { const { latitude, longitude, ...rest } = campaign; const payload = { ...rest, capacity: campaign.capacity ? Number(campaign.capacity) : null }; if (editingCampaignId) await tableUpdate("campaigns", `id=eq.${editingCampaignId}`, payload, session.access_token); else await tableInsert("campaigns", payload, session.access_token); setCampaign(emptyCampaign); setEditingCampaignId(null); await load() }
     catch (cause) { setError(cause instanceof Error ? cause.message : "Không tạo được chiến dịch.") }
   }
   async function createPost(event: FormEvent) {
@@ -81,7 +82,7 @@ export function AdminDashboard({ onLogin }: { onLogin?: () => void }) {
     ["Người dùng", rows.profiles.length, "👥"],
     ["Lượt đăng ký", rows.registrations.length, "📋"],
     ["Báo cáo ô nhiễm", rows.reports.length, "📍"],
-    ["Điểm dọn dẹp", rows.points.length, "🌱"],
+    ["Lời nhắn mới", rows.messages.filter((row) => value(row, "status") === "new").length, "✉️"],
   ], [rows])
 
   if (!profile || profile.role !== "admin") return <main className="admin-locked"><div><h1>{profile ? "Không có quyền truy cập" : "Đăng nhập quản trị"}</h1><p>{profile ? "Tài khoản hiện tại không có vai trò admin." : "Đăng nhập bằng tài khoản admin để mở dashboard."}</p>{!profile && onLogin && <button className="auth-primary" onClick={onLogin}>ĐĂNG NHẬP</button>} <a href="/">Về trang chủ</a></div></main>
