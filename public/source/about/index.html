@@ -1819,7 +1819,7 @@
         if (event.data.ok) { document.getElementById('zaloGroupSection').style.display = 'block'; document.getElementById('mBtnJoin').style.display = 'none'; alert('Đăng ký tham gia thành công! Vui lòng quét mã QR hoặc bấm link Zalo bên dưới để vào nhóm.'); } else alert(event.data.message || 'Không thể đăng ký chiến dịch.');
       }
       if (event.data?.type === 'hnx:pollution-report-result') {
-        if (event.data.ok) document.getElementById('successModal').style.display = 'flex'; else alert(event.data.message || 'Không thể gửi báo cáo.');
+        if (event.data.ok) { document.querySelector('#successModal p').textContent = 'Cảm ơn bạn đã báo điểm ô nhiễm. Thông tin đã được ghi nhận!'; document.getElementById('successModal').style.display = 'flex'; } else alert(event.data.message || 'Không thể gửi báo cáo.');
       }
     });
 
@@ -1838,7 +1838,7 @@
       alert("Đăng ký đối tác thành công! Cảm ơn sự đồng hành của quý tổ chức/doanh nghiệp.");
       e.target.reset();
     }
-    window.addEventListener('message', function(event) { if (event.data?.type === 'hnx:participation-result') alert(event.data.ok ? 'Đăng ký thành công!' : (event.data.message || 'Email này đã đăng ký trước đó.')); });
+    window.addEventListener('message', function(event) { if (event.data?.type === 'hnx:participation-result') alert(event.data.ok ? 'Cảm ơn bạn đã trở thành tình nguyện viên của Hà Nội Xanh!' : (event.data.message || 'Email này đã đăng ký trước đó.')); });
 
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
@@ -1847,11 +1847,13 @@
       const input = document.getElementById('userMsgInput');
       const messageText = input.value.trim();
       if (!messageText) return;
+      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:contact-message', description: messageText }, '*'); return; }
       alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!');
       input.value = '';
     }
 
     window.addEventListener('message', function(event) {
+      if (event.data?.type === 'hnx:contact-message-result') { if (event.data.ok) { alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!'); document.getElementById('userMsgInput').value = ''; } else alert(event.data.message || 'Không thể gửi lời nhắn.'); return; }
       if (event.data?.type !== 'hnx:campaigns-data' || !Array.isArray(event.data.campaigns)) return;
       const groups = { upcoming: document.getElementById('pane-upcoming'), completed: document.getElementById('pane-completed') };
       if (!groups.upcoming || !groups.completed) return;
