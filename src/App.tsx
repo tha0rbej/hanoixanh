@@ -73,7 +73,7 @@ function SourceFrame({
         return
       }
       if (message?.type === "hnx:contact-message") {
-        void tableInsert("contact_messages", { name: message.fullName || "Khách", email: message.email || "", message: message.description || "", user_id: session?.user.id || null }, session?.access_token || "")
+        void tableInsert("contact_messages", { name: message.fullName || profile?.full_name || "Khách chưa đăng nhập", email: message.email || profile?.email || "", message: message.description || "", user_id: session?.user.id || null }, session?.access_token || "")
           .then(() => frameRef.current?.contentWindow?.postMessage({ type: "hnx:contact-message-result", ok: true }, window.location.origin))
           .catch((error: Error) => frameRef.current?.contentWindow?.postMessage({ type: "hnx:contact-message-result", ok: false, message: error.message }, window.location.origin))
         return
@@ -110,18 +110,27 @@ function SourceFrame({
     }
     window.addEventListener("message", receiveNavigation)
     return () => window.removeEventListener("message", receiveNavigation)
-  }, [location.pathname, navigate, onAuth, refreshProfile, session, signOut])
+  }, [location.pathname, navigate, onAuth, profile, refreshProfile, session, signOut])
 
   useEffect(() => {
     frameRef.current?.contentWindow?.postMessage({ type: "hnx:auth-state", user: profile ? { id: profile.id, name: profile.full_name, email: profile.email, phone: profile.phone, role: profile.role, camps: 0, hours: 0, trash: 0 } : null }, window.location.origin)
   }, [profile])
 
   const handleFrameLoad = () => {
+    if (page === "home") frameRef.current?.contentWindow?.postMessage({ type: "hnx:scroll-top" }, window.location.origin)
     frameRef.current?.contentWindow?.postMessage({ type: "hnx:auth-state", user: profile ? { id: profile.id, name: profile.full_name, email: profile.email, phone: profile.phone, role: profile.role, camps: 0, hours: 0, trash: 0 } : null }, window.location.origin)
     const token = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
-    if (token && page !== "home") void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/campaigns?select=*&order=start_at.desc`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(campaigns => frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaigns-data", campaigns }, window.location.origin))
+    if (token) void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/campaigns?select=*&order=start_at.desc`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(campaigns => frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaigns-data", campaigns }, window.location.origin))
+    if (token) void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/homepage_metrics?select=metric_key,metric_value`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(metrics => frameRef.current?.contentWindow?.postMessage({ type: "hnx:homepage-metrics", metrics }, window.location.origin))
     if (session) void tableSelect<{ campaign_key: string | null }>("campaign_registrations", "campaign_key", session.access_token, `&user_id=eq.${encodeURIComponent(session.user.id)}`).then(items => frameRef.current?.contentWindow?.postMessage({ type: "hnx:registered-campaigns", keys: items.map(x => x.campaign_key).filter(Boolean) }, window.location.origin))
   }
+
+  useEffect(() => {
+    if (page !== "home") return
+    frameRef.current?.contentWindow?.postMessage({ type: "hnx:scroll-top" }, window.location.origin)
+    const timer = window.setTimeout(() => frameRef.current?.contentWindow?.postMessage({ type: "hnx:scroll-top" }, window.location.origin), 100)
+    return () => window.clearTimeout(timer)
+  }, [page, source])
 
   useEffect(() => {
     if (!frameRef.current?.contentWindow || page === "home") return

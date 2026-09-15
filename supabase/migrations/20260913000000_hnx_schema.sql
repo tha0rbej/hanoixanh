@@ -51,7 +51,28 @@ create table if not exists public.posts (
 );
 create table if not exists public.contact_messages (id uuid primary key default gen_random_uuid(), name text not null default '', email text not null, message text not null, user_id uuid references public.profiles(id) on delete set null, status text not null default 'new', created_at timestamptz not null default now());
 create table if not exists public.partners (id uuid primary key default gen_random_uuid(), name text not null, email text, phone text, organization text, status text not null default 'active', created_at timestamptz not null default now());
+create table if not exists public.homepage_metrics (
+  id uuid primary key default gen_random_uuid(),
+  metric_key text not null unique,
+  metric_value jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now(),
+  updated_by uuid references public.profiles(id)
+);
+insert into public.homepage_metrics (metric_key, metric_value) values
+('overview', '{"campaigns":250,"volunteers":1200,"trash_tons":350,"cleaned_km":50}'::jsonb),
+('monthly_waste', '{"2026-05":62,"2026-06":78,"2026-07":84,"2026-08":71,"2026-09":55}'::jsonb),
+('impact_tiers', '[{"amount":100000,"text":"Một bộ đồ bảo hộ và găng tay"},{"amount":500000,"text":"Dụng cụ thu gom cho một đội"},{"amount":2000000,"text":"Xử lý rác cho một buổi quy mô lớn"}]'::jsonb)
+on conflict (metric_key) do nothing;
 create table if not exists public.volunteer_registrations (id uuid primary key default gen_random_uuid(), user_id uuid not null references public.profiles(id) on delete cascade, name text not null, email text not null, phone text, created_at timestamptz not null default now());
+insert into public.posts (title, slug, content, excerpt, image_url, source_name, source_url, category, status, published_at)
+select seed.title, seed.slug, seed.content, seed.excerpt, seed.image_url, seed.source_name, seed.source_url, seed.category, 'published', seed.published_at
+from (values
+ ('Nhà sáng lập Hà Nội Xanh: Người dân ném rác khi chúng tôi dọn sông Tô Lịch', 'nha-sang-lap-ha-noi-xanh-don-song-to-lich', 'Câu chuyện về hành trình làm sạch các dòng sông Hà Nội, những rủi ro của tình nguyện viên và kế hoạch mở rộng điểm xanh trên toàn thành phố.', 'Câu chuyện thật về hành trình làm sạch các dòng sông Hà Nội.', 'news-hanoi-xanh.png', 'VnExpress', 'https://vnexpress.net', 'Báo tin tức', '2026-09-10'::timestamptz),
+ ('Hà Nội khuyến cáo hạn chế ra ngoài khi không khí ô nhiễm', 'ha-noi-khuyen-cao-han-che-ra-ngoai', 'Khuyến cáo bảo vệ sức khỏe trong những ngày chất lượng không khí xuống thấp.', 'Khuyến cáo bảo vệ sức khỏe người dân.', 'news-air-pollution.jpg', 'VnExpress', 'https://vnexpress.net', 'Góc xanh', '2025-12-02'::timestamptz),
+ ('Vì sao không khí ở Hà Nội ô nhiễm hơn TP.HCM?', 'vi-sao-khong-khi-ha-noi-o-nhiem', 'Bụi đường, PM10, PM2.5 và điều kiện thời tiết là những nguyên nhân chính.', 'Bụi đường và điều kiện thời tiết là những nguyên nhân chính.', 'news-pm25.webp', 'VietnamPlus', 'https://www.vietnamplus.vn', 'Ấn phẩm', '2025-03-27'::timestamptz),
+ ('Bịt mũi đi học, né rác đi làm giữa Hà Nội', 'bit-mui-di-hoc-ne-rac-di-lam', 'Ghi nhận các điểm đổ trộm rác, phế thải xây dựng trên đường phố.', 'Ghi nhận các điểm đổ trộm rác giữa Hà Nội.', 'news-waste-hanoi.jpg', 'VOV', 'https://vov.vn', 'Podcast', '2025-07-17'::timestamptz)
+) as seed(title,slug,content,excerpt,image_url,source_name,source_url,category,published_at)
+where not exists (select 1 from public.posts p where p.slug = seed.slug);
 alter table public.volunteer_registrations enable row level security;
 drop policy if exists volunteer_create on public.volunteer_registrations;
 create policy volunteer_create on public.volunteer_registrations for insert with check (user_id = auth.uid());
@@ -96,6 +117,11 @@ alter table public.cleanup_points enable row level security;
 alter table public.posts enable row level security;
 alter table public.contact_messages enable row level security;
 alter table public.partners enable row level security;
+alter table public.homepage_metrics enable row level security;
+drop policy if exists homepage_metrics_public_read on public.homepage_metrics;
+create policy homepage_metrics_public_read on public.homepage_metrics for select using (true);
+drop policy if exists homepage_metrics_admin_write on public.homepage_metrics;
+create policy homepage_metrics_admin_write on public.homepage_metrics for all using (public.is_admin()) with check (public.is_admin());
 
 drop policy if exists profiles_read on public.profiles;
 create policy profiles_read on public.profiles for select using (id = auth.uid() or public.is_admin());
