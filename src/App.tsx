@@ -40,6 +40,7 @@ function SourceFrame({
   const navigate = useNavigate()
   const { session, profile, loading: authLoading, refreshProfile, signOut } = useAuth()
   const frameRef = useRef<HTMLIFrameElement>(null)
+  const pendingReportRef = useRef<{ location?: string; description?: string; latitude?: number; longitude?: number; image?: File | null } | null>(null)
   const baseUrl = import.meta.env.BASE_URL.endsWith("/")
     ? import.meta.env.BASE_URL
     : `${import.meta.env.BASE_URL}/`
@@ -87,7 +88,7 @@ function SourceFrame({
         return
       }
       if (message?.type === "hnx:pollution-report") {
-        if (!session) { onAuth("login"); return }
+        if (!session) { pendingReportRef.current = message; onAuth("login"); return }
         void (async () => {
           try {
             const imageUrl = message.image instanceof File ? await uploadPublicFile(message.image, session.access_token) : null
@@ -111,6 +112,19 @@ function SourceFrame({
     window.addEventListener("message", receiveNavigation)
     return () => window.removeEventListener("message", receiveNavigation)
   }, [location.pathname, navigate, onAuth, profile, refreshProfile, session, signOut])
+
+  useEffect(() => {
+    const report = pendingReportRef.current
+    if (!session || !report) return
+    pendingReportRef.current = null
+    void (async () => {
+      try {
+        const imageUrl = report.image instanceof File ? await uploadPublicFile(report.image, session.access_token) : null
+        await tableInsert("pollution_reports", { user_id: session.user.id, location_name: report.location, address: report.location, latitude: report.latitude || null, longitude: report.longitude || null, description: report.description, photo_url: imageUrl, status: "new", severity: "medium" }, session.access_token)
+        frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: true }, window.location.origin)
+      } catch (error) { frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: false, message: error instanceof Error ? error.message : "Không gửi được báo cáo." }, window.location.origin) }
+    })()
+  }, [session])
 
   useEffect(() => {
     frameRef.current?.contentWindow?.postMessage({ type: "hnx:auth-state", user: profile ? { id: profile.id, name: profile.full_name, email: profile.email, phone: profile.phone, role: profile.role, camps: 0, hours: 0, trash: 0 } : null }, window.location.origin)
