@@ -1796,6 +1796,10 @@
 
     document.getElementById('pollutionForm').addEventListener('submit', function(e) {
       e.preventDefault();
+      const locationInput = document.getElementById('reportLocation'); const descInput = document.getElementById('reportDesc');
+      if (!locationInput.value.trim()) { alert('Vui lòng điền địa điểm ô nhiễm.'); locationInput.focus(); return; }
+      if (!descInput.value.trim()) { alert('Vui lòng điền mô tả chi tiết.'); descInput.focus(); return; }
+      if (!selectedReportImages.length) { alert('Vui lòng chọn ít nhất một hình ảnh hiện trạng.'); document.getElementById('fileInput').click(); return; }
       if (window.parent !== window) {
         if (!selectedReportImages.length) return alert('Vui lòng chọn ít nhất một ảnh.'); window.parent.postMessage({ type: 'hnx:pollution-report', location: document.getElementById('reportLocation').value.trim(), description: document.getElementById('reportDesc').value.trim(), latitude: selectedLat, longitude: selectedLng, images: selectedReportImages }, '*');
         return;
