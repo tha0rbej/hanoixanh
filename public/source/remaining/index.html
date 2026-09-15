@@ -1396,18 +1396,14 @@
       document.getElementById('policyModal').style.display = 'flex';
     }
 
-    function previewUpload(input) {
-      if (input.files && input.files[0]) {
-        document.getElementById('uploadPlaceholder').style.display = 'none';
-        const p = document.getElementById('uploadPreviewText'); p.style.display = 'flex'; p.style.gap = '8px'; p.style.flexWrap = 'wrap'; p.innerHTML = '';
-        [...input.files].forEach(file => { const img = document.createElement('img'); img.src = URL.createObjectURL(file); img.title = file.name; img.style = 'width:64px;height:64px;object-fit:cover;border-radius:8px'; p.appendChild(img); });
-      }
-    }
+    let selectedReportImages = [];
+    function previewUpload(input) { selectedReportImages = [...selectedReportImages, ...input.files]; input.value = ''; renderReportImages(); }
+    function renderReportImages() { const p = document.getElementById('uploadPreviewText'); p.innerHTML = ''; p.style.display = 'flex'; p.style.gap = '8px'; p.style.flexWrap = 'wrap'; selectedReportImages.forEach((file, index) => { const wrap = document.createElement('span'); wrap.style = 'position:relative;display:inline-block'; const img = document.createElement('img'); img.src = URL.createObjectURL(file); img.title = file.name; img.style = 'width:64px;height:64px;object-fit:cover;border-radius:8px'; const remove = document.createElement('button'); remove.type = 'button'; remove.textContent = '×'; remove.title = 'Xóa ảnh'; remove.style = 'position:absolute;right:-6px;top:-8px;width:22px;height:22px;border:0;border-radius:50%;background:#dc2626;color:#fff;font-weight:bold;cursor:pointer'; remove.onclick = () => { selectedReportImages.splice(index, 1); renderReportImages(); }; wrap.append(img, remove); p.appendChild(wrap); }); const add = document.createElement('button'); add.type = 'button'; add.textContent = '+'; add.title = 'Thêm ảnh'; add.style = 'width:64px;height:64px;border:2px dashed #10b981;border-radius:8px;background:#ecfdf5;color:#059669;font-size:28px;cursor:pointer'; add.onclick = () => document.getElementById('fileInput').click(); p.appendChild(add); }
 
     document.getElementById('pollutionForm').addEventListener('submit', function(e) {
       e.preventDefault();
       if (window.parent !== window) {
-        window.parent.postMessage({ type: 'hnx:pollution-report', location: document.getElementById('reportLocation').value.trim(), description: document.getElementById('reportDesc').value.trim(), latitude: selectedLat, longitude: selectedLng, images: [...document.getElementById('fileInput').files] }, '*');
+        if (!selectedReportImages.length) return alert('Vui lòng chọn ít nhất một ảnh.'); window.parent.postMessage({ type: 'hnx:pollution-report', location: document.getElementById('reportLocation').value.trim(), description: document.getElementById('reportDesc').value.trim(), latitude: selectedLat, longitude: selectedLng, images: selectedReportImages }, '*');
         return;
       }
       document.getElementById('successModal').style.display = 'flex';
