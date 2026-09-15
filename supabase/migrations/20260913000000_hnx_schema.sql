@@ -35,6 +35,7 @@ create table if not exists public.pollution_reports (
   status text not null default 'new' check (status in ('new','verifying','resolved','rejected')),
   admin_note text, created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
+alter table public.pollution_reports add column if not exists photo_urls jsonb not null default '[]'::jsonb;
 
 create table if not exists public.cleanup_points (
   id uuid primary key default gen_random_uuid(), name text not null, address text not null,

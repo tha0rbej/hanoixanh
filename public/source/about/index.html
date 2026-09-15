@@ -642,7 +642,7 @@
             <div class="form-group">
               <label>Hình ảnh hiện trạng*</label>
               <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-                <input type="file" id="fileInput" accept="image/png, image/jpeg" style="display: none;" onchange="previewUpload(this)" required>
+                <input type="file" id="fileInput" accept="image/png, image/jpeg" style="display: none;" onchange="previewUpload(this)" multiple required>
                 <div id="uploadPlaceholder">
                   <span>Tải lên hình ảnh</span>
                   <small>PNG, JPG (tối đa 5MB)</small>
@@ -1793,15 +1793,15 @@
     function previewUpload(input) {
       if (input.files && input.files[0]) {
         document.getElementById('uploadPlaceholder').style.display = 'none';
-        const p = document.getElementById('uploadPreviewText');
-        p.style.display = 'block'; p.innerText = 'Đã đính kèm: ' + input.files[0].name;
+        const p = document.getElementById('uploadPreviewText'); p.style.display = 'flex'; p.style.gap = '8px'; p.style.flexWrap = 'wrap'; p.innerHTML = '';
+        [...input.files].forEach(file => { const img = document.createElement('img'); img.src = URL.createObjectURL(file); img.title = file.name; img.style = 'width:64px;height:64px;object-fit:cover;border-radius:8px'; p.appendChild(img); });
       }
     }
 
     document.getElementById('pollutionForm').addEventListener('submit', function(e) {
       e.preventDefault();
       if (window.parent !== window) {
-        window.parent.postMessage({ type: 'hnx:pollution-report', location: document.getElementById('reportLocation').value.trim(), description: document.getElementById('reportDesc').value.trim(), latitude: selectedLat, longitude: selectedLng, image: document.getElementById('fileInput').files?.[0] || null }, '*');
+        window.parent.postMessage({ type: 'hnx:pollution-report', location: document.getElementById('reportLocation').value.trim(), description: document.getElementById('reportDesc').value.trim(), latitude: selectedLat, longitude: selectedLng, images: [...document.getElementById('fileInput').files] }, '*');
         return;
       }
       document.getElementById('successModal').style.display = 'flex';

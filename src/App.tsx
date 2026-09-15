@@ -40,7 +40,7 @@ function SourceFrame({
   const navigate = useNavigate()
   const { session, profile, loading: authLoading, refreshProfile, signOut } = useAuth()
   const frameRef = useRef<HTMLIFrameElement>(null)
-  const pendingReportRef = useRef<{ location?: string; description?: string; latitude?: number; longitude?: number; image?: File | null } | null>(null)
+  const pendingReportRef = useRef<{ location?: string; description?: string; latitude?: number; longitude?: number; image?: File | null; images?: File[] } | null>(null)
   const baseUrl = import.meta.env.BASE_URL.endsWith("/")
     ? import.meta.env.BASE_URL
     : `${import.meta.env.BASE_URL}/`
@@ -49,7 +49,7 @@ function SourceFrame({
   useEffect(() => {
     const receiveNavigation = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return
-      const message = event.data as { type?: string; path?: string; tab?: "login" | "register" | "reset"; campaignKey?: string; location?: string; description?: string; email?: string; latitude?: number; longitude?: number; fullName?: string; phone?: string; image?: File }
+      const message = event.data as { type?: string; path?: string; tab?: "login" | "register" | "reset"; campaignKey?: string; location?: string; description?: string; email?: string; latitude?: number; longitude?: number; fullName?: string; phone?: string; image?: File; images?: File[] }
       if (message?.type === "hnx:navigate" && message.path && allowedPaths.has(message.path)) {
         if (message.path !== location.pathname) navigate(message.path)
         return
@@ -91,8 +91,9 @@ function SourceFrame({
         if (!session) { pendingReportRef.current = message; onAuth("login"); return }
         void (async () => {
           try {
-            const imageUrl = message.image instanceof File ? await uploadPublicFile(message.image, session.access_token) : null
-            await tableInsert("pollution_reports", { user_id: session.user.id, location_name: message.location, address: message.location, latitude: message.latitude || null, longitude: message.longitude || null, description: message.description, photo_url: imageUrl, status: "new", severity: "medium" }, session.access_token)
+            const images = Array.isArray(message.images) ? message.images : (message.image ? [message.image] : [])
+            const imageUrls = await Promise.all(images.filter((image): image is File => image instanceof File).map(image => uploadPublicFile(image, session.access_token)))
+            await tableInsert("pollution_reports", { user_id: session.user.id, location_name: message.location, address: message.location, latitude: message.latitude || null, longitude: message.longitude || null, description: message.description, photo_url: imageUrls[0] || null, photo_urls: imageUrls, status: "new", severity: "medium" }, session.access_token)
             frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: true }, window.location.origin)
           } catch (error) { frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: false, message: error instanceof Error ? error.message : "Không gửi được báo cáo." }, window.location.origin) }
         })()
@@ -119,8 +120,9 @@ function SourceFrame({
     pendingReportRef.current = null
     void (async () => {
       try {
-        const imageUrl = report.image instanceof File ? await uploadPublicFile(report.image, session.access_token) : null
-        await tableInsert("pollution_reports", { user_id: session.user.id, location_name: report.location, address: report.location, latitude: report.latitude || null, longitude: report.longitude || null, description: report.description, photo_url: imageUrl, status: "new", severity: "medium" }, session.access_token)
+        const images = Array.isArray(report.images) ? report.images : (report.image ? [report.image] : [])
+        const imageUrls = await Promise.all(images.filter((image): image is File => image instanceof File).map(image => uploadPublicFile(image, session.access_token)))
+        await tableInsert("pollution_reports", { user_id: session.user.id, location_name: report.location, address: report.location, latitude: report.latitude || null, longitude: report.longitude || null, description: report.description, photo_url: imageUrls[0] || null, photo_urls: imageUrls, status: "new", severity: "medium" }, session.access_token)
         frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: true }, window.location.origin)
       } catch (error) { frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: false, message: error instanceof Error ? error.message : "Không gửi được báo cáo." }, window.location.origin) }
     })()
