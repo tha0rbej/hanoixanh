@@ -141,15 +141,27 @@
         /* SCHEDULE */
         .schedule-section { padding-top: 75px; padding-bottom: 75px; background: white; }
         .schedule-grid { max-width: 1250px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
-        .schedule-card { border: 1px solid #e2e9e4; border-radius: 12px; padding: 25px; background: #fff; }
+        .schedule-card { border: 1px solid #e2e9e4; border-radius: 12px; padding: 25px; background: #fff; display: flex; flex-direction: column; }
         .schedule-status { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 20px; }
         .status-tag { padding: 5px 9px; border-radius: 5px; font-size: 10px; font-weight: 800; }
         .status-tag.opening { background: #e4f6ec; color: #16854d; }
         .status-tag.upcoming { background: #fff2d8; color: #b27813; }
         .status-tag.preparing { background: #e7eef7; color: #446b9c; }
+        .status-tag.completed { background: #e5e7eb; color: #6b7280; }
+        .btn-ended { display: flex; align-items: center; border-radius: 6px; background: #9ca3af; color: #fff; padding: 13px 18px; font-weight: 700; }
+        .impact-section { padding: 75px 7%; background: #f7faf8; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; max-width: 1100px; margin: 0 auto 30px; }
+        .metrics-grid > div { background: #fff; border: 1px solid #e2e9e4; border-radius: 12px; padding: 22px; text-align: center; }
+        .metrics-grid strong { display: block; color: #087443; font-size: 25px; font-weight: 800; }
+        .metrics-grid span { display: block; margin-top: 8px; color: #5d6e64; font-size: 13px; }
+        .homepage-waste { max-width: 1100px; margin: 0 auto 30px; padding: 25px; border-radius: 12px; background: #fff; border: 1px solid #e2e9e4; }
+        .homepage-waste h3 { margin: 0 0 20px; color: #17251d; }
+        #wasteChart { display: flex; align-items: end; gap: 18px; height: 180px; border-bottom: 1px solid #d8e4dc; padding: 10px 15px 0; }
+        #wasteChart span { flex: 1; min-height: 8px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; background: #159457; border-radius: 6px 6px 0 0; color: #fff; padding-top: 5px; }
+        #wasteChart small { transform: translateY(24px); color: #5d6e64; }
         .volunteers-count { font-size: 10px; color: #748078; }
         .schedule-card h3 { font-size: 19px; margin-bottom: 18px; }
-        .schedule-info { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .schedule-info { list-style: none; display: flex; flex: 1; flex-direction: column; gap: 12px; margin-bottom: 20px; }
         .schedule-info li { font-size: 13px; color: #5d6e64; display: flex; gap: 10px; }
         .schedule-info i { color: #159457; width: 15px; }
         .view-all-btn { display: block; width: fit-content; margin: 30px auto 0; color: #0f8a52; font-size: 13px; font-weight: 800; }
@@ -363,7 +375,7 @@
 
     <nav>
         <ul>
-            <li><a href="../../" target="_parent" class="active">Trang chủ</a></li>
+            <li><a href="../../" target="_parent" class="active" onclick="event.preventDefault(); window.parent.postMessage({type:'hnx:navigate', path:'/'}, '*')">Trang chủ</a></li>
             <li><a href="../../ve-ha-noi-xanh" target="_parent">Về Hà Nội Xanh</a></li>
             <li><a href="../../chien-dich" target="_parent">Chiến dịch</a></li>
             <li><a href="../../tac-dong" target="_parent">Tác động cộng đồng</a></li>
@@ -540,59 +552,7 @@
 <!-- =====================================================
      LỊCH RA QUÂN
 ===================================================== -->
-<section class="schedule-section">
-    <div class="section-header">
-        <h2>Lịch ra quân & Điểm nóng cần viện trợ</h2>
-        <p>Đăng ký tham gia ngay cùng Hà Nội Xanh cuối tuần này để chung tay mang lại diện mạo mới cho các dòng sông.</p>
-    </div>
-    
-    <div class="schedule-grid">
-        <div class="schedule-card">
-            <div class="schedule-status">
-                <span class="status-tag opening">Đang mở đăng ký</span>
-                <span class="volunteers-count"><i class="fa-solid fa-user-group"></i> 50 Tình nguyện viên</span>
-            </div>
-            <h3>Dọn dẹp Sông Lừ – Khương Trung</h3>
-            <ul class="schedule-info">
-                <li><i class="fa-regular fa-calendar"></i> Chủ Nhật, 30/08/2026</li>
-                <li><i class="fa-regular fa-clock"></i> 07:30 - 11:30</li>
-                <li><i class="fa-solid fa-location-dot"></i> Cầu Khương Đình, Thanh Xuân</li>
-            </ul>
-            <a href="../../tham-gia" target="_parent" class="btn-green" style="justify-content:center;width:100%;">Đăng ký tham gia ngay &rarr;</a>
-        </div>
-
-        <div class="schedule-card">
-            <div class="schedule-status">
-                <span class="status-tag upcoming">Sắp diễn ra</span>
-                <span class="volunteers-count"><i class="fa-solid fa-user-group"></i> 80 Tình nguyện viên</span>
-            </div>
-            <h3>Chiến dịch Sông Tô Lịch xanh</h3>
-            <ul class="schedule-info">
-                <li><i class="fa-regular fa-calendar"></i> Thứ Bảy, 05/09/2026</li>
-                <li><i class="fa-regular fa-clock"></i> 08:00 - 12:00</li>
-                <li><i class="fa-solid fa-location-dot"></i> Đoạn Hoàng Quốc Việt, Cầu Giấy</li>
-            </ul>
-            <a href="../../tham-gia" target="_parent" class="btn-green" style="justify-content:center;width:100%;">Đăng ký tham gia ngay &rarr;</a>
-        </div>
-
-        <div class="schedule-card">
-            <div class="schedule-status">
-                <span class="status-tag preparing">Chuẩn bị</span>
-                <span class="volunteers-count"><i class="fa-solid fa-user-group"></i> 30 Tình nguyện viên</span>
-            </div>
-            <h3>Trồng cây ven Sông Kim Ngưu</h3>
-            <ul class="schedule-info">
-                <li><i class="fa-regular fa-calendar"></i> Chủ Nhật, 12/09/2026</li>
-                <li><i class="fa-regular fa-clock"></i> 08:00 - 11:00</li>
-                <li><i class="fa-solid fa-location-dot"></i> Cầu Mai Động, Hai Bà Trưng</li>
-            </ul>
-            <a href="../../tham-gia" target="_parent" class="btn-green" style="justify-content:center;width:100%;">Đăng ký tham gia ngay &rarr;</a>
-        </div>
-    </div>
-    
-    <a href="../../chien-dich" target="_parent" class="view-all-btn">Xem tất cả lịch ra quân &rarr;</a>
-</section>
-
+<section class="schedule-section"><div class="section-header"><h2>Lịch ra quân &amp; Điểm nóng cần viện trợ</h2><p>Cùng Hà Nội Xanh theo dõi chiến dịch sắp diễn ra và những hoạt động đã hoàn thành gần đây.</p></div><div class="schedule-grid"><div class="schedule-card"><div class="schedule-status"><span class="status-tag upcoming">Sắp diễn ra</span><span class="volunteers-count"><i class="fa-solid fa-user-group"></i> 100 Tình nguyện viên</span></div><h3>Ra quân làm sạch kênh mương tại Xuân Phương</h3><ul class="schedule-info"><li><i class="fa-regular fa-calendar"></i> Thứ Bảy, 12/09/2026</li><li><i class="fa-regular fa-clock"></i> 06:15 - 12:00</li><li><i class="fa-solid fa-location-dot"></i> Đường CN8, P. Xuân Phương, Hà Nội</li></ul><a href="../../chien-dich" target="_parent" class="btn-green" style="justify-content:center;width:100%;">Đăng ký tham gia ngay &rarr;</a></div><div class="schedule-card"><div class="schedule-status"><span class="status-tag completed">Đã kết thúc</span><span class="volunteers-count"><i class="fa-solid fa-user-group"></i> 45 Tình nguyện viên</span></div><h3>Dọn dẹp rác dềnh sau mưa lũ tại Chợ Tứ Liên</h3><ul class="schedule-info"><li><i class="fa-regular fa-calendar"></i> Hoàn thành ngày 27/07/2026</li><li><i class="fa-solid fa-location-dot"></i> Chợ Tứ Liên, Tây Hồ, Hà Nội</li></ul><span class="btn-ended" style="justify-content:center;width:100%;">Đã kết thúc</span></div><div class="schedule-card"><div class="schedule-status"><span class="status-tag completed">Đã kết thúc</span><span class="volunteers-count"><i class="fa-solid fa-user-group"></i> 80 Tình nguyện viên</span></div><h3>Chủ nhật xanh tại Ngõ 236 Âu Cơ</h3><ul class="schedule-info"><li><i class="fa-regular fa-calendar"></i> Hoàn thành ngày 12/07/2026</li><li><i class="fa-solid fa-location-dot"></i> Ngõ 236 Âu Cơ, P. Hồng Hà, Hà Nội</li></ul><span class="btn-ended" style="justify-content:center;width:100%;">Đã kết thúc</span></div></div><a href="../../chien-dich" target="_parent" class="view-all-btn">Xem tất cả lịch ra quân &rarr;</a></section>
 <!-- =====================================================
      BẢN ĐỒ TƯƠNG TÁC THỰC TẾ
 ===================================================== -->
@@ -863,6 +823,7 @@
 <!-- =====================================================
      FOOTER
 ===================================================== -->
+<section class="impact-section" id="homepageMetrics"><div class="section-header"><h2>Tổng quan dữ liệu toàn hệ thống</h2><p>Dữ liệu được cập nhật từ Dashboard.</p></div><div class="metrics-grid"><div><strong data-metric="campaigns">250+</strong><span>Chiến dịch</span></div><div><strong data-metric="volunteers">1.200+</strong><span>Tình nguyện viên</span></div><div><strong data-metric="trash_tons">350</strong><span>Tấn rác đã xử lý</span></div><div><strong data-metric="cleaned_km">50+</strong><span>Km sông đã làm sạch</span></div></div><div class="homepage-waste"><h3>Khối lượng rác xử lý qua các tháng (Đơn vị: Tấn)</h3><div id="wasteChart"></div></div><div id="impactTiers" class="metrics-grid"></div></section>
 <footer class="footer">
     <div class="footer-grid">
         <div class="footer-col">
@@ -934,10 +895,38 @@
         event.preventDefault();
         const input = document.getElementById('userMsgInput');
         if (!input.value.trim()) return;
+        if (window.parent !== window) window.parent.postMessage({ type: 'hnx:contact-message', description: input.value.trim() }, '*');
         alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!');
         input.value = '';
     }
+    function renderHomeCampaigns(campaigns) {
+        const grid = document.querySelector('.schedule-grid');
+        if (!grid || !Array.isArray(campaigns)) return;
+        const upcoming = campaigns.find(c => c.status === 'upcoming');
+        const completed = campaigns.filter(c => c.status === 'completed').sort((a, b) => new Date(b.start_at) - new Date(a.start_at)).slice(0, 2);
+        const items = [upcoming, ...completed].filter(Boolean);
+        grid.innerHTML = items.map((c, index) => {
+            const isUpcoming = index === 0;
+            const start = new Date(c.start_at);
+            const end = c.end_at ? new Date(c.end_at) : start;
+            const date = start.toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
+            const time = `${start.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`;
+            return `<div class="schedule-card"><div class="schedule-status"><span class="status-tag ${isUpcoming ? 'upcoming' : 'completed'}">${isUpcoming ? 'Sắp diễn ra' : 'Đã kết thúc'}</span><span class="volunteers-count"><i class="fa-solid fa-user-group"></i> ${c.capacity || 0} Tình nguyện viên</span></div><h3>${c.title || ''}</h3><ul class="schedule-info"><li><i class="fa-regular fa-calendar"></i> ${isUpcoming ? date : `Hoàn thành ngày ${start.toLocaleDateString('vi-VN')}`}</li>${isUpcoming ? `<li><i class="fa-regular fa-clock"></i> ${time}</li>` : ''}<li><i class="fa-solid fa-location-dot"></i> ${c.location || ''}</li></ul>${isUpcoming ? '<a href="../../chien-dich" target="_parent" class="btn-green" style="justify-content:center;width:100%;">Đăng ký tham gia ngay &rarr;</a>' : '<span class="btn-ended" style="justify-content:center;width:100%;">Đã kết thúc</span>'}</div>`;
+        }).join('');
+    }
     window.addEventListener('message', function(event) {
+        if (event.data?.type === 'hnx:scroll-top') { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; return; }
+        if (event.data?.type === 'hnx:campaigns-data') { renderHomeCampaigns(event.data.campaigns); return; }
+        if (event.data?.type === 'hnx:homepage-metrics') {
+            const metrics = Object.fromEntries((event.data.metrics || []).map(m => [m.metric_key, m.metric_value]));
+            const overview = metrics.overview || {};
+            document.querySelectorAll('[data-metric]').forEach(el => { const key = el.getAttribute('data-metric'); if (overview[key] !== undefined) el.textContent = Number(overview[key]).toLocaleString('vi-VN') + (key === 'campaigns' || key === 'cleaned_km' ? '+' : ''); });
+            const chart = document.getElementById('wasteChart'); const monthly = metrics.monthly_waste || {};
+            if (chart) chart.innerHTML = Object.entries(monthly).map(([month, value]) => `<span title="${value} tấn" style="height:${Math.max(8, Number(value))}%"><b>${value}</b><small>${month.slice(5)}</small></span>`).join('');
+            const tiers = document.getElementById('impactTiers'); const impact = metrics.impact_tiers || [];
+            if (tiers) tiers.innerHTML = impact.map(t => `<div><strong>${Number(t.amount).toLocaleString('vi-VN')} VNĐ</strong><span>${t.text}</span></div>`).join('');
+            return;
+        }
         if (event.data?.type !== 'hnx:auth-state') return;
         const actions = document.querySelector('.header-actions');
         if (!actions) return;
@@ -946,7 +935,10 @@
             loginButton.textContent = event.data.user?.name || 'ĐĂNG NHẬP';
             loginButton.onclick = function(e) {
                 e.preventDefault();
-                if (!event.data.user) window.parent.postMessage({type:'hnx:auth-open', tab:'login'}, '*');
+                if (!event.data.user) { window.parent.postMessage({type:'hnx:auth-open', tab:'login'}, '*'); return; }
+                let menu = document.getElementById('homeAccountMenu');
+                if (!menu) { menu = document.createElement('button'); menu.id = 'homeAccountMenu'; menu.textContent = 'Đăng xuất'; menu.style.cssText = 'position:absolute;right:0;top:calc(100% + 10px);z-index:20;width:185px;padding:16px;border:1px solid #d1fae5;border-radius:14px;background:#fff;color:#b91c1c;font-weight:700;font-size:13px;line-height:1.2;box-shadow:0 12px 30px rgba(0,0,0,.12);cursor:pointer;text-align:left'; loginButton.parentElement.style.position = 'relative'; loginButton.parentElement.appendChild(menu); menu.onclick = function() { window.parent.postMessage({type:'hnx:signout'}, '*'); menu.remove(); }; }
+                else menu.remove();
             };
         }
         let link = document.getElementById('adminDashboardLink');
@@ -955,6 +947,7 @@
         } else if (link) link.remove();
     });
 
+    window.scrollTo(0, 0);
     document.addEventListener("DOMContentLoaded", function() {
         
         // 1. Cấu hình các điểm trên bản đồ với tọa độ thực tế tại Hà Nội

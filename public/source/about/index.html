@@ -77,6 +77,11 @@
       text-transform: uppercase; text-decoration: none; cursor: pointer; transition: 0.2s; white-space: nowrap; height: 42px;
     }
     .btn-login-custom:hover { background: var(--primary-light); }
+    .account-menu { position: relative; display: inline-flex; }
+    .account-menu .account-dropdown { display: none; position: absolute; right: 0; top: calc(100% + 8px); min-width: 150px; padding: 6px; border: 1px solid #d1fae5; border-radius: 10px; background: #fff; box-shadow: 0 8px 24px rgba(0,0,0,.14); z-index: 20; }
+    .account-menu.open .account-dropdown { display: block; }
+    .account-dropdown button { width: 100%; border: 0; border-radius: 7px; background: transparent; padding: 9px 12px; text-align: left; color: #b91c1c; font-weight: 700; cursor: pointer; }
+    .account-dropdown button:hover { background: #fef2f2; }
 
     /* VIEW 1: CHIẾN DỊCH */
     #page-chien-dich { display: block; }
@@ -469,7 +474,7 @@
     <div class="header-actions">
       <a onclick="navigateParent('/tham-gia')" class="btn-join" id="nav-btn-thamgia">THAM GIA</a>
       <a href="#" class="donate-btn" onclick="event.preventDefault(); openDonateModal()"><i class="fa-regular fa-heart"></i> QUYÊN TẶNG</a>
-      <a onclick="handleHeaderAuthClick()" class="btn-login" id="headerLoginBtn">ĐĂNG NHẬP</a>
+      <div class="account-menu" id="accountMenu"><a onclick="handleHeaderAuthClick()" class="btn-login" id="headerLoginBtn">ĐĂNG NHẬP</a><div class="account-dropdown"><button type="button" onclick="handleLogout(); document.getElementById('accountMenu').classList.remove('open')">Đăng xuất</button></div></div>
     </div>
   </header>
 
@@ -699,7 +704,6 @@
               <p style="font-size: 14px; color: var(--text-sub);">Mã TNV: <strong>#HNX-0934</strong> | Cấp độ: <span style="color: var(--primary); font-weight: bold;" id="uLevel">Tình nguyện viên tích cực</span></p>
               <div class="profile-btn-group">
                 <button class="btn-edit-profile" onclick="openEditProfileModal()">Chỉnh sửa hồ sơ</button>
-                <button class="btn-logout-profile" onclick="handleLogout()">Đăng xuất</button>
               </div>
             </div>
           </div>
@@ -822,14 +826,6 @@
       <div class="news-hero">
         <h1>Tin tức và câu chuyện</h1>
         <p>Cùng cập nhật kiến thức, xu hướng môi trường<br>và những hành động xanh vì một Hà Nội bền vững hơn.</p>
-      </div>
-
-      <div class="news-filter-tabs">
-        <a class="news-filter-btn active">Tất cả</a>
-        <a class="news-filter-btn">Góc xanh</a>
-        <a class="news-filter-btn">Báo tin tức</a>
-        <a class="news-filter-btn">Ấn phẩm</a>
-        <a class="news-filter-btn">Podcast</a>
       </div>
 
       <div class="news-layout">
@@ -1528,12 +1524,9 @@
     }
 
     function handleHeaderAuthClick() {
+      if (currentUser) { document.getElementById('accountMenu')?.classList.toggle('open'); return; }
       if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:auth-open', tab: 'login' }, '*'); return; }
-      if (currentUser) {
-        switchMainView('tac-dong');
-      } else {
-        openAuthModal('login');
-      }
+      openAuthModal('login');
     }
 
     function handleLoginAction(e) {
@@ -1615,6 +1608,7 @@
         loggedOutBox.style.display = 'flex';
         loggedInBox.style.display = 'none';
         loginHeaderBtn.innerText = "ĐĂNG NHẬP";
+        document.getElementById('accountMenu')?.classList.remove('open');
         if(noHistoryBox) noHistoryBox.style.display = 'block';
       }
     }
@@ -1831,15 +1825,20 @@
 
     function handleThamGiaCaNhan(e) {
       e.preventDefault();
+      const values = [...e.target.querySelectorAll('input')].map(x => x.value.trim());
+      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:volunteer-register', fullName: values[0], phone: values[1], email: values[2] }, '*'); return; }
       alert("Đăng ký tình nguyện viên thành công! Hà Nội Xanh sẽ liên hệ với bạn sớm.");
       e.target.reset();
     }
 
     function handleThamGiaDoanhNghiep(e) {
       e.preventDefault();
+      const values = [...e.target.querySelectorAll('input')].map(x => x.value.trim());
+      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:partner-register', organization: values[0], fullName: values[1], phone: values[2], email: values[3] }, '*'); return; }
       alert("Đăng ký đối tác thành công! Cảm ơn sự đồng hành của quý tổ chức/doanh nghiệp.");
       e.target.reset();
     }
+    window.addEventListener('message', function(event) { if (event.data?.type === 'hnx:participation-result') alert(event.data.ok ? 'Đăng ký thành công!' : (event.data.message || 'Email này đã đăng ký trước đó.')); });
 
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
@@ -1851,6 +1850,14 @@
       alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!');
       input.value = '';
     }
+
+    window.addEventListener('message', function(event) {
+      if (event.data?.type !== 'hnx:campaigns-data' || !Array.isArray(event.data.campaigns)) return;
+      const groups = { upcoming: document.getElementById('pane-upcoming'), completed: document.getElementById('pane-completed') };
+      if (!groups.upcoming || !groups.completed) return;
+      groups.upcoming.innerHTML = ''; groups.completed.innerHTML = '';
+      event.data.campaigns.forEach(function(c) { const ended = c.status === 'completed'; const pane = ended ? groups.completed : groups.upcoming; const card = document.createElement('div'); card.className = 'camp-card'; card.innerHTML = '<div class="card-thumb"><span class="badge-card">' + (ended ? 'Đã diễn ra' : 'Sắp diễn ra') + '</span>' + (c.image_url ? '<img src="' + c.image_url + '" alt="">' : '') + '</div><div class="card-info"><h4></h4><div class="card-meta-line">📍 ' + (c.location || '') + '</div><div class="card-meta-line">📅 ' + new Date(c.start_at).toLocaleString('vi-VN') + '</div><div class="card-desc"></div><div class="card-bottom"><span class="card-members">👥 ' + (c.capacity || '') + ' người tham gia</span><button class="btn-view">Xem chi tiết →</button></div></div>'; card.querySelector('h4').textContent = c.title || ''; card.querySelector('.card-desc').textContent = c.description || ''; campaignDetails[c.id] = { isCompleted: ended, title: c.title || '', meta: '📍 ' + (c.location || '') + ' | 📅 ' + new Date(c.start_at).toLocaleString('vi-VN'), status: c.description || '', action: c.description || '' }; card.querySelector('.btn-view').onclick = function() { openDetailModal(c.id); }; pane.appendChild(card); });
+    });
 
     const knownCampaignLocations = [
       { name: "Quận Tây Hồ (Chợ Tứ Liên & Âu Cơ)", keywords: ["tây hồ", "tay ho", "chợ tứ liên", "tứ liên", "âu cơ", "236 âu cơ"], lat: 21.065, lng: 105.820, status: "Đã xử lý", color: "#10b981", desc: "Dọn sạch rác dềnh sau mưa tại Chợ Tứ Liên & Ngõ 236 Âu Cơ.", count: 2 },

@@ -79,9 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     resetPassword: requestPasswordReset,
     async signOut() {
-      if (session) await apiSignOut(session.access_token)
-      setSession(null)
-      setProfile(null)
+      try { if (session) await apiSignOut(session.access_token) } finally { setSession(null); setProfile(null) }
     },
     refreshProfile,
   }), [loading, profile, refreshProfile, session])
