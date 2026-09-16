@@ -11,7 +11,7 @@ import { AdminDashboard } from "./app/AdminDashboard"
 import { ConnectedAdminDashboard } from "./app/ConnectedAdminDashboard"
 import { AuthModal } from "./app/AuthModal"
 import { AuthProvider, useAuth } from "./app/AuthContext"
-import { tableInsert, tableSelect, updateProfile, uploadPublicFile } from "./lib/supabase"
+import { tableInsert, tableInsertMinimal, tableSelect, updateProfile, uploadPublicFile } from "./lib/supabase"
 
 type SourcePage = "home" | "about" | "remaining"
 
@@ -24,6 +24,16 @@ const allowedPaths = new Set([
   "/tham-gia",
   "/admin",
 ])
+
+type ParticipationSummaryRow = { status?: string; attended_hours?: number | string; trash_kg?: number | string }
+
+function volunteerLevel(campaigns: number, hours: number) {
+  if (campaigns >= 15 && hours >= 100) return "Đại sứ Xanh"
+  if (campaigns >= 8 && hours >= 40) return "Thành viên nòng cốt"
+  if (campaigns >= 3 && hours >= 12) return "Tình nguyện viên tích cực"
+  if (campaigns >= 1) return "Tình nguyện viên"
+  return "Thành viên mới"
+}
 
 function SourceFrame({
   page,
@@ -45,6 +55,40 @@ function SourceFrame({
     ? import.meta.env.BASE_URL
     : `${import.meta.env.BASE_URL}/`
   const source = `${baseUrl}source/${page}/index.html${view ? `#${view}` : ""}`
+
+  const sendAuthState = async () => {
+    if (!profile || !session) {
+      frameRef.current?.contentWindow?.postMessage({ type: "hnx:auth-state", user: null }, window.location.origin)
+      return
+    }
+    let campaigns = 0
+    let hours = 0
+    let trashKg = 0
+    try {
+      const registrations = await tableSelect<ParticipationSummaryRow>("campaign_registrations", "*", session.access_token, `&user_id=eq.${encodeURIComponent(session.user.id)}`)
+      const attended = registrations.filter(item => item.status === "attended")
+      campaigns = attended.length
+      hours = attended.reduce((sum, item) => sum + Number(item.attended_hours || 0), 0)
+      trashKg = attended.reduce((sum, item) => sum + Number(item.trash_kg || 0), 0)
+    } catch {
+      // Keep the profile available even before the participation migration is applied.
+    }
+    frameRef.current?.contentWindow?.postMessage({
+      type: "hnx:auth-state",
+      user: {
+        id: profile.id,
+        name: profile.full_name,
+        email: profile.email,
+        phone: profile.phone,
+        volunteerCode: profile.volunteer_code,
+        role: profile.role,
+        camps: campaigns,
+        hours,
+        trash: `${trashKg.toLocaleString("vi-VN")} kg`,
+        level: volunteerLevel(campaigns, hours),
+      },
+    }, window.location.origin)
+  }
 
   useEffect(() => {
     const receiveNavigation = (event: MessageEvent) => {
@@ -74,9 +118,9 @@ function SourceFrame({
         return
       }
       if (message?.type === "hnx:contact-message") {
-        void tableInsert("contact_messages", { name: message.fullName || profile?.full_name || "Khách chưa đăng nhập", email: message.email || profile?.email || "", message: message.description || "", user_id: session?.user.id || null }, session?.access_token || "")
+        void tableInsertMinimal("contact_messages", { name: message.fullName || profile?.full_name || "Khách chưa đăng nhập", email: message.email || profile?.email || "", message: message.description || "", user_id: session?.user.id || null }, session?.access_token || "")
           .then(() => frameRef.current?.contentWindow?.postMessage({ type: "hnx:contact-message-result", ok: true }, window.location.origin))
-          .catch((error: Error) => frameRef.current?.contentWindow?.postMessage({ type: "hnx:contact-message-result", ok: false, message: error.message }, window.location.origin))
+          .catch((error: Error) => frameRef.current?.contentWindow?.postMessage({ type: "hnx:contact-message-result", ok: false, message: error.message || "Không thể gửi lời nhắn." }, window.location.origin))
         return
       }
       if (message?.type === "hnx:campaign-register") {
@@ -92,8 +136,9 @@ function SourceFrame({
         void (async () => {
           try {
             const images = Array.isArray(message.images) ? message.images : (message.image ? [message.image] : [])
-            const imageUrls = await Promise.all(images.filter((image): image is File => image instanceof File).map(image => uploadPublicFile(image, session.access_token)))
-            await tableInsert("pollution_reports", { user_id: session.user.id, location_name: message.location, address: message.location, latitude: message.latitude || null, longitude: message.longitude || null, description: message.description, photo_url: imageUrls[0] || null, photo_urls: imageUrls, status: "new", severity: "medium" }, session.access_token)
+            const firstImage = images.find((image): image is File => image instanceof File)
+            const photoUrl = firstImage ? await uploadPublicFile(firstImage, session.access_token) : null
+            await tableInsertMinimal("pollution_reports", { user_id: session.user.id, location_name: message.location, address: message.location, latitude: message.latitude || null, longitude: message.longitude || null, description: message.description, photo_url: photoUrl, status: "new", severity: "medium" }, session.access_token)
             frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: true }, window.location.origin)
           } catch (error) { frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: false, message: error instanceof Error ? error.message : "Không gửi được báo cáo." }, window.location.origin) }
         })()
@@ -121,20 +166,21 @@ function SourceFrame({
     void (async () => {
       try {
         const images = Array.isArray(report.images) ? report.images : (report.image ? [report.image] : [])
-        const imageUrls = await Promise.all(images.filter((image): image is File => image instanceof File).map(image => uploadPublicFile(image, session.access_token)))
-        await tableInsert("pollution_reports", { user_id: session.user.id, location_name: report.location, address: report.location, latitude: report.latitude || null, longitude: report.longitude || null, description: report.description, photo_url: imageUrls[0] || null, photo_urls: imageUrls, status: "new", severity: "medium" }, session.access_token)
+        const firstImage = images.find((image): image is File => image instanceof File)
+        const photoUrl = firstImage ? await uploadPublicFile(firstImage, session.access_token) : null
+        await tableInsertMinimal("pollution_reports", { user_id: session.user.id, location_name: report.location, address: report.location, latitude: report.latitude || null, longitude: report.longitude || null, description: report.description, photo_url: photoUrl, status: "new", severity: "medium" }, session.access_token)
         frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: true }, window.location.origin)
       } catch (error) { frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: false, message: error instanceof Error ? error.message : "Không gửi được báo cáo." }, window.location.origin) }
     })()
   }, [session])
 
   useEffect(() => {
-    frameRef.current?.contentWindow?.postMessage({ type: "hnx:auth-state", user: profile ? { id: profile.id, name: profile.full_name, email: profile.email, phone: profile.phone, role: profile.role, camps: 0, hours: 0, trash: 0 } : null }, window.location.origin)
-  }, [profile])
+    void sendAuthState()
+  }, [profile, session])
 
   const handleFrameLoad = () => {
     if (page === "home") frameRef.current?.contentWindow?.postMessage({ type: "hnx:scroll-top" }, window.location.origin)
-    frameRef.current?.contentWindow?.postMessage({ type: "hnx:auth-state", user: profile ? { id: profile.id, name: profile.full_name, email: profile.email, phone: profile.phone, role: profile.role, camps: 0, hours: 0, trash: 0 } : null }, window.location.origin)
+    void sendAuthState()
     const token = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
     if (token) void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/campaigns?select=*&order=start_at.desc`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(campaigns => frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaigns-data", campaigns }, window.location.origin))
     if (token) void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/homepage_metrics?select=metric_key,metric_value`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(metrics => frameRef.current?.contentWindow?.postMessage({ type: "hnx:homepage-metrics", metrics }, window.location.origin))

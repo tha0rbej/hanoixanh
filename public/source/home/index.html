@@ -418,20 +418,20 @@
     </div>
     <div class="stats-container">
         <div class="stat-card">
-            <h3>250+</h3>
+            <h3 data-metric="campaigns">230+</h3>
             <p>BUỔI RA QUÂN</p>
         </div>
         <div class="stat-card">
-            <h3>1,200+</h3>
-            <p>TẤN RÁC VỚT ĐƯỢC</p>
-        </div>
-        <div class="stat-card">
-            <h3>15,000+</h3>
+            <h3 data-metric="volunteers">85.000+</h3>
             <p>TÌNH NGUYỆN VIÊN</p>
         </div>
         <div class="stat-card">
-            <h3>40+</h3>
-            <p>TUYẾN SÔNG ĐƯỢC HỒI SINH</p>
+            <h3 data-metric="trash_tons">350+</h3>
+            <p>TẤN RÁC ĐÃ XỬ LÝ</p>
+        </div>
+        <div class="stat-card">
+            <h3 data-metric="cleanup_points">120+</h3>
+            <p>ĐIỂM ĐÃ LÀM SẠCH</p>
         </div>
     </div>
 </section>
@@ -823,7 +823,6 @@
 <!-- =====================================================
      FOOTER
 ===================================================== -->
-<section class="impact-section" id="homepageMetrics"><div class="section-header"><h2>Tổng quan dữ liệu toàn hệ thống</h2><p>Dữ liệu được cập nhật từ Dashboard.</p></div><div class="metrics-grid"><div><strong data-metric="campaigns">250+</strong><span>Chiến dịch</span></div><div><strong data-metric="volunteers">1.200+</strong><span>Tình nguyện viên</span></div><div><strong data-metric="trash_tons">350</strong><span>Tấn rác đã xử lý</span></div><div><strong data-metric="cleaned_km">50+</strong><span>Km sông đã làm sạch</span></div></div><div class="homepage-waste"><h3>Khối lượng rác xử lý qua các tháng (Đơn vị: Tấn)</h3><div id="wasteChart"></div></div><div id="impactTiers" class="metrics-grid"></div></section>
 <footer class="footer">
     <div class="footer-grid">
         <div class="footer-col">
@@ -895,7 +894,7 @@
         event.preventDefault();
         const input = document.getElementById('userMsgInput');
         if (!input.value.trim()) return;
-        if (window.parent !== window) window.parent.postMessage({ type: 'hnx:contact-message', description: input.value.trim() }, '*');
+        if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:contact-message', description: input.value.trim() }, '*'); return; }
         alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!');
         input.value = '';
     }
@@ -915,16 +914,17 @@
         }).join('');
     }
     window.addEventListener('message', function(event) {
+        if (event.data?.type === 'hnx:contact-message-result') { if (event.data.ok) { alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!'); document.getElementById('userMsgInput').value = ''; } else alert(event.data.message || 'Không thể gửi lời nhắn.'); return; }
         if (event.data?.type === 'hnx:scroll-top') { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; return; }
         if (event.data?.type === 'hnx:campaigns-data') { renderHomeCampaigns(event.data.campaigns); return; }
         if (event.data?.type === 'hnx:homepage-metrics') {
             const metrics = Object.fromEntries((event.data.metrics || []).map(m => [m.metric_key, m.metric_value]));
             const overview = metrics.overview || {};
-            document.querySelectorAll('[data-metric]').forEach(el => { const key = el.getAttribute('data-metric'); if (overview[key] !== undefined) el.textContent = Number(overview[key]).toLocaleString('vi-VN') + (key === 'campaigns' || key === 'cleaned_km' ? '+' : ''); });
-            const chart = document.getElementById('wasteChart'); const monthly = metrics.monthly_waste || {};
-            if (chart) chart.innerHTML = Object.entries(monthly).map(([month, value]) => `<span title="${value} tấn" style="height:${Math.max(8, Number(value))}%"><b>${value}</b><small>${month.slice(5)}</small></span>`).join('');
-            const tiers = document.getElementById('impactTiers'); const impact = metrics.impact_tiers || [];
-            if (tiers) tiers.innerHTML = impact.map(t => `<div><strong>${Number(t.amount).toLocaleString('vi-VN')} VNĐ</strong><span>${t.text}</span></div>`).join('');
+            document.querySelectorAll('[data-metric]').forEach(el => {
+                const key = el.getAttribute('data-metric');
+                const value = key === 'cleanup_points' && overview[key] === undefined ? overview.cleaned_km : overview[key];
+                if (value !== undefined) el.textContent = Number(value).toLocaleString('vi-VN') + '+';
+            });
             return;
         }
         if (event.data?.type !== 'hnx:auth-state') return;

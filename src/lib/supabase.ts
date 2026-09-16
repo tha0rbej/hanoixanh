@@ -11,6 +11,7 @@ export type HnxProfile = {
   full_name: string
   phone?: string | null
   avatar_url?: string | null
+  volunteer_code?: string | null
   role: UserRole
   created_at?: string
 }
@@ -154,6 +155,20 @@ export async function tableInsert<T>(table: string, values: unknown, token: stri
     body: JSON.stringify(values),
   })
   return parseResponse<T[]>(response)
+}
+
+/**
+ * Insert without asking PostgREST to return the inserted row. This is needed
+ * for public write-only tables: RLS may allow INSERT while correctly denying
+ * SELECT to the visitor.
+ */
+export async function tableInsertMinimal(table: string, values: unknown, token = "") {
+  const response = await fetch(`${supabaseUrl}/rest/v1/${table}`, {
+    method: "POST",
+    headers: { ...authHeaders(token), Prefer: "return=minimal" },
+    body: JSON.stringify(values),
+  })
+  await parseResponse<unknown>(response)
 }
 
 export async function tableUpdate<T>(table: string, query: string, values: unknown, token: string) {

@@ -417,10 +417,10 @@
         </div>
 
         <div class="summary-bar">
-          <div class="stat-item"><div class="stat-val">🚩 128+</div><div class="stat-label">Chiến dịch</div></div>
-          <div class="stat-item"><div class="stat-val">👥 12.560+</div><div class="stat-label">Tình nguyện viên</div></div>
-          <div class="stat-item"><div class="stat-val">🗑️ 356,2 <span>tấn</span></div><div class="stat-label">Rác đã thu gom</div></div>
-          <div class="stat-item"><div class="stat-val">🌱 85+</div><div class="stat-label">Điểm đã làm sạch</div></div>
+          <div class="stat-item"><div class="stat-val">🚩 <b data-campaign-metric="campaigns">230+</b></div><div class="stat-label">Chiến dịch đã thực hiện</div></div>
+          <div class="stat-item"><div class="stat-val">👥 <b data-campaign-metric="volunteers">85.000+</b></div><div class="stat-label">Tình nguyện viên đồng hành</div></div>
+          <div class="stat-item"><div class="stat-val">🗑️ <b data-campaign-metric="trash_tons">350+</b></div><div class="stat-label">Tấn rác đã dọn sạch</div></div>
+          <div class="stat-item"><div class="stat-val">🌱 <b data-campaign-metric="cleanup_points">120+</b></div><div class="stat-label">Điểm đã làm sạch</div></div>
         </div>
       </section>
 
@@ -574,7 +574,7 @@
             <div class="form-group">
               <label>Hình ảnh hiện trạng*</label>
               <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-                <input type="file" id="fileInput" accept="image/png, image/jpeg" style="display: none;" onchange="previewUpload(this)" multiple required>
+                <input type="file" id="fileInput" accept="image/png, image/jpeg" style="display: none;" onchange="previewUpload(this)" multiple>
                 <div id="uploadPlaceholder">
                   <span>📷 Tải lên hình ảnh</span>
                   <small>PNG, JPG (tối đa 5MB)</small>
@@ -635,7 +635,7 @@
             <div class="avatar-circle" id="uAvatarCircle"><span id="uAvatarText">N</span></div>
             <div>
               <h3 style="font-size: 19px; font-weight: 900;" id="uName">Nguyễn Thị Bình</h3>
-              <p style="font-size: 14px; color: var(--text-sub);">Mã TNV: <strong>#HNX-0934</strong> | Cấp độ: <span style="color: var(--primary); font-weight: bold;" id="uLevel">Tình nguyện viên tích cực</span></p>
+              <p style="font-size: 14px; color: var(--text-sub);">Mã TNV: <strong id="uVolunteerCode">Đang cấp mã</strong> | Cấp độ: <span style="color: var(--primary); font-weight: bold;" id="uLevel">Tình nguyện viên tích cực</span></p>
               <div class="profile-btn-group">
                 <button class="btn-edit-profile" onclick="openEditProfileModal()">Chỉnh sửa hồ sơ</button>
               </div>
@@ -667,7 +667,7 @@
       </div>
 
       <h2 class="section-title">📊 Tổng quan dữ liệu toàn hệ thống</h2>
-      <div class="impact-overview-grid">
+      <div class="impact-overview-grid" id="impactOverviewGrid">
         <div class="impact-box">
           <div class="big-num">230+</div>
           <div class="sub-lbl">Chiến dịch đã thực hiện (+12%)</div>
@@ -691,7 +691,7 @@
           <h4 style="font-size: 16.5px; font-weight: 800; color: #0f172a;">Khối lượng rác xử lý qua các tháng (Đơn vị: Tấn)</h4>
           <span style="font-size: 13.5px; color: var(--text-sub);">Dữ liệu được cập nhật từ tháng 05/2026 đến tháng 09/2026</span>
         </div>
-        <div class="chart-container">
+        <div class="chart-container" id="impactWasteChart">
           <div class="bar-group"><div class="bar-col" style="height: 35%;" data-val="35t"></div><span class="bar-lbl">T5</span></div>
           <div class="bar-group"><div class="bar-col" style="height: 52%;" data-val="52t"></div><span class="bar-lbl">T6</span></div>
           <div class="bar-group"><div class="bar-col" style="height: 100%; background: var(--primary);" data-val="110t"></div><span class="bar-lbl">T7</span></div>
@@ -701,7 +701,7 @@
       </div>
 
       <h2 class="section-title">📸 Dashboard: Trước – Sau khi làm sạch</h2>
-      <div class="before-after-grid">
+      <div class="before-after-grid" id="beforeAfterGrid">
         <div class="ba-card" onclick="openGalleryModal('comp_1')">
           <div class="ba-split">
             <div class="ba-half">
@@ -1047,7 +1047,7 @@
       <div class="modal-section-h">🎯 Kế hoạch & Mục tiêu hành động:</div>
       <p class="modal-text" id="mAction">Nội dung hành động...</p>
       <div class="modal-section-h">🛡️ Trang bị hỗ trợ từ Hà Nội Xanh:</div>
-      <p class="modal-text">TNV được cấp phát đầy đủ ủng cao su chuyên dụng, găng tay chống nước 2 lớp, kẹp gắp rác và khẩu trang than hoạt tính.</p>
+      <p class="modal-text" id="mSupport">Chưa cập nhật.</p>
       <div id="zaloGroupSection" style="display: none; margin-top: 20px; padding: 16px; background: var(--primary-light); border-radius: 8px; border: 1px dashed var(--primary);">
         <p style="font-weight: 800; color: var(--primary-dark); margin-bottom: 8px; font-size: 15px;">Đăng ký thành công! Quét mã QR hoặc bấm vào link bên dưới để vào nhóm Zalo:</p>
         <img src="qr-zalo.png" alt="QR Zalo Hà Nội Xanh" style="width: 180px; height: 180px; object-fit: contain; margin: 10px auto; border-radius: 6px; border: 1px solid #ccc; display: block;">
@@ -1109,10 +1109,12 @@
     </div>
   </div>
 
-  <div class="modal-backdrop" id="successModal">
-    <div class="modal-content" style="text-align: center; width: 400px;">
-      <h3 style="color: var(--primary); margin-bottom: 10px; font-size: 20px;">Gửi báo cáo thành công! 🎉</h3>
+  <div class="modal-backdrop" id="successModal" role="dialog" aria-modal="true" aria-labelledby="successModalTitle" onclick="if (event.target === this) closeModal('successModal')">
+    <div class="modal-content" style="text-align: center; width: 400px; position: relative;">
+      <button type="button" aria-label="Đóng" onclick="closeModal('successModal')" style="position:absolute;right:12px;top:8px;border:0;background:transparent;color:#64748b;font-size:28px;line-height:1;cursor:pointer;">&times;</button>
+      <h3 id="successModalTitle" style="color: var(--primary); margin-bottom: 10px; font-size: 20px;">Gửi báo cáo thành công! 🎉</h3>
       <p style="font-size: 14px; color: var(--text-sub); margin-bottom: 20px;">Cảm ơn sự đóng góp của bạn! Thông tin điểm đen đã được ghi nhận.</p>
+      <button type="button" class="btn-pill btn-join" onclick="closeModal('successModal')">Đóng</button>
     </div>
   </div>
 
@@ -1218,6 +1220,8 @@
         loggedInBox.style.display = 'grid';
         loginHeaderBtn.innerText = currentUser.name.toUpperCase();
         document.getElementById('uName').innerText = currentUser.name;
+        document.getElementById('uVolunteerCode').innerText = currentUser.volunteerCode ? `#${currentUser.volunteerCode}` : 'Đang cấp mã';
+        document.getElementById('uLevel').innerText = currentUser.level || 'Thành viên mới';
         document.getElementById('uHour').innerText = currentUser.hours;
         document.getElementById('uCamp').innerText = currentUser.camps;
         document.getElementById('uTrash').innerText = currentUser.trash;
@@ -1343,6 +1347,7 @@
         document.getElementById('mMeta').innerText = data.meta;
         document.getElementById('mStatus').innerText = data.status;
         document.getElementById('mAction').innerText = data.action;
+        document.getElementById('mSupport').innerText = data.support || 'Chưa cập nhật.';
         document.getElementById('zaloGroupSection').style.display = 'none';
         document.getElementById('mBtnJoin').style.display = data.isCompleted ? 'none' : 'inline-flex';
         document.getElementById('detailModal').style.display = 'flex';
@@ -1371,6 +1376,52 @@
       comp_2: { t: "Dự án 2 – Ngõ 236 Âu Cơ (Hồng Hà)", before: "Picture3.jpg", after: "Picture4.jpg", d: "Ngõ dân sinh ngập nước và rác dềnh trôi vào nhà ➔ Sau khi dọn: Không gian sạch thoáng, an toàn cho cư dân." },
       comp_3: { t: "Dự án 3 – Bãi bồi Cầu Long Biên (Hoàn Kiếm)", before: "Picture5.jpg", after: "Picture6.jpg", d: "Bãi phế thải chôn vùi dưới chân cầu di sản ➔ Sau khi dọn: Toàn bộ bãi bồi được dọn sạch, tập kết rác thành hàng tấn gọn gàng." }
     };
+
+    function escapeImpactHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+    }
+
+    function renderImpactMetrics(rows) {
+      const metrics = Object.fromEntries((rows || []).map(row => [row.metric_key, row.metric_value]));
+      const overview = metrics.overview || {};
+      const overviewItems = [
+        [overview.campaigns, 'Chiến dịch đã thực hiện'],
+        [overview.volunteers, 'Tình nguyện viên đồng hành'],
+        [overview.trash_tons, 'Tấn rác đã dọn sạch'],
+        [overview.cleanup_points ?? overview.cleaned_km, overview.cleanup_points !== undefined ? 'Điểm đã làm sạch' : 'Km sông đã làm sạch']
+      ];
+      const overviewGrid = document.getElementById('impactOverviewGrid');
+      if (overviewGrid && Object.keys(overview).length) {
+        overviewGrid.innerHTML = overviewItems.map(([number, label]) => `<div class="impact-box"><div class="big-num">${Number(number || 0).toLocaleString('vi-VN')}+</div><div class="sub-lbl">${escapeImpactHtml(label)}</div></div>`).join('');
+      }
+      document.querySelectorAll('[data-campaign-metric]').forEach(element => {
+        const key = element.getAttribute('data-campaign-metric');
+        const number = key === 'cleanup_points' && overview[key] === undefined ? overview.cleaned_km : overview[key];
+        if (number !== undefined) element.textContent = `${Number(number).toLocaleString('vi-VN')}+`;
+      });
+
+      const monthly = metrics.monthly_waste || {};
+      const monthlyEntries = Object.entries(monthly).filter(([, value]) => Number(value) > 0).sort(([a], [b]) => a.localeCompare(b));
+      const wasteChart = document.getElementById('impactWasteChart');
+      if (wasteChart && monthlyEntries.length) {
+        const maxValue = Math.max(...monthlyEntries.map(([, value]) => Number(value) || 0), 1);
+        wasteChart.innerHTML = monthlyEntries.map(([month, value]) => {
+          const amount = Number(value) || 0;
+          const label = /^\d{4}-\d{2}$/.test(month) ? `T${Number(month.slice(5))}` : month;
+          return `<div class="bar-group"><div class="bar-col" style="height:${Math.max(4, Math.round(amount / maxValue * 100))}%;" data-val="${amount}t"></div><span class="bar-lbl">${escapeImpactHtml(label)}</span></div>`;
+        }).join('');
+      }
+
+      const projects = Array.isArray(metrics.before_after) ? metrics.before_after : [];
+      const beforeAfterGrid = document.getElementById('beforeAfterGrid');
+      if (beforeAfterGrid && projects.length) {
+        Object.keys(galleryData).forEach(key => delete galleryData[key]);
+        projects.forEach((project, index) => {
+          galleryData[`impact_${index}`] = { t: project.title || '', before: project.before_url || '', after: project.after_url || '', d: project.description || '' };
+        });
+        beforeAfterGrid.innerHTML = projects.map((project, index) => `<div class="ba-card" onclick="openGalleryModal('impact_${index}')"><div class="ba-split"><div class="ba-half"><span class="ba-badge">TRƯỚC</span><img src="${escapeImpactHtml(project.before_url || '')}" alt="Ảnh trước khi làm sạch"></div><div class="ba-half"><span class="ba-badge" style="background: var(--primary);">SAU</span><img src="${escapeImpactHtml(project.after_url || '')}" alt="Ảnh sau khi làm sạch"></div></div><div class="ba-body"><h4>${escapeImpactHtml(project.title || '')}</h4><p>${escapeImpactHtml(project.description || '')}</p></div></div>`).join('');
+      }
+    }
 
     function openGalleryModal(key) {
       const data = galleryData[key];
@@ -1414,6 +1465,7 @@
     });
 
     window.addEventListener('message', function(event) {
+      if (event.data?.type === 'hnx:homepage-metrics') { renderImpactMetrics(event.data.metrics); return; }
       if (event.data?.type === 'hnx:auth-state') {
         currentUser = event.data.user || null; applyUserDataToUI();
         const actions = document.querySelector('#top .header-actions'); let link = document.getElementById('adminDashboardLink');
@@ -1425,11 +1477,13 @@
         if (event.data.ok) { document.getElementById('zaloGroupSection').style.display = 'block'; document.getElementById('mBtnJoin').style.display = 'none'; alert('Đăng ký tham gia thành công! Vui lòng quét mã QR hoặc bấm link Zalo bên dưới để vào nhóm.'); } else alert(event.data.message || 'Không thể đăng ký chiến dịch.');
       }
       if (event.data?.type === 'hnx:pollution-report-result') {
-        if (event.data.ok) { alert('Cảm ơn bạn đã báo cáo.'); document.getElementById('successModal').style.display = 'flex'; } else alert(event.data.message || 'Không thể gửi báo cáo.');
+        if (event.data.ok) { document.getElementById('pollutionForm').reset(); selectedReportImages = []; renderReportImages(); }
+        if (event.data.ok) { document.getElementById('successModal').style.display = 'flex'; } else alert(event.data.message || 'Không thể gửi báo cáo.');
       }
     });
 
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    document.addEventListener('keydown', function(event) { if (event.key === 'Escape') closeModal('successModal'); });
 
     function sendFeedback(e) {
       e.preventDefault();
@@ -1450,7 +1504,7 @@
         const card = document.createElement('div'); card.className = 'camp-card';
         card.innerHTML = '<div class="card-thumb"><span class="badge-card">' + (ended ? 'Đã diễn ra' : 'Sắp diễn ra') + '</span>' + (c.image_url ? '<img src="' + c.image_url + '" alt="">' : '') + '</div><div class="card-info"><h4></h4><div class="card-meta-line">📍 ' + (c.location || '') + '</div><div class="card-meta-line">📅 ' + new Date(c.start_at).toLocaleString('vi-VN') + '</div><div class="card-desc"></div><div class="card-bottom"><span class="card-members">👥 ' + (c.capacity || '') + ' người tham gia</span><button class="btn-view">Xem chi tiết →</button></div></div>';
         card.querySelector('h4').textContent = c.title || ''; card.querySelector('.card-desc').textContent = c.description || '';
-        campaignDetails[c.id] = { isCompleted: ended, title: c.title || '', meta: '📍 ' + (c.location || '') + ' | 📅 ' + new Date(c.start_at).toLocaleString('vi-VN'), status: c.pollution_status || c.description || '', action: (c.action_plan || '') + (c.support_equipment ? '\n\n🛡️ Trang bị hỗ trợ: ' + c.support_equipment : '') };
+        campaignDetails[c.id] = { isCompleted: ended, title: c.title || '', meta: '📍 ' + (c.location || '') + ' | 📅 ' + new Date(c.start_at).toLocaleString('vi-VN'), status: c.pollution_status || c.description || 'Chưa cập nhật.', action: c.action_plan || 'Chưa cập nhật.', support: c.support_equipment || 'Chưa cập nhật.' };
         card.querySelector('.btn-view').onclick = function() { openDetailModal(c.id); }; pane.appendChild(card);
       });
     });
