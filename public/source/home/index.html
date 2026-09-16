@@ -57,20 +57,22 @@
 
         .header-actions { display: flex; align-items: center; gap: 12px; }
 
-        .btn-join { background: #035c2e; color: white; padding: 10px 22px; border-radius: 30px; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; }
+        .btn-join { background: #035c2e; color: white; padding: 10px 22px; border-radius: 30px; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; transition: transform 0.3s ease, box-shadow 0.3s ease; }
 
         .donate-btn {
-            background: #EF4444; 
-            color: white; padding: 10px 22px; border-radius: 30px; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 6px; letter-spacing: 0.5px; transition: background 0.3s ease;
+            background: #f97316;
+            color: white; padding: 10px 22px; border-radius: 30px; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 6px; letter-spacing: 0.5px; transition: transform 0.3s ease, box-shadow 0.3s ease; animation: pulse 2.2s ease-in-out infinite;
         }
-        .donate-btn:hover { background: #DC2626; }
+        .donate-btn:hover { background: #ea580c; }
 
         .search-box { display: flex; align-items: center; gap: 8px; border: 1px solid #d1d5db; border-radius: 30px; padding: 8px 16px; background: #fff; height: 40px; }
         .search-box i { color: #8da4be; font-size: 14px; }
         .search-box input { width: 100px; border: none; outline: none; font-size: 13px; font-family: inherit; }
         .search-box input::placeholder { color: #9ca3af; }
 
-        .btn-login { color: #035c2e; border: 1.5px solid #035c2e; padding: 9px 22px; border-radius: 30px; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; background: transparent; }
+        .btn-login { color: #035c2e; border: 1.5px solid #035c2e; padding: 9px 22px; border-radius: 30px; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; background: transparent; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .header-actions .btn-join:hover, .header-actions .btn-login:hover, .header-actions .donate-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 16px rgba(0,0,0,0.16); }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
 
         /* =========================
            HERO
@@ -178,15 +180,14 @@
 
         .map-card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px; background: #fff; cursor: pointer; transition: 0.3s; }
         .map-card.active { border: 2px solid #10b981 !important; background: #f2fbf7; }
-        .map-card.warning { border: 1px solid #fde047; }
-        .map-card.completed { border: 1px solid #93c5fd; }
+        .map-card.warning { border: 1px solid #ef4444; }
+        .map-card.completed { border: 1px solid #10b981; }
         .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
         .card-top h4 { font-size: 15px; color: #111; max-width: 70%; line-height: 1.3; font-weight: 700; }
         .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
-        .status-badge.cleaning { background: #d1fae5; color: #065f46; }
-        .status-badge.need-help { background: #fef3c7; color: #b45309; }
-        .status-badge.done { background: #dbeafe; color: #1d4ed8; }
-        .status-badge.upcoming { background: #f3e8ff; color: #7e22ce; }
+        .status-badge.cleaning { background: #fee2e2; color: #b91c1c; }
+        .status-badge.need-help, .status-badge.upcoming { background: #fee2e2; color: #b91c1c; }
+        .status-badge.done { background: #d1fae5; color: #047857; }
         .map-card .loc { font-size: 12px; color: #6b7280; margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
         .card-stats { display: flex; justify-content: space-between; font-size: 12px; color: #9ca3af; }
         .card-stats strong { display: block; margin-top: 4px; font-size: 13px; }
@@ -196,15 +197,15 @@
         /* BẢN ĐỒ LEAFLET CONTAINER */
         .map-view { flex: 1; position: relative; background: #022c22; }
         #real-map { width: 100%; height: 100%; z-index: 1; }
-        .leaflet-tile { filter: brightness(0.6) sepia(1) hue-rotate(100deg) saturate(2); }
+        .leaflet-tile { filter: none; }
 
         .map-overlay-top { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 1000; }
         .map-btn { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 15px; border-radius: 8px; font-size: 12px; font-weight: 600; backdrop-filter: blur(4px); display: flex; align-items: center; gap: 8px; cursor: pointer; }
 
         /* GIM BẢN ĐỒ CỦA LEAFLET */
         .custom-leaflet-icon { background: transparent; border: none; }
-        .pin { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: bold; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; transition: 0.3s; background: #047857; margin-top: -16px; margin-left: -16px; }
-        .pin:hover, .pin.active { transform: scale(1.15); background: #ea580c; z-index: 100; width: 40px; height: 40px; font-size: 16px; margin-top: -20px; margin-left: -20px; }
+        .pin { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: bold; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; transition: 0.3s; background: var(--pin-color); margin-top: -16px; margin-left: -16px; }
+        .pin:hover, .pin.active { transform: scale(1.15); background: var(--pin-color); z-index: 100; width: 40px; height: 40px; font-size: 16px; margin-top: -20px; margin-left: -20px; }
 
         .map-tooltip { position: absolute; background: #111827; color: white; padding: 8px 15px; border-radius: 8px; font-size: 13px; font-weight: 600; white-space: nowrap; top: -45px; left: 50%; transform: translateX(-50%); box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 20; display: none; }
         .map-tooltip::after { content: ""; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); border-width: 6px 6px 0; border-style: solid; border-color: #111827 transparent transparent transparent; }
@@ -215,10 +216,9 @@
         .map-legend strong { color: #9ca3af; margin-right: 5px; }
         .map-legend .legend-item { display: flex; align-items: center; gap: 6px; }
         .map-legend i.circle { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-        .map-legend i.blue { background: #3b82f6; }
         .map-legend i.green { background: #10b981; }
-        .map-legend i.yellow { background: #f59e0b; }
-        .map-legend i.purple { background: #a855f7; }
+        .map-legend i.orange { background: #f59e0b; }
+        .map-legend i.red { background: #ef4444; }
 
         /* THẺ DETAIL NỔI Ở DƯỚI BẢN ĐỒ */
         .map-detail-card { position: absolute; bottom: 20px; left: 20px; right: 20px; background: white; border-radius: 12px; padding: 15px; display: flex; gap: 15px; align-items: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 1000; transition: 0.3s; }
@@ -607,15 +607,13 @@
         <div class="map-filters">
             <div class="map-search">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" placeholder="Tìm theo khu vực hoặc tên sông">
+                <input type="text" id="mapSearchInput" placeholder="Tìm theo khu vực hoặc tên sông">
             </div>
-            <select class="map-select">
-                <option>Tất cả quận/huyện</option>
-                <option>Quận Cầu Giấy</option>
-                <option>Quận Thanh Xuân</option>
-                <option>Quận Nam Từ Liêm</option>
-                <option>Quận Hoàng Mai</option>
-                <option>Quận Hai Bà Trưng</option>
+            <select class="map-select" id="mapDistrictSelect">
+                <option value="">Tất cả quận/huyện</option>
+                <option>Ba Đình</option><option>Bắc Từ Liêm</option><option>Cầu Giấy</option><option>Đống Đa</option><option>Hai Bà Trưng</option><option>Hoàn Kiếm</option><option>Hoàng Mai</option><option>Hà Đông</option><option>Long Biên</option><option>Nam Từ Liêm</option><option>Tây Hồ</option><option>Thanh Xuân</option>
+                <option>Sơn Tây</option><option>Thanh Trì</option><option>Đan Phượng</option><option>Đông Anh</option><option>Gia Lâm</option><option>Hoài Đức</option><option>Mê Linh</option><option>Mỹ Đức</option><option>Phú Xuyên</option><option>Phúc Thọ</option><option>Quốc Oai</option><option>Sóc Sơn</option><option>Thạch Thất</option><option>Thanh Oai</option><option>Thường Tín</option><option>Ứng Hòa</option><option>Chương Mỹ</option>
+                <option value="Ba Vì">Ba Vì</option>
             </select>
         </div>
     </div>
@@ -633,7 +631,7 @@
                 <div class="map-card active" data-id="1">
                     <div class="card-top">
                         <h4>Sông Tô Lịch – Đoạn Hoàng Quốc Việt</h4>
-                        <span class="status-badge cleaning">Đang dọn dẹp</span>
+                        <span class="status-badge cleaning">Sắp ra quân</span>
                     </div>
                     <div class="loc"><i class="fa-solid fa-location-dot"></i> Quận Cầu Giấy</div>
                     <div class="card-stats">
@@ -646,7 +644,7 @@
                 <div class="map-card warning" data-id="2">
                     <div class="card-top">
                         <h4>Sông Lừ – Khương Trung</h4>
-                        <span class="status-badge need-help">Cần viện trợ</span>
+                        <span class="status-badge need-help">Sắp ra quân</span>
                     </div>
                     <div class="loc"><i class="fa-solid fa-location-dot"></i> Quận Thanh Xuân</div>
                     <div class="card-stats">
@@ -659,7 +657,7 @@
                 <div class="map-card completed" data-id="3">
                     <div class="card-top">
                         <h4>Kênh Nhuệ – Từ Liêm</h4>
-                        <span class="status-badge done">Hoàn thành</span>
+                        <span class="status-badge done">Đã hoàn thành</span>
                     </div>
                     <div class="loc"><i class="fa-solid fa-location-dot"></i> Quận Nam Từ Liêm</div>
                     <div class="card-stats">
@@ -672,7 +670,7 @@
                 <div class="map-card" data-id="4">
                     <div class="card-top">
                         <h4>Sông Sét – Định Công</h4>
-                        <span class="status-badge cleaning">Đang dọn dẹp</span>
+                        <span class="status-badge cleaning">Sắp ra quân</span>
                     </div>
                     <div class="loc"><i class="fa-solid fa-location-dot"></i> Quận Hoàng Mai</div>
                     <div class="card-stats">
@@ -715,15 +713,13 @@
             <!-- KHUNG CHÚ THÍCH -->
             <div class="map-legend">
                 <strong>CHÚ THÍCH:</strong>
-                <div class="legend-item"><i class="circle blue"></i> Đã xử lý</div>
-                <div class="legend-item"><i class="circle green"></i> Đang dọn dẹp</div>
-                <div class="legend-item"><i class="circle yellow"></i> Cần viện trợ</div>
-                <div class="legend-item"><i class="circle purple"></i> Sắp ra quân</div>
+                <div class="legend-item"><i class="circle green"></i> Đã hoàn thành</div>
+                <div class="legend-item"><i class="circle red"></i> Sắp ra quân</div>
             </div>
 
             <!-- THẺ THÔNG TIN CHI TIẾT DƯỚI BẢN ĐỒ -->
             <div class="map-detail-card" id="detail-card">
-                <img src="trangchu3.jpg" alt="Hình ảnh khu vực">
+                <img id="detail-img" src="trangchu3.jpg" alt="Hình ảnh khu vực">
                 <div class="info">
                     <div class="tags">
                         <span class="badge-loc" id="detail-tag-loc">Cầu Giấy</span>
@@ -965,8 +961,8 @@
                 date: "Cập nhật: 28/08/2026",
                 leader: "Nguyễn Văn Hùng",
                 amount: "1.2 Tấn",
-                img: "nhap_link_anh_chi_tiet_1.jpg",
-                coords: [21.0456, 105.7951] 
+                img: "trangchu3.jpg",
+                coords: [21.0456, 105.7951], status: "Sắp ra quân", color: "#ef4444"
             },
             2: {
                 title: "Sông Lừ – Khương Trung",
@@ -974,8 +970,8 @@
                 date: "Cập nhật: 25/08/2026",
                 leader: "Trần Thị Mai",
                 amount: "2.5 Tấn",
-                img: "nhap_link_anh_chi_tiet_2.jpg",
-                coords: [20.9950, 105.8190] 
+                img: "trangchu2.jpg",
+                coords: [20.9950, 105.8190], status: "Sắp ra quân", color: "#ef4444"
             },
             3: {
                 title: "Kênh Nhuệ – Từ Liêm",
@@ -983,8 +979,8 @@
                 date: "Cập nhật: 20/08/2026",
                 leader: "Lê Văn Tuấn",
                 amount: "4.1 Tấn",
-                img: "nhap_link_anh_chi_tiet_3.jpg",
-                coords: [21.0315, 105.7533] 
+                img: "trangchu1.jpg",
+                coords: [21.0315, 105.7533], status: "Đã hoàn thành", color: "#10b981"
             },
             4: {
                 title: "Sông Sét – Định Công",
@@ -992,8 +988,8 @@
                 date: "Cập nhật: 30/08/2026",
                 leader: "Phạm Hoàng",
                 amount: "1.8 Tấn",
-                img: "nhap_link_anh_chi_tiet_4.jpg",
-                coords: [20.9830, 105.8420] 
+                img: "sau.jpg",
+                coords: [20.9830, 105.8420], status: "Sắp ra quân", color: "#ef4444"
             },
             5: {
                 title: "Sông Kim Ngưu – Mai Động",
@@ -1001,8 +997,8 @@
                 date: "Cập nhật: 01/09/2026",
                 leader: "Vũ Nam",
                 amount: "0 Tấn",
-                img: "nhap_link_anh_chi_tiet_5.jpg",
-                coords: [20.9972, 105.8625] 
+                img: "truoc.jpg",
+                coords: [20.9972, 105.8625], status: "Sắp ra quân", color: "#ef4444"
             }
         };
 
@@ -1026,7 +1022,7 @@
         Object.keys(locations).forEach(id => {
             const loc = locations[id];
             const iconHTML = `
-                <div class="pin ${id == 1 ? 'active' : ''}" id="pin-${id}" data-id="${id}">
+                <div class="pin ${id == 1 ? 'active' : ''}" id="pin-${id}" data-id="${id}" style="--pin-color: ${loc.color}" title="${loc.status}">
                     ${id}
                     <div class="map-tooltip">${loc.title}</div>
                 </div>
@@ -1057,7 +1053,6 @@
             cards.forEach(card => {
                 if (card.getAttribute("data-id") == id) {
                     card.classList.add("active");
-                    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 } else {
                     card.classList.remove("active");
                 }
@@ -1080,8 +1075,46 @@
                 activateLocation(this.getAttribute("data-id"));
             });
         });
+
+        const normalize = value => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const districtSelect = document.getElementById('mapDistrictSelect');
+        const searchInput = document.getElementById('mapSearchInput');
+        const districtCenters = {
+            'ba dinh': [21.034, 105.823], 'bac tu liem': [21.071, 105.765], 'cau giay': [21.036, 105.793],
+            'dong da': [21.014, 105.826], 'hai ba trung': [21.006, 105.852], 'hoan kiem': [21.028, 105.852],
+            'hoang mai': [20.982, 105.861], 'ha dong': [20.971, 105.777], 'long bien': [21.046, 105.892],
+            'nam tu liem': [21.011, 105.746], 'tay ho': [21.069, 105.824], 'thanh xuan': [20.993, 105.808],
+            'son tay': [21.140, 105.506], 'ba vi': [21.198, 105.423], 'thanh tri': [20.941, 105.823], 'dan phuong': [21.086, 105.665],
+            'dong anh': [21.139, 105.848], 'gia lam': [21.018, 105.945], 'hoai duc': [21.024, 105.704],
+            'me linh': [21.181, 105.718], 'my duc': [20.693, 105.726], 'phu xuyen': [20.735, 105.910],
+            'phuc tho': [21.105, 105.566], 'quoc oai': [20.990, 105.641], 'soc son': [21.257, 105.838],
+            'thach that': [21.034, 105.567], 'thanh oai': [20.861, 105.769], 'thuong tin': [20.844, 105.861],
+            'ung hoa': [20.724, 105.766], 'chuong my': [20.900, 105.690]
+        };
+        function filterMap(query = '') {
+            const q = normalize(query.trim());
+            const district = normalize(districtSelect.value);
+            let firstMatch = null;
+            cards.forEach(card => {
+                const id = card.dataset.id, loc = locations[id];
+                const matches = (!q || normalize(`${loc.title} ${loc.shortLoc}`).includes(q)) && (!district || normalize(loc.shortLoc).includes(district.replace('quận ', '')));
+                card.style.display = matches ? '' : 'none';
+                if (matches && !firstMatch) firstMatch = loc;
+                if (markers[id]) markers[id].setOpacity(matches ? 1 : 0);
+            });
+            if (district && districtCenters[district]) {
+                map.flyTo(districtCenters[district], 13, { duration: 0.8 });
+            } else if (firstMatch) {
+                map.flyTo(firstMatch.coords, district || q ? 14 : 12, { duration: 0.8 });
+                activateLocation(Object.keys(locations).find(id => locations[id] === firstMatch));
+            } else if (q) {
+                alert("Khu vực này hiện chưa có dữ liệu chiến dịch!");
+            }
+        }
+        searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); filterMap(e.target.value); } });
+        districtSelect.addEventListener('change', () => filterMap(searchInput.value));
         
-        setTimeout(() => activateLocation(1), 500);
+        activateLocation(1);
     });
 </script>
 
