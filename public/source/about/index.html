@@ -458,9 +458,29 @@
     #top .search-box i { color: #8da4be; font-size: 14px; }
     #top .search-box input { width: 100px; border: none; outline: none; font-size: 13px; padding: 0; }
     #top .btn-login { color: #035c2e; border: 1.5px solid #035c2e; padding: 9px 22px; border-radius: 30px; font-weight: 700; font-size: 13px; letter-spacing: .5px; background: transparent; cursor: pointer; white-space: nowrap; }
-    @media (max-width: 1100px) { #top nav ul { gap: 15px; } #top .header-actions { gap: 7px; } #top .search-box { display: none; } }
+    @media (max-width: 1100px) {
+      #top.home-toolbar { height: auto; min-height: 75px; flex-wrap: wrap; padding: 15px 4%; gap: 14px; }
+      #top nav { order: 3; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      #top nav ul { gap: 20px; justify-content: flex-start; min-width: max-content; padding: 0 10px 5px 5px; }
+      #top .header-actions { gap: 7px; }
+      #top .search-box { display: none; }
+      .container { width: 100%; max-width: 100%; padding-left: 20px; padding-right: 20px; }
+      .main-grid { grid-template-columns: minmax(250px, 0.85fr) minmax(0, 1.4fr); }
+      .main-grid > :last-child { grid-column: 1 / -1; }
+      .impact-overview-grid, .thamgia-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .before-after-grid, .news-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .news-layout, .vehx-grid-2, .vehx-media-feature-grid { grid-template-columns: 1fr; gap: 28px; }
+      .vehx-partner-logo-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
     @media (max-width: 900px) { #top.home-toolbar { height: auto; min-height: 75px; flex-wrap: wrap; padding: 15px 5%; gap: 15px; } #top nav { order: 3; width: 100%; overflow-x: auto; } #top nav ul { justify-content: flex-start; min-width: max-content; padding: 0 10px 5px 5px; } }
     @media (max-width: 480px) { #top .header-actions .btn-join { display: none; } #top .donate-btn { font-size: 10px; padding: 9px 10px; } #top .btn-login { padding: 8px 11px; font-size: 11px; } }
+    @media (max-width: 700px) {
+      .main-grid, .impact-overview-grid, .before-after-grid, .news-grid-3, .thamgia-cards-grid, .thamgia-form-grid-2, .footer-grid { grid-template-columns: 1fr; }
+      .main-grid > :last-child { grid-column: auto; }
+      .profile-logged-in { grid-template-columns: 1fr; }
+      .picker-footer { align-items: stretch; flex-direction: column; }
+    }
   </style>
 </head>
 <body>
@@ -1842,7 +1862,7 @@
     function handleThamGiaCaNhan(e) {
       e.preventDefault();
       const values = [...e.target.querySelectorAll('input')].map(x => x.value.trim());
-      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:volunteer-register', fullName: values[0], phone: values[1], email: values[2] }, '*'); return; }
+      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:volunteer-register', fullName: values[0], phone: values[1], email: values[2], address: values[3] }, '*'); return; }
       alert("Đăng ký tình nguyện viên thành công! Hà Nội Xanh sẽ liên hệ với bạn sớm.");
       e.target.reset();
     }
@@ -1850,11 +1870,12 @@
     function handleThamGiaDoanhNghiep(e) {
       e.preventDefault();
       const values = [...e.target.querySelectorAll('input')].map(x => x.value.trim());
-      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:partner-register', organization: values[0], fullName: values[1], phone: values[2], email: values[3] }, '*'); return; }
+      const organizationType = e.target.querySelector('select')?.value || '';
+      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:partner-register', organization: values[0], organizationType, fullName: values[1], phone: values[2], email: values[3] }, '*'); return; }
       alert("Đăng ký đối tác thành công! Cảm ơn sự đồng hành của quý tổ chức/doanh nghiệp.");
       e.target.reset();
     }
-    window.addEventListener('message', function(event) { if (event.data?.type === 'hnx:participation-result') alert(event.data.ok ? 'Cảm ơn bạn đã trở thành tình nguyện viên của Hà Nội Xanh!' : (event.data.message || 'Email này đã đăng ký trước đó.')); });
+    window.addEventListener('message', function(event) { if (event.data?.type === 'hnx:participation-result') { const success = event.data.kind === 'partner' ? 'Đăng ký hợp tác thành công! Hà Nội Xanh sẽ liên hệ với bạn sớm.' : 'Cảm ơn bạn đã trở thành tình nguyện viên của Hà Nội Xanh!'; alert(event.data.ok ? success : (event.data.message || 'Email này đã đăng ký trước đó.')); } });
 
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     document.addEventListener('keydown', function(event) { if (event.key === 'Escape') closeModal('successModal'); });

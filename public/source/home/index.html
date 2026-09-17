@@ -328,7 +328,7 @@
            RESPONSIVE
         ========================= */
         @media (max-width: 1100px) { nav ul { gap: 15px; } .header-actions { gap: 7px; } .search-box { display: none; } .hero h1 { font-size: 48px; } }
-        @media (max-width: 900px) {
+        @media (max-width: 1050px) {
             header { height: auto; min-height: 75px; flex-wrap: wrap; padding: 15px 5%; gap: 15px; }
             nav { order: 3; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
             nav ul { justify-content: flex-start; min-width: max-content; padding: 0 10px 5px 5px; }
@@ -343,6 +343,8 @@
             .map-legend { display: none; }
             .map-detail-card { flex-wrap: wrap; }
             .map-detail-card .action { width: 100%; justify-content: space-between; }
+            .metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .mission-content, .cards-grid, .schedule-grid, .news-grid, .map-header, .map-container, .donate-container { width: 100%; }
         }
         @media (max-width: 768px) {
             .hero { min-height: 720px; padding-top: 80px; }
@@ -984,6 +986,7 @@
         grid.querySelectorAll('.home-campaign-open').forEach(button => button.addEventListener('click', () => openHomeCampaignModal(button.dataset.campaignId)));
     }
     window.addEventListener('message', function(event) {
+        if (event.data?.type === 'hnx:posts-data') { renderHomeNews(event.data.posts || []); return; }
         if (event.data?.type === 'hnx:contact-message-result') { if (event.data.ok) { alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!'); document.getElementById('userMsgInput').value = ''; } else alert(event.data.message || 'Không thể gửi lời nhắn.'); return; }
         if (event.data?.type === 'hnx:campaign-register-result') {
             const button = document.getElementById('homeCampaignRegister');
@@ -1050,6 +1053,21 @@
             if (!link) { link = document.createElement('a'); link.id = 'adminDashboardLink'; link.className = 'btn-login'; link.textContent = 'DASHBOARD'; link.href = '#'; link.onclick = function(e) { e.preventDefault(); window.parent.postMessage({ type: 'hnx:navigate', path: '/admin' }, '*'); }; actions.insertBefore(link, actions.lastElementChild); }
         } else if (link) link.remove();
     });
+
+    function escapeNewsHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+    }
+
+    function renderHomeNews(posts) {
+        const grid = document.querySelector('.news-section .news-grid');
+        if (!grid || !Array.isArray(posts)) return;
+        if (!posts.length) { grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#64748b">Chưa có bài viết nào được xuất bản.</p>'; return; }
+        grid.innerHTML = posts.slice(0, 3).map(post => {
+            const date = new Date(post.published_at || post.created_at).toLocaleDateString('vi-VN');
+            const url = post.source_url || '#';
+            return `<article class="news-card"><img class="news-img" src="${escapeNewsHtml(post.image_url || 'news-hanoi-xanh.png')}" alt="${escapeNewsHtml(post.title)}"><div class="news-body"><div class="news-meta"><span><i class="fa-regular fa-calendar"></i> ${date}</span><span><i class="fa-solid fa-newspaper"></i> ${escapeNewsHtml(post.source_name || post.category || 'Hà Nội Xanh')}</span></div><h3 class="news-title"><a href="${escapeNewsHtml(url)}" target="_blank" rel="noopener">${escapeNewsHtml(post.title)}</a></h3><p class="news-desc">${escapeNewsHtml(post.excerpt || post.content || '')}</p><a href="${escapeNewsHtml(url)}" target="_blank" rel="noopener" class="read-more">Đọc tiếp <i class="fa-solid fa-chevron-right"></i></a></div></article>`;
+        }).join('');
+    }
 
     window.scrollTo(0, 0);
     document.addEventListener("DOMContentLoaded", function() {
@@ -1142,7 +1160,7 @@
             });
         });
 
-        function activateLocation(id) {
+        function activateLocation(id, scrollCard = true) {
             document.querySelectorAll('.pin').forEach(pin => {
                 if (pin.getAttribute("data-id") == id) {
                     pin.classList.add("active");
@@ -1154,7 +1172,7 @@
             cards.forEach(card => {
                 if (card.getAttribute("data-id") == id) {
                     card.classList.add("active");
-                    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    if (scrollCard) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 } else {
                     card.classList.remove("active");
                 }
@@ -1178,7 +1196,7 @@
             });
         });
         
-        setTimeout(() => activateLocation(1), 500);
+        setTimeout(() => activateLocation(1, false), 500);
     });
 </script>
 

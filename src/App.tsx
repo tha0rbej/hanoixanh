@@ -131,7 +131,7 @@ function SourceFrame({
   useEffect(() => {
     const receiveNavigation = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return
-      const message = event.data as { type?: string; path?: string; tab?: "login" | "register" | "reset"; campaignKey?: string; location?: string; description?: string; email?: string; latitude?: number; longitude?: number; fullName?: string; phone?: string; birthDate?: string; gender?: string; address?: string; occupation?: string; interests?: string; bio?: string; currentPassword?: string; newPassword?: string; image?: File; images?: File[] }
+      const message = event.data as { type?: string; path?: string; tab?: "login" | "register" | "reset"; campaignKey?: string; location?: string; description?: string; email?: string; latitude?: number; longitude?: number; fullName?: string; phone?: string; organization?: string; organizationType?: string; birthDate?: string; gender?: string; address?: string; occupation?: string; interests?: string; bio?: string; currentPassword?: string; newPassword?: string; image?: File; images?: File[] }
       if (message?.type === "hnx:navigate" && message.path && allowedPaths.has(message.path)) {
         if (message.path !== location.pathname) navigate(message.path)
         return
@@ -142,16 +142,16 @@ function SourceFrame({
         void (async () => {
           try {
             if (message.type === "hnx:volunteer-register") {
-              const existing = await tableSelect<{ id: string }>("campaign_registrations", "id", session.access_token, `&user_id=eq.${encodeURIComponent(session.user.id)}&limit=1`)
+              const existing = await tableSelect<{ id: string }>("volunteer_registrations", "id", session.access_token, `&user_id=eq.${encodeURIComponent(session.user.id)}&limit=1`)
               if (existing.length) throw new Error("Bạn đã đăng ký rồi.")
-              await tableInsert("campaign_registrations", { user_id: session.user.id, status: "registered" }, session.access_token)
+              await tableInsert("volunteer_registrations", { user_id: session.user.id, name: message.fullName || profile?.full_name || "", email: message.email || profile?.email || "", phone: message.phone || profile?.phone || null, address: message.address || profile?.address || null }, session.access_token)
             } else {
               const existing = await tableSelect<{ id: string }>("partners", "id", session.access_token, `&email=ilike.${encodeURIComponent(message.email || "")}&limit=1`)
               if (existing.length) throw new Error("Email này đã đăng ký đối tác rồi.")
-              await tableInsert("partners", { name: message.fullName || "", email: message.email || "", phone: message.phone || "", organization: message.organization || "" }, session.access_token)
+              await tableInsert("partners", { user_id: session.user.id, name: message.fullName || "", email: message.email || "", phone: message.phone || "", organization: message.organization || "", organization_type: message.organizationType || "" }, session.access_token)
             }
-            frameRef.current?.contentWindow?.postMessage({ type: "hnx:participation-result", ok: true }, window.location.origin)
-          } catch (error) { frameRef.current?.contentWindow?.postMessage({ type: "hnx:participation-result", ok: false, message: error instanceof Error ? error.message : "Không thể đăng ký." }, window.location.origin) }
+            frameRef.current?.contentWindow?.postMessage({ type: "hnx:participation-result", kind: message.type === "hnx:partner-register" ? "partner" : "volunteer", ok: true }, window.location.origin)
+          } catch (error) { frameRef.current?.contentWindow?.postMessage({ type: "hnx:participation-result", kind: message.type === "hnx:partner-register" ? "partner" : "volunteer", ok: false, message: error instanceof Error ? error.message : "Không thể đăng ký." }, window.location.origin) }
         })()
         return
       }
@@ -238,6 +238,7 @@ function SourceFrame({
     const token = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
     if (token) void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/campaigns?select=*&order=start_at.desc`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(campaigns => frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaigns-data", campaigns }, window.location.origin))
     if (token) void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/homepage_metrics?select=metric_key,metric_value`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(metrics => frameRef.current?.contentWindow?.postMessage({ type: "hnx:homepage-metrics", metrics }, window.location.origin))
+    if (token) void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/posts?select=*&status=eq.published&order=published_at.desc.nullslast,created_at.desc`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(posts => frameRef.current?.contentWindow?.postMessage({ type: "hnx:posts-data", posts: Array.isArray(posts) ? posts : [] }, window.location.origin))
     if (session) void tableSelect<{ campaign_key: string | null }>("campaign_registrations", "campaign_key", session.access_token, `&user_id=eq.${encodeURIComponent(session.user.id)}`).then(items => frameRef.current?.contentWindow?.postMessage({ type: "hnx:registered-campaigns", keys: items.map(x => x.campaign_key).filter(Boolean) }, window.location.origin))
   }
 

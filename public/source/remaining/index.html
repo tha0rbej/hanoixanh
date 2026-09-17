@@ -381,9 +381,28 @@
     #top .search-box i { color: #8da4be; font-size: 14px; }
     #top .search-box input { width: 100px; border: none; outline: none; font-size: 13px; padding: 0; }
     #top .btn-login { color: #035c2e; border: 1.5px solid #035c2e; padding: 9px 22px; border-radius: 30px; font-weight: 700; font-size: 13px; letter-spacing: .5px; background: transparent; cursor: pointer; white-space: nowrap; }
-    @media (max-width: 1100px) { #top nav ul { gap: 15px; } #top .header-actions { gap: 7px; } #top .search-box { display: none; } }
+    @media (max-width: 1100px) {
+      #top.home-toolbar { height: auto; min-height: 75px; flex-wrap: wrap; padding: 15px 4%; gap: 14px; }
+      #top nav { order: 3; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      #top nav ul { gap: 20px; justify-content: flex-start; min-width: max-content; padding: 0 10px 5px 5px; }
+      #top .header-actions { gap: 7px; }
+      #top .search-box { display: none; }
+      .container { width: 100%; max-width: 100%; padding-left: 20px; padding-right: 20px; }
+      .main-grid { grid-template-columns: minmax(250px, 0.85fr) minmax(0, 1.4fr); }
+      .main-grid > :last-child { grid-column: 1 / -1; }
+      .impact-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .before-after-grid, .news-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .news-layout { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
     @media (max-width: 900px) { #top.home-toolbar { height: auto; min-height: 75px; flex-wrap: wrap; padding: 15px 5%; gap: 15px; } #top nav { order: 3; width: 100%; overflow-x: auto; } #top nav ul { justify-content: flex-start; min-width: max-content; padding: 0 10px 5px 5px; } }
     @media (max-width: 480px) { #top .header-actions .btn-join { display: none; } #top .donate-btn { font-size: 10px; padding: 9px 10px; } #top .btn-login { padding: 8px 11px; font-size: 11px; } }
+    @media (max-width: 700px) {
+      .main-grid, .impact-overview-grid, .before-after-grid, .news-grid-3, .footer-grid { grid-template-columns: 1fr; }
+      .main-grid > :last-child { grid-column: auto; }
+      .profile-logged-in { grid-template-columns: 1fr; }
+      .picker-footer { align-items: stretch; flex-direction: column; }
+    }
   </style>
 </head>
 <body>
@@ -1390,6 +1409,24 @@
       return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
     }
 
+    function renderNewsPosts(posts) {
+      const column = document.querySelector('#page-tin-tuc .news-col-left');
+      const sidebar = document.querySelector('#page-tin-tuc .news-sidebar-box');
+      if (!column || !Array.isArray(posts)) return;
+      if (!posts.length) { column.innerHTML = '<div class="news-main-card"><div class="news-main-body"><h3>Chưa có bài viết nào được xuất bản.</h3></div></div>'; if (sidebar) sidebar.innerHTML = ''; return; }
+      const article = post => {
+        const date = new Date(post.published_at || post.created_at).toLocaleDateString('vi-VN');
+        const url = escapeImpactHtml(post.source_url || '#');
+        return `<article class="news-sub-card" onclick="window.open('${url}','_blank')" style="cursor:pointer"><img src="${escapeImpactHtml(post.image_url || 'news-hanoi-xanh.png')}" alt="${escapeImpactHtml(post.title || '')}"><div class="news-sub-body"><span class="news-tag" style="padding:2px 6px;font-size:10px">${escapeImpactHtml(post.category || 'Tin tức')}</span><h4>${escapeImpactHtml(post.title || '')}</h4><p>${escapeImpactHtml(post.excerpt || post.content || '')}</p><div class="news-sub-meta">${date} • ${escapeImpactHtml(post.source_name || 'Hà Nội Xanh')}</div></div></article>`;
+      };
+      const [featured, ...others] = posts;
+      const mainCards = others.slice(0, 3);
+      const sidebarCards = others.slice(3);
+      const date = new Date(featured.published_at || featured.created_at).toLocaleDateString('vi-VN');
+      column.innerHTML = `<article class="news-main-card"><img src="${escapeImpactHtml(featured.image_url || 'news-hanoi-xanh.png')}" alt="${escapeImpactHtml(featured.title || '')}"><div class="news-main-body"><span class="news-tag">${escapeImpactHtml(featured.category || 'Tin tức')}</span><h3>${escapeImpactHtml(featured.title || '')}</h3><p>${escapeImpactHtml(featured.excerpt || featured.content || '')}</p><div class="news-meta-row"><span>${date} &nbsp; ${escapeImpactHtml(featured.source_name || 'Hà Nội Xanh')}</span><a href="${escapeImpactHtml(featured.source_url || '#')}" target="_blank" rel="noopener" class="news-link-read">Đọc tiếp →</a></div></div></article><div class="news-grid-3">${mainCards.map(article).join('')}</div>`;
+      if (sidebar) sidebar.innerHTML = `<div class="news-sidebar-title"><span>🌱 Xu hướng nổi bật</span></div>${sidebarCards.map(post => { const itemDate = new Date(post.published_at || post.created_at).toLocaleDateString('vi-VN'); return `<a href="${escapeImpactHtml(post.source_url || '#')}" target="_blank" rel="noopener" class="news-side-item"><img src="${escapeImpactHtml(post.image_url || 'news-hanoi-xanh.png')}" alt="${escapeImpactHtml(post.title || '')}"><div class="news-side-info"><h5>${escapeImpactHtml(post.title || '')}</h5><span>${itemDate} • ${escapeImpactHtml(post.source_name || 'Hà Nội Xanh')}</span></div></a>`; }).join('')}`;
+    }
+
     function renderImpactMetrics(rows) {
       const metrics = Object.fromEntries((rows || []).map(row => [row.metric_key, row.metric_value]));
       const overview = metrics.overview || {};
@@ -1474,6 +1511,7 @@
     });
 
     window.addEventListener('message', function(event) {
+      if (event.data?.type === 'hnx:posts-data') { renderNewsPosts(event.data.posts || []); return; }
       if (event.data?.type === 'hnx:homepage-metrics') { renderImpactMetrics(event.data.metrics); return; }
       if (event.data?.type === 'hnx:auth-state') {
         currentUser = event.data.user || null; applyUserDataToUI();

@@ -205,6 +205,35 @@
         .btn-confirm-crop { background: var(--primary-green); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;}
         .btn-cancel-crop { background: #e5e7eb; color: #333; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;}
         #file-upload { display: none; }
+
+        @media (max-width: 1100px) {
+            header { height: auto; min-height: 75px; flex-wrap: wrap; padding: 15px 4%; gap: 14px; }
+            .nav-links { order: 3; width: 100%; overflow-x: auto; gap: 20px; padding: 0 5px 5px; }
+            .container { width: 100%; max-width: 100%; padding-left: 20px; padding-right: 20px; }
+            .profile-layout { flex-wrap: wrap; }
+            .sidebar-left { flex-basis: 220px; }
+            .main-content { flex: 1 1 calc(100% - 245px); }
+            .sidebar-right { flex: 1 1 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+            .sidebar-right .card { margin-bottom: 0; }
+            .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
+        }
+
+        @media (max-width: 760px) {
+            .header-actions { margin-left: auto; }
+            .header-actions .btn-join, .header-actions .donate-btn { display: none; }
+            .profile-banner { padding-bottom: 95px; }
+            .profile-banner::before { width: 100%; background: rgba(255,255,255,.84); }
+            .profile-layout { display: block; margin-top: -60px; }
+            .sidebar-left, .main-content, .sidebar-right { width: 100%; }
+            .sidebar-right { display: block; }
+            .sidebar-right .card { margin-bottom: 20px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full-width { grid-column: auto; }
+            .history-item { align-items: flex-start; flex-wrap: wrap; gap: 14px; }
+            .history-date { flex-basis: 75px; padding-right: 14px; margin-right: 0; }
+            .history-meta { flex-direction: column; gap: 7px; }
+            .footer-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
