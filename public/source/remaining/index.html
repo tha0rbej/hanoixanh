@@ -18,7 +18,6 @@
       --border-color: #E3E8E3;
       --footer-bg: #05190e;
       --footer-border: #13331f;
-      --status-orange: #f59e0b;
       --status-red: #ef4444;
       --status-green: #10b981;
       --status-gray: #64748b;
@@ -149,14 +148,14 @@
     .legend-item { display: flex; align-items: center; gap: 6px; font-weight: 600; }
     .dot { width: 9px; height: 9px; border-radius: 50%; }
     .dot-green { background: #10b981; }
-    .dot-orange { background: #f59e0b; }
     .dot-red { background: #ef4444; }
 
-    .map-popup { position: absolute; bottom: 12px; left: 12px; width: 260px; background: #fff; border-radius: 8px; padding: 14px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.12); font-size: 12.5px; z-index: 500; }
-    .map-popup h5 { font-size: 14.5px; font-weight: 800; margin-bottom: 4px; color: var(--text-main); }
-    .map-popup .status-tag { font-weight: bold; margin-bottom: 5px; display: inline-block; font-size: 12px; }
-    .map-popup p { color: var(--text-sub); font-size: 12px; margin-bottom: 6px; line-height: 1.4; }
-    .map-popup a { color: var(--primary); font-weight: 700; text-decoration: none; font-size: 12.5px; cursor: pointer; }
+    .map-detail-card { position: absolute; bottom: 12px; left: 12px; right: 12px; background: #fff; border-radius: 10px; padding: 12px; display: flex; gap: 12px; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.16); font-size: 12px; z-index: 500; }
+    .map-detail-card img { width: 70px; height: 70px; border-radius: 7px; object-fit: cover; background: #eee; }
+    .map-detail-card .info { flex: 1; min-width: 0; }
+    .map-detail-card h3 { font-size: 15px; margin: 2px 0 3px; color: var(--text-main); }
+    .map-detail-card p { color: var(--text-sub); margin: 0; }
+    .map-detail-card .amount strong { display: block; color: var(--primary); font-size: 17px; }
 
     /* CỘT 3 */
     .report-intro { font-size: 13.5px; color: var(--text-sub); margin-bottom: 14px; line-height: 1.5; }
@@ -564,18 +563,16 @@
 
           <div class="map-container">
             <div class="map-legend">
-              <div class="legend-item"><span class="dot dot-green"></span> Đã xử lý</div>
-              <div class="legend-item"><span class="dot dot-orange"></span> Đang xử lý</div>
-              <div class="legend-item"><span class="dot dot-red"></span> Chưa xử lý</div>
+              <div class="legend-item"><span class="dot dot-green"></span> Đã hoàn thành</div>
+              <div class="legend-item"><span class="dot dot-red"></span> Sắp ra quân</div>
             </div>
 
             <div id="boundaryMap"></div>
 
-            <div class="map-popup" id="districtPopup">
-              <h5 id="popDistrict">Quận Tây Hồ</h5>
-              <span class="status-tag" id="popStatus" style="color: var(--status-green);">Đã xử lý</span>
-              <p id="popDesc">Vấn đề: Dọn sạch rác dềnh sau mưa tại Chợ Tứ Liên & Ngõ 236 Âu Cơ.<br>Chiến dịch liên quan: <strong id="popCount">2</strong></p>
-              <a onclick="switchMainView('tac-dong')">Xem chi tiết tác động →</a>
+            <div class="map-detail-card" id="mapDetailCard">
+              <img id="mapDetailImg" src="news-waste-hanoi.jpg" alt="Khu vực chiến dịch">
+              <div class="info"><span class="status-tag" id="mapDetailStatus" style="color:#10b981">Đã hoàn thành</span><h3 id="mapDetailTitle">Quận Tây Hồ</h3><p id="mapDetailDesc">Dọn sạch rác dềnh sau mưa.</p></div>
+              <div class="amount">Đã vớt:<strong id="mapDetailCount">2 chiến dịch</strong></div>
             </div>
           </div>
         </section>
@@ -1557,11 +1554,11 @@
     });
 
     const knownCampaignLocations = [
-      { name: "Quận Tây Hồ (Chợ Tứ Liên & Âu Cơ)", keywords: ["tây hồ", "tay ho", "chợ tứ liên", "tứ liên", "âu cơ", "236 âu cơ"], lat: 21.065, lng: 105.820, status: "Đã xử lý", color: "#10b981", desc: "Dọn sạch rác dềnh sau mưa tại Chợ Tứ Liên & Ngõ 236 Âu Cơ.", count: 2 },
-      { name: "Quận Hoàn Kiếm (Cầu Long Biên)", keywords: ["hoàn kiếm", "hoan kiem", "cầu long biên", "long biên", "long bien"], lat: 21.030, lng: 105.852, status: "Đang xử lý", color: "#f59e0b", desc: "Trục vớt rác bãi bồi chân Cầu Long Biên.", count: 2 },
-      { name: "Quận Đống Đa (Sông Tô Lịch)", keywords: ["đống đa", "dong da", "sông tô lịch", "tô lịch", "to lich"], lat: 21.018, lng: 105.825, status: "Đã xử lý", color: "#10b981", desc: "Làm sạch bờ sông Tô Lịch định kỳ.", count: 4 },
-      { name: "Quận Nam Từ Liêm (Xuân Phương)", keywords: ["nam từ liêm", "từ liêm", "xuân phương", "xuan phuong", "cn8"], lat: 21.042, lng: 105.748, status: "Đang ra quân", color: "#f59e0b", desc: "Ra quân làm sạch mương thoát nước đường CN8 Xuân Phương.", count: 1 },
-      { name: "Huyện Thanh Trì (Xóm Quán Đại Thanh)", keywords: ["thanh trì", "thanh tri", "đại thanh", "dai thanh", "xóm quán"], lat: 20.950, lng: 105.840, status: "Đang xử lý", color: "#f59e0b", desc: "Chiến dịch Chung tay vì Thủ đô tại Xóm Quán Đại Thanh.", count: 2 }
+      { name: "Quận Tây Hồ (Chợ Tứ Liên & Âu Cơ)", keywords: ["tây hồ", "tay ho", "chợ tứ liên", "tứ liên", "âu cơ", "236 âu cơ"], lat: 21.065, lng: 105.820, status: "Đã hoàn thành", color: "#10b981", desc: "Dọn sạch rác dềnh sau mưa tại Chợ Tứ Liên & Ngõ 236 Âu Cơ.", count: 2 },
+      { name: "Quận Hoàn Kiếm (Cầu Long Biên)", keywords: ["hoàn kiếm", "hoan kiem", "cầu long biên", "long biên", "long bien"], lat: 21.030, lng: 105.852, status: "Sắp ra quân", color: "#ef4444", desc: "Trục vớt rác bãi bồi chân Cầu Long Biên.", count: 2 },
+      { name: "Quận Đống Đa (Sông Tô Lịch)", keywords: ["đống đa", "dong da", "sông tô lịch", "tô lịch", "to lich"], lat: 21.018, lng: 105.825, status: "Đã hoàn thành", color: "#10b981", desc: "Làm sạch bờ sông Tô Lịch định kỳ.", count: 4 },
+      { name: "Quận Nam Từ Liêm (Xuân Phương)", keywords: ["nam từ liêm", "từ liêm", "xuân phương", "xuan phuong", "cn8"], lat: 21.042, lng: 105.748, status: "Sắp ra quân", color: "#ef4444", desc: "Ra quân làm sạch mương thoát nước đường CN8 Xuân Phương.", count: 1 },
+      { name: "Huyện Thanh Trì (Xóm Quán Đại Thanh)", keywords: ["thanh trì", "thanh tri", "đại thanh", "dai thanh", "xóm quán"], lat: 20.950, lng: 105.840, status: "Sắp ra quân", color: "#ef4444", desc: "Chiến dịch Chung tay vì Thủ đô tại Xóm Quán Đại Thanh.", count: 2 }
     ];
 
     const bMap = L.map('boundaryMap', {
@@ -1574,6 +1571,24 @@
     L.control.zoom({ position: 'bottomright' }).addTo(bMap);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(bMap);
 
+    const addressInput = document.getElementById('reportLocation');
+    let addressTimer;
+    addressInput.addEventListener('input', () => {
+      clearTimeout(addressTimer);
+      const query = addressInput.value.trim();
+      if (query.length < 3) return;
+      addressTimer = setTimeout(() => fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query + ', Hà Nội, Việt Nam')}`)
+        .then(response => response.json()).then(results => { if (results[0]) bMap.flyTo([+results[0].lat, +results[0].lon], 15, { duration: 0.8 }); }).catch(() => {}), 500);
+    });
+    bMap.on('click', event => {
+      const { lat, lng } = event.latlng;
+      selectedLat = lat; selectedLng = lng;
+      addressInput.value = 'Đang lấy địa chỉ...';
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18`)
+        .then(response => response.json()).then(result => { addressInput.value = result.display_name || `${lat.toFixed(5)}, ${lng.toFixed(5)}`; })
+        .catch(() => { addressInput.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`; });
+    });
+
     let currentActiveMarker = null;
     knownCampaignLocations.forEach(loc => {
       const circleMarker = L.circleMarker([loc.lat, loc.lng], {
@@ -1583,11 +1598,13 @@
     });
 
     function updateMapDistrictInfo(loc) {
-      document.getElementById('popDistrict').innerText = loc.name;
-      const statusEl = document.getElementById('popStatus');
+      document.getElementById('mapDetailImg').src = loc.image || 'news-waste-hanoi.jpg';
+      document.getElementById('mapDetailTitle').innerText = loc.name;
+      const statusEl = document.getElementById('mapDetailStatus');
       statusEl.innerText = loc.status;
       statusEl.style.color = loc.color;
-      document.getElementById('popDesc').innerHTML = `Vấn đề: ${loc.desc}<br>Chiến dịch liên quan: <strong>${loc.count}</strong>`;
+      document.getElementById('mapDetailDesc').innerText = loc.desc;
+      document.getElementById('mapDetailCount').innerText = `${loc.count} chiến dịch`;
     }
 
     function searchAndFlyMap(e) {
@@ -1627,11 +1644,11 @@
             bMap.flyTo([lat, lon], 15, { duration: 1.2 });
             if (currentActiveMarker) bMap.removeLayer(currentActiveMarker);
             currentActiveMarker = L.marker([lat, lon]).addTo(bMap);
-            document.getElementById('popDistrict').innerText = displayName;
-            const statusEl = document.getElementById('popStatus');
-            statusEl.innerText = "Chưa có dữ liệu";
-            statusEl.style.color = "var(--status-gray)";
-            document.getElementById('popDesc').innerHTML = `Khu vực này hiện chưa có chiến dịch xử lý.<br><a onclick="reportThisLocation('${displayName}')" style="color:var(--primary);font-weight:bold;cursor:pointer;">+ Báo điểm ô nhiễm tại đây</a>`;
+            document.getElementById('mapDetailTitle').innerText = displayName;
+            document.getElementById('mapDetailStatus').innerText = "Sắp ra quân";
+            document.getElementById('mapDetailStatus').style.color = "#ef4444";
+            document.getElementById('mapDetailDesc').innerText = "Chưa có chiến dịch xử lý tại khu vực này.";
+            document.getElementById('mapDetailCount').innerText = "0 chiến dịch";
           } else {
             fallbackSearch(rawQuery, btn);
           }
@@ -1644,11 +1661,11 @@
       bMap.flyTo([lat, lon], 14, { duration: 1.2 });
       if (currentActiveMarker) bMap.removeLayer(currentActiveMarker);
       currentActiveMarker = L.marker([lat, lon]).addTo(bMap);
-      document.getElementById('popDistrict').innerText = rawQuery;
-      const statusEl = document.getElementById('popStatus');
-      statusEl.innerText = "Chưa có dữ liệu";
-      statusEl.style.color = "var(--status-gray)";
-      document.getElementById('popDesc').innerHTML = `Khu vực "${rawQuery}" đã được định vị trên bản đồ.<br><a onclick="reportThisLocation('${rawQuery}')" style="color:var(--primary);font-weight:bold;cursor:pointer;">+ Báo điểm ô nhiễm tại đây</a>`;
+      document.getElementById('mapDetailTitle').innerText = rawQuery;
+      document.getElementById('mapDetailStatus').innerText = "Sắp ra quân";
+      document.getElementById('mapDetailStatus').style.color = "#ef4444";
+      document.getElementById('mapDetailDesc').innerText = `Đã định vị khu vực "${rawQuery}" trên bản đồ.`;
+      document.getElementById('mapDetailCount').innerText = "0 chiến dịch";
     }
 
     function reportThisLocation(name) {
