@@ -71,6 +71,22 @@
         .search-box input::placeholder { color: #9ca3af; }
 
         .btn-login { color: #035c2e; border: 1.5px solid #035c2e; padding: 9px 22px; border-radius: 30px; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; background: transparent; }
+        .btn-login.account-trigger { display:inline-flex; align-items:center; gap:8px; border:0; padding:4px 0 4px 10px; color:#111827; cursor:pointer; }
+        .account-avatar { width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid #d1fae5; }
+
+        .home-campaign-modal { display:none; position:fixed; inset:0; z-index:5000; padding:20px; background:rgba(15,23,42,.68); align-items:center; justify-content:center; }
+        .home-campaign-modal.open { display:flex; }
+        .home-campaign-dialog { width:min(720px, 96vw); max-height:90vh; overflow:auto; border-radius:14px; background:#fff; padding:34px 38px; box-shadow:0 24px 70px rgba(0,0,0,.3); }
+        .home-campaign-dialog h2 { color:#15803d; font-size:25px; margin-bottom:18px; }
+        .home-campaign-meta { padding:14px 16px; border-radius:8px; background:#f1f5f9; color:#64748b; margin-bottom:22px; }
+        .home-campaign-detail { margin:18px 0; text-align:center; }
+        .home-campaign-detail strong { display:block; color:#172033; font-size:16px; margin-bottom:7px; }
+        .home-campaign-detail p { color:#64748b; }
+        .home-campaign-actions { display:flex; justify-content:flex-end; gap:12px; margin-top:28px; }
+        .home-modal-close, .home-modal-register { border:0; border-radius:999px; padding:14px 22px; font-weight:800; cursor:pointer; }
+        .home-modal-close { background:#e2e8f0; color:#475569; }
+        .home-modal-register { background:#08783e; color:#fff; }
+        .home-modal-register:hover { background:#035c2e; }
 
         /* =========================
            HERO
@@ -389,7 +405,7 @@
             <i class="fa-regular fa-heart"></i>
             QUYÊN TẶNG
         </a>
-        <a href="#" onclick="event.preventDefault(); window.parent.postMessage({type:'hnx:auth-open', tab:'login'}, '*')" class="btn-login">ĐĂNG NHẬP</a>
+        <a href="#" onclick="event.preventDefault(); window.parent.postMessage({type:'hnx:auth-open', tab:'login'}, '*')" class="btn-login account-trigger"><img id="homeAccountAvatar" class="account-avatar" src="logo.jpg" alt="Avatar" hidden><span id="homeAccountName">ĐĂNG NHẬP</span><i id="homeAccountCaret" class="fa-solid fa-chevron-down" hidden></i></a>
     </div>
 </header>
 
@@ -820,6 +836,20 @@
     </a>
 </section>
 
+<div id="homeCampaignModal" class="home-campaign-modal" role="dialog" aria-modal="true" aria-labelledby="homeCampaignTitle" onclick="if(event.target===this) closeHomeCampaignModal()">
+    <div class="home-campaign-dialog">
+        <h2 id="homeCampaignTitle"></h2>
+        <div class="home-campaign-meta" id="homeCampaignMeta"></div>
+        <div class="home-campaign-detail"><strong>⚠️ Tình trạng ô nhiễm tại điểm ra quân:</strong><p id="homeCampaignPollution"></p></div>
+        <div class="home-campaign-detail"><strong>🎯 Kế hoạch &amp; Mục tiêu hành động:</strong><p id="homeCampaignPlan"></p></div>
+        <div class="home-campaign-detail"><strong>🛡️ Trang bị hỗ trợ từ Hà Nội Xanh:</strong><p id="homeCampaignSupport"></p></div>
+        <div class="home-campaign-actions">
+            <button type="button" class="home-modal-close" onclick="closeHomeCampaignModal()">ĐÓNG</button>
+            <button type="button" class="home-modal-register" id="homeCampaignRegister">ĐĂNG KÝ THAM GIA NGAY</button>
+        </div>
+    </div>
+</div>
+
 <!-- =====================================================
      FOOTER
 ===================================================== -->
@@ -898,9 +928,48 @@
         alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!');
         input.value = '';
     }
+    let homeCurrentUser = null;
+    let activeHomeCampaignId = null;
+    const homeCampaigns = new Map();
+    const registeredHomeCampaigns = new Set();
+
+    function closeHomeCampaignModal() {
+        document.getElementById('homeCampaignModal').classList.remove('open');
+    }
+
+    function openHomeCampaignModal(id) {
+        const campaign = homeCampaigns.get(String(id));
+        if (!campaign) return;
+        activeHomeCampaignId = String(id);
+        const start = new Date(campaign.start_at);
+        document.getElementById('homeCampaignTitle').textContent = campaign.title || 'Chiến dịch Hà Nội Xanh';
+        document.getElementById('homeCampaignMeta').textContent = `📍 ${campaign.location || 'Chưa cập nhật địa điểm'}  📅 ${start.toLocaleString('vi-VN')}`;
+        document.getElementById('homeCampaignPollution').textContent = campaign.pollution_status || 'Chưa cập nhật';
+        document.getElementById('homeCampaignPlan').textContent = campaign.action_plan || campaign.description || 'Chưa cập nhật';
+        document.getElementById('homeCampaignSupport').textContent = campaign.support_equipment || 'Hà Nội Xanh sẽ thông báo trước ngày ra quân';
+        const registerButton = document.getElementById('homeCampaignRegister');
+        const registered = registeredHomeCampaigns.has(activeHomeCampaignId);
+        registerButton.disabled = registered;
+        registerButton.textContent = registered ? 'BẠN ĐÃ ĐĂNG KÝ' : 'ĐĂNG KÝ THAM GIA NGAY';
+        document.getElementById('homeCampaignModal').classList.add('open');
+    }
+
+    document.getElementById('homeCampaignRegister').addEventListener('click', function() {
+        if (!activeHomeCampaignId) return;
+        if (!homeCurrentUser) {
+            window.parent.postMessage({ type: 'hnx:auth-open', tab: 'login' }, '*');
+            return;
+        }
+        this.disabled = true;
+        this.textContent = 'ĐANG ĐĂNG KÝ...';
+        window.parent.postMessage({ type: 'hnx:campaign-register', campaignKey: activeHomeCampaignId }, '*');
+    });
+
     function renderHomeCampaigns(campaigns) {
         const grid = document.querySelector('.schedule-grid');
         if (!grid || !Array.isArray(campaigns)) return;
+        homeCampaigns.clear();
+        campaigns.forEach(c => homeCampaigns.set(String(c.id), c));
         const upcoming = campaigns.find(c => c.status === 'upcoming');
         const completed = campaigns.filter(c => c.status === 'completed').sort((a, b) => new Date(b.start_at) - new Date(a.start_at)).slice(0, 2);
         const items = [upcoming, ...completed].filter(Boolean);
@@ -910,11 +979,31 @@
             const end = c.end_at ? new Date(c.end_at) : start;
             const date = start.toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
             const time = `${start.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`;
-            return `<div class="schedule-card"><div class="schedule-status"><span class="status-tag ${isUpcoming ? 'upcoming' : 'completed'}">${isUpcoming ? 'Sắp diễn ra' : 'Đã kết thúc'}</span><span class="volunteers-count"><i class="fa-solid fa-user-group"></i> ${c.capacity || 0} Tình nguyện viên</span></div><h3>${c.title || ''}</h3><ul class="schedule-info"><li><i class="fa-regular fa-calendar"></i> ${isUpcoming ? date : `Hoàn thành ngày ${start.toLocaleDateString('vi-VN')}`}</li>${isUpcoming ? `<li><i class="fa-regular fa-clock"></i> ${time}</li>` : ''}<li><i class="fa-solid fa-location-dot"></i> ${c.location || ''}</li></ul>${isUpcoming ? '<a href="../../chien-dich" target="_parent" class="btn-green" style="justify-content:center;width:100%;">Đăng ký tham gia ngay &rarr;</a>' : '<span class="btn-ended" style="justify-content:center;width:100%;">Đã kết thúc</span>'}</div>`;
+            return `<div class="schedule-card"><div class="schedule-status"><span class="status-tag ${isUpcoming ? 'upcoming' : 'completed'}">${isUpcoming ? 'Sắp diễn ra' : 'Đã kết thúc'}</span><span class="volunteers-count"><i class="fa-solid fa-user-group"></i> ${c.capacity || 0} Tình nguyện viên</span></div><h3>${c.title || ''}</h3><ul class="schedule-info"><li><i class="fa-regular fa-calendar"></i> ${isUpcoming ? date : `Hoàn thành ngày ${start.toLocaleDateString('vi-VN')}`}</li>${isUpcoming ? `<li><i class="fa-regular fa-clock"></i> ${time}</li>` : ''}<li><i class="fa-solid fa-location-dot"></i> ${c.location || ''}</li></ul>${isUpcoming ? `<button type="button" class="btn-green home-campaign-open" data-campaign-id="${c.id}" style="justify-content:center;width:100%;border:0;cursor:pointer;">Đăng ký tham gia ngay &rarr;</button>` : '<span class="btn-ended" style="justify-content:center;width:100%;">Đã kết thúc</span>'}</div>`;
         }).join('');
+        grid.querySelectorAll('.home-campaign-open').forEach(button => button.addEventListener('click', () => openHomeCampaignModal(button.dataset.campaignId)));
     }
     window.addEventListener('message', function(event) {
         if (event.data?.type === 'hnx:contact-message-result') { if (event.data.ok) { alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!'); document.getElementById('userMsgInput').value = ''; } else alert(event.data.message || 'Không thể gửi lời nhắn.'); return; }
+        if (event.data?.type === 'hnx:campaign-register-result') {
+            const button = document.getElementById('homeCampaignRegister');
+            if (event.data.ok) {
+                registeredHomeCampaigns.add(activeHomeCampaignId);
+                button.textContent = 'BẠN ĐÃ ĐĂNG KÝ';
+                button.disabled = true;
+                alert('Đăng ký tham gia chiến dịch thành công!');
+            } else {
+                button.textContent = 'ĐĂNG KÝ THAM GIA NGAY';
+                button.disabled = false;
+                alert(event.data.message || 'Không thể đăng ký chiến dịch.');
+            }
+            return;
+        }
+        if (event.data?.type === 'hnx:registered-campaigns') {
+            registeredHomeCampaigns.clear();
+            (event.data.keys || []).forEach(key => registeredHomeCampaigns.add(String(key)));
+            return;
+        }
         if (event.data?.type === 'hnx:scroll-top') { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; return; }
         if (event.data?.type === 'hnx:campaigns-data') { renderHomeCampaigns(event.data.campaigns); return; }
         if (event.data?.type === 'hnx:homepage-metrics') {
@@ -928,17 +1017,32 @@
             return;
         }
         if (event.data?.type !== 'hnx:auth-state') return;
+        homeCurrentUser = event.data.user || null;
         const actions = document.querySelector('.header-actions');
         if (!actions) return;
         const loginButton = actions.querySelector('.btn-login');
         if (loginButton) {
-            loginButton.textContent = event.data.user?.name || 'ĐĂNG NHẬP';
+            const accountName = document.getElementById('homeAccountName');
+            const accountAvatar = document.getElementById('homeAccountAvatar');
+            const accountCaret = document.getElementById('homeAccountCaret');
+            accountName.textContent = event.data.user?.name || 'ĐĂNG NHẬP';
+            accountAvatar.hidden = !event.data.user;
+            accountCaret.hidden = !event.data.user;
+            if (event.data.user) accountAvatar.src = event.data.user.avatarUrl || 'logo.jpg';
             loginButton.onclick = function(e) {
                 e.preventDefault();
                 if (!event.data.user) { window.parent.postMessage({type:'hnx:auth-open', tab:'login'}, '*'); return; }
                 let menu = document.getElementById('homeAccountMenu');
-                if (!menu) { menu = document.createElement('button'); menu.id = 'homeAccountMenu'; menu.textContent = 'Đăng xuất'; menu.style.cssText = 'position:absolute;right:0;top:calc(100% + 10px);z-index:20;width:185px;padding:16px;border:1px solid #d1fae5;border-radius:14px;background:#fff;color:#b91c1c;font-weight:700;font-size:13px;line-height:1.2;box-shadow:0 12px 30px rgba(0,0,0,.12);cursor:pointer;text-align:left'; loginButton.parentElement.style.position = 'relative'; loginButton.parentElement.appendChild(menu); menu.onclick = function() { window.parent.postMessage({type:'hnx:signout'}, '*'); menu.remove(); }; }
-                else menu.remove();
+                if (!menu) { menu = document.createElement('div'); menu.id = 'homeAccountMenu'; menu.style.cssText = 'position:absolute;right:0;top:calc(100% + 10px);z-index:20;width:200px;padding:10px 16px;border:1px solid #d1fae5;border-radius:14px;background:#fff;color:#111827;font-size:13px;line-height:1.2;box-shadow:0 12px 30px rgba(0,0,0,.12);text-align:left'; loginButton.parentElement.style.position = 'relative'; loginButton.parentElement.appendChild(menu); }
+                if (menu) {
+                    menu.innerHTML = '<button id="homeProfileLink" type="button" style="display:block;width:100%;padding:10px 0;border:0;background:transparent;text-align:left;font-weight:700;cursor:pointer">Hồ sơ cá nhân</button><button id="homeLogoutLink" type="button" style="display:block;width:100%;padding:10px 0;border:0;background:transparent;text-align:left;color:#b91c1c;font-weight:700;cursor:pointer">Đăng xuất</button>';
+                    menu.onclick = function(e) {
+                        e.stopPropagation();
+                        if (e.target.id === 'homeProfileLink') window.parent.postMessage({type:'hnx:navigate', path:'/ho-so'}, '*');
+                        if (e.target.id === 'homeLogoutLink' && window.confirm('Bạn có chắc chắn muốn đăng xuất không?')) window.parent.postMessage({type:'hnx:signout'}, '*');
+                        menu.remove();
+                    };
+                } else menu.remove();
             };
         }
         let link = document.getElementById('adminDashboardLink');

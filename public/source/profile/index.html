@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hà Nội Xanh - Hồ Sơ Cá Nhân</title>
+
+    <!-- Font Awesome cho icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- Thư viện Cropper.js (Dùng để cắt ảnh) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <style>
+        /* =========================================
+           1. CÀI ĐẶT BIẾN MÀU SẮC & CHUNG
+        ========================================= */
+        :root {
+            --primary-green: #038a47; 
+            --dark-green: #035c2e;   
+            --light-green-bg: #f4fbf6; 
+            --light-green-badge: #e6f4ea;
+            --text-dark: #222222;
+            --text-gray: #6b7280;
+            --border-color: #e5e7eb;
+            --bg-body: #f4f7f6; /* Màu nền xám nhạt của toàn trang */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-dark); line-height: 1.6; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        button { font-family: inherit; outline: none; }
+
+        .container { max-width: 1250px; margin: 0 auto; padding: 0 20px; }
+
+        /* =========================================
+           2. MÀN HÌNH ĐĂNG NHẬP
+        ========================================= */
+        #login-screen { display: none; min-height: 100vh; background: linear-gradient(135deg, var(--light-green-badge) 0%, #ffffff 100%); align-items: center; justify-content: center; padding: 20px; }
+        .login-card { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(3, 138, 71, 0.1); width: 100%; max-width: 400px; text-align: center; }
+        .login-card img { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--border-color); margin-bottom: 15px; }
+        .login-card h2 { color: var(--dark-green); margin-bottom: 5px; }
+        .login-card p { color: var(--text-gray); font-size: 14px; margin-bottom: 25px; }
+        .login-form input { width: 100%; padding: 12px 15px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; }
+        .login-form input:focus { border-color: var(--primary-green); outline: none; }
+        .btn-login-submit { width: 100%; background: var(--primary-green); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .btn-login-submit:hover { background: var(--dark-green); }
+
+        /* =========================================
+           3. GIAO DIỆN CHÍNH (APP)
+        ========================================= */
+        #main-app { display: block; } 
+
+        /* Header */
+        header { background: #ffffff; height: 90px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; border-bottom: 2px solid #f0f0f0; position: sticky; top: 0; z-index: 2000; }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 16px; color: var(--dark-green); line-height: 1.2; cursor: pointer; }
+        .logo img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #e0e0e0;}
+        .nav-links { display: flex; gap: 25px; align-items: center; }
+        .nav-links a { font-size: 13px; font-weight: 800; color: #4a5568; transition: 0.3s; cursor: pointer; white-space: nowrap; }
+        .nav-links a:hover, .nav-links a.active { color: #129c50; }
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .btn-join { background:#035c2e; color:#fff; padding:10px 22px; border-radius:30px; font-weight:700; font-size:13px; cursor:pointer; }
+        .donate-btn { background:#ef4444; color:#fff; padding:10px 22px; border-radius:30px; font-weight:700; font-size:13px; cursor:pointer; }
+        
+        .user-dropdown-container { position: relative; }
+        .user-menu { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: 0.2s; padding-left: 15px; border-left: 1px solid var(--border-color);}
+        .user-menu img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+        .dropdown-menu { display: none; position: absolute; top: 120%; right: 0; background: white; border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); min-width: 180px; z-index: 1001; overflow: hidden; }
+        .dropdown-menu.show { display: block; }
+        .dropdown-menu a { display: flex; align-items: center; gap: 10px; padding: 12px 15px; font-size: 14px; font-weight: 600; color: var(--text-dark); border-bottom: 1px solid #f3f4f6; }
+        .dropdown-menu a:last-child { border-bottom: none; color: #ef4444; }
+        .dropdown-menu a:hover { background: #f9fafb; color: var(--primary-green); }
+
+        .footer { background:#10291e; color:#fff; padding:60px 5% 25px; margin-top:50px; }
+        .footer-grid { max-width:1300px; margin:0 auto; display:grid; grid-template-columns:1.2fr 1fr .8fr 1fr; gap:50px; padding-bottom:40px; }
+        .footer-col h4 { font-size:16px; margin-bottom:15px; }
+        .footer-col p, .contact-info { color:#b9c7bf; font-size:13px; line-height:1.7; }
+        .footer-logo-area { display:flex; align-items:center; gap:10px; font-weight:800; font-size:20px; margin-bottom:15px; }
+        .footer-logo-area img { width:45px; height:45px; border-radius:50%; object-fit:cover; }
+        .footer-logo-area span { color:#10b981; }
+        .footer-links, .contact-info { list-style:none; }
+        .footer-links li, .contact-info li { margin-bottom:12px; }
+        .footer-links a { color:#d1d5db; cursor:pointer; }
+        .footer-links a:hover { color:#10b981; }
+        .footer-bottom { max-width:1300px; margin:0 auto; padding-top:25px; border-top:1px solid rgba(255,255,255,.08); font-size:13px; color:#9ca3af; }
+        .empty-history { padding:35px 20px; text-align:center; color:var(--text-gray); border:1px dashed var(--border-color); border-radius:10px; }
+
+        /* =========================================
+           CSS CHỈNH SỬA BANNER ẢNH NỀN
+        ========================================= */
+        .profile-banner { 
+            /* THAY LINK NÀY BẰNG ẢNH THẬT CỦA BẠN NHÉ */
+            background-image: url('../home/trangchu1.jpg');
+            background-color: #e8f5e9; 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            padding: 35px 0 120px 0; 
+            position: relative;
+        }
+        
+        .profile-banner::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 78%; height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,.98) 0%, rgba(255,255,255,.88) 52%, rgba(255,255,255,.18) 100%);
+            z-index: 1;
+        }
+
+        .breadcrumb { font-size: 13px; color: var(--text-gray); margin-bottom: 15px; position: relative; z-index: 2;}
+        .breadcrumb strong { color: var(--text-dark); }
+        .banner-content { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2;}
+        .banner-text h1 { font-size: 34px; color: var(--dark-green); margin-bottom: 8px; text-shadow: 0 1px 0 rgba(255,255,255,.8); }
+        .banner-text p { color: #1f3b2d; font-size: 14px; font-weight: 600; max-width: 590px; line-height: 1.65; text-shadow: 0 1px 1px rgba(255,255,255,.9); }
+        
+        /* =========================================
+           LAYOUT 3 CỘT ĐÈ LÊN ẢNH NỀN
+        ========================================= */
+        .profile-layout { 
+            display: flex; 
+            gap: 25px; 
+            margin-top: -75px; 
+            padding-bottom: 60px; 
+            align-items: flex-start; 
+            position: relative; 
+            z-index: 10; 
+        }
+        .card { 
+            background: #ffffff; 
+            border-radius: 12px; 
+            padding: 24px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            margin-bottom: 20px; 
+        }
+
+        /* --- CỘT TRÁI (MENU) --- */
+        .sidebar-left { flex: 0 0 260px; text-align: center;}
+        .avatar-lg { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin: 0 auto; display: block; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .btn-change-photo { background: white; border: 1px solid var(--border-color); padding: 6px 15px; border-radius: 20px; font-size: 12px; font-weight: 600; margin: 15px 0; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+        .badge-role { display: inline-flex; align-items: center; gap: 5px; background: var(--light-green-badge); color: var(--primary-green); padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; margin: 5px 0 25px; }
+        .side-menu a { display: flex; align-items: center; gap: 15px; padding: 12px 15px; border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--text-gray); margin-bottom: 5px; transition: 0.2s; cursor: pointer;}
+        .side-menu a.active { background: var(--light-green-badge); color: var(--primary-green); }
+        .side-menu a:hover:not(.active) { background: #f9fafb; color: var(--text-dark); }
+
+        /* --- CỘT GIỮA (NỘI DUNG CHÍNH) --- */
+        .main-content { flex: 1; min-width: 0; position: relative; }
+        .tab-content { display: none; animation: fadeIn 0.4s ease-in-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .section-header { margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+        .section-header h2 { font-size: 20px; margin-bottom: 5px; color: var(--text-dark); }
+        .section-header p { font-size: 13px; color: var(--text-gray); margin-bottom: 0; }
+
+        /* Khối CSS Form */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group.full-width { grid-column: span 2; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+        .form-group label span { color: red; }
+        .input-box { position: relative; }
+        .input-box i.icon-left { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-gray); font-size: 14px; pointer-events: none; }
+        .input-box i.icon-eye { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-gray); font-size: 14px; cursor: pointer; transition: 0.3s; }
+        .input-box i.icon-eye:hover { color: var(--primary-green); }
+        .input-box i.icon-down { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-gray); font-size: 12px; pointer-events: none; }
+        .input-box input[type="date"] { padding-left: 40px; text-transform: uppercase; }
+        .input-box input[type="date"]::-webkit-calendar-picker-indicator { background: transparent; bottom: 0; color: transparent; cursor: pointer; height: auto; left: 0; position: absolute; right: 0; top: 0; width: auto; }
+        .input-box input, .input-box select, .input-box textarea { width: 100%; padding: 12px 40px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; outline: none; appearance: none;}
+        .input-box input:focus, .input-box select:focus, .input-box textarea:focus { border-color: var(--primary-green); }
+        .input-box input[readonly] { background-color: #f9fafb; color: var(--text-gray); cursor: not-allowed; }
+        .input-box textarea { padding-left: 15px; padding-right: 15px; resize: none; min-height: 80px; }
+        .form-actions { display: flex; gap: 15px; margin-top: 25px; }
+        .btn-save { background: var(--primary-green); color: white; padding: 12px 25px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; }
+        .btn-save:hover, .btn-save:focus-visible { background: var(--dark-green); font-weight: 900; box-shadow: 0 6px 16px rgba(3, 92, 46, .28); transform: translateY(-1px); }
+        .btn-cancel { background: white; border: 1px solid var(--border-color); padding: 12px 25px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+
+        /* Khối CSS Lịch sử tham gia */
+        .history-list { display: flex; flex-direction: column; gap: 15px; }
+        .history-item { display: flex; align-items: center; padding: 20px; border: 1px solid var(--border-color); border-radius: 10px; position: relative; overflow: hidden; }
+        .history-item::before { content: ""; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: var(--primary-green); }
+        .history-date { flex: 0 0 100px; text-align: center; border-right: 1px solid var(--border-color); padding-right: 20px; margin-right: 20px; }
+        .history-date h3 { font-size: 24px; color: var(--primary-green); margin: 0; line-height: 1; }
+        .history-date p { font-size: 12px; color: var(--text-gray); text-transform: uppercase; margin-top: 5px; font-weight: 600;}
+        .history-info { flex: 1; }
+        .history-info h4 { font-size: 16px; margin: 0 0 8px 0; color: var(--text-dark); }
+        .history-meta { display: flex; gap: 20px; font-size: 13px; color: var(--text-gray); }
+        .history-meta span { display: flex; align-items: center; gap: 5px; }
+        .history-status { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; background: var(--light-green-badge); color: var(--primary-green); }
+
+        /* --- CỘT PHẢI (THỐNG KÊ HOẠT ĐỘNG CHUNG) --- */
+        .sidebar-right { flex: 0 0 280px; }
+        .stat-card { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-radius: 8px; margin-bottom: 12px; background: #fafafa; border: 1px solid #f3f4f6; cursor: pointer; transition: 0.3s;}
+        .stat-card:hover { background: var(--light-green-badge); border-color: var(--light-green-badge); transform: translateY(-2px);}
+        .stat-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; margin-right: 15px; background: var(--light-green-badge); color: var(--primary-green);}
+
+        /* =========================================
+           4. MODAL CĂN CHỈNH ẢNH (CROPPER UI)
+        ========================================= */
+        #cropper-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 9999; align-items: center; justify-content: center; }
+        .cropper-container-box { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; text-align: center; }
+        .img-container { width: 100%; height: 350px; background: #f0f0f0; margin-bottom: 20px; overflow: hidden; }
+        .img-container img { max-width: 100%; }
+        .cropper-actions { display: flex; justify-content: flex-end; gap: 10px; }
+        .btn-confirm-crop { background: var(--primary-green); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;}
+        .btn-cancel-crop { background: #e5e7eb; color: #333; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;}
+        #file-upload { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- MÀN HÌNH ĐĂNG NHẬP -->
+    <div id="login-screen">
+        <div class="login-card">
+            <img src="https://via.placeholder.com/60x60/035c2e/ffffff?text=HN" alt="Logo">
+            <h2>HÀ NỘI XANH</h2>
+            <p>Đăng nhập để tiếp tục đóng góp cho cộng đồng</p>
+            <form class="login-form" onsubmit="handleLogin(event)">
+                <input type="email" placeholder="Email của bạn" value="" required>
+                <input type="password" placeholder="Mật khẩu" value="" required>
+                <button type="submit" class="btn-login-submit">Đăng Nhập</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MÀN HÌNH CHÍNH APP -->
+    <div id="main-app">
+        <!-- HEADER -->
+        <header>
+            <a href="#" class="logo" onclick="event.preventDefault(); navigateParent('/')">
+                <img src="../home/logo.jpg" alt="Logo Hà Nội Xanh">
+                <span>HÀ NỘI<br>XANH</span>
+            </a>
+            <nav class="nav-links">
+                <a onclick="navigateParent('/')">Trang chủ</a>
+                <a onclick="navigateParent('/ve-ha-noi-xanh')">Về Hà Nội Xanh</a>
+                <a onclick="navigateParent('/chien-dich')">Chiến dịch</a>
+                <a onclick="navigateParent('/tac-dong')">Tác động cộng đồng</a>
+                <a onclick="navigateParent('/tin-tuc')">Tin tức &amp; câu chuyện</a>
+            </nav>
+            <div class="header-actions">
+                <a class="btn-join" onclick="navigateParent('/tham-gia')">THAM GIA</a>
+                <a class="donate-btn" onclick="navigateParent('/tac-dong')"><i class="fa-regular fa-heart"></i> QUYÊN TẶNG</a>
+                <div class="user-dropdown-container">
+                    <div class="user-menu" onclick="toggleDropdown()">
+                        <img id="header-avatar" src="../home/logo.jpg" alt="Avatar">
+                        <span id="header-user-name">Thành viên</span> <i class="fa-solid fa-chevron-down" style="font-size: 10px;"></i>
+                    </div>
+                    <div id="dropdown-menu" class="dropdown-menu">
+                        <a href="#" onclick="switchTab('tab-profile', document.querySelectorAll('.menu-link')[0])"><i class="fa-regular fa-user"></i> Hồ sơ cá nhân</a>
+                        <a href="#" onclick="switchTab('tab-history', document.querySelectorAll('.menu-link')[1])"><i class="fa-solid fa-clock-rotate-left"></i> Lịch sử tham gia</a>
+                        <a href="#" onclick="switchTab('tab-password', document.querySelectorAll('.menu-link')[2])"><i class="fa-solid fa-lock"></i> Đổi mật khẩu</a>
+                        <a href="#" onclick="handleLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- BANNER (NỀN ẢNH VÀ CHỮ LÊN TRÊN) -->
+        <div class="profile-banner">
+            <div class="container">
+                <div class="breadcrumb" id="breadcrumb-text"><i class="fa-solid fa-house"></i> > Tài khoản > <strong>Hồ sơ cá nhân</strong></div>
+                <div class="banner-content">
+                    <div class="banner-text">
+                        <h1 id="banner-title">Hồ sơ cá nhân</h1>
+                        <p id="banner-desc">Cập nhật thông tin cá nhân để kết nối tốt hơn với cộng đồng Hà Nội Xanh<br>và cùng nhau lan tỏa những giá trị tốt đẹp vì một Thủ đô xanh – sạch – đẹp hơn mỗi ngày.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LAYOUT 3 CỘT (ĐƯỢC KÉO ÂM LÊN ĐỂ ĐÈ LÊN ẢNH NỀN) -->
+        <div class="container profile-layout">
+            
+            <!-- Cột Trái: Menu Chuyển Tab -->
+            <aside class="sidebar-left card">
+                <img id="main-profile-avatar" class="avatar-lg" src="../home/logo.jpg" alt="Avatar">
+                <input type="file" id="file-upload" accept="image/*">
+                <button class="btn-change-photo" onclick="document.getElementById('file-upload').click();"><i class="fa-solid fa-camera"></i> Đổi ảnh</button>
+                <h3 id="profile-user-name">Thành viên</h3>
+                <div class="badge-role" id="profile-level"><i class="fa-solid fa-leaf"></i> Thành viên mới</div>
+
+                <ul class="side-menu" style="text-align: left; margin-top: 15px;">
+                    <li><a class="menu-link active" onclick="switchTab('tab-profile', this)"><i class="fa-regular fa-user"></i> Hồ sơ cá nhân</a></li>
+                    <li><a class="menu-link" onclick="switchTab('tab-history', this)"><i class="fa-regular fa-clock"></i> Lịch sử tham gia</a></li>
+                    <li><a class="menu-link" onclick="switchTab('tab-password', this)"><i class="fa-solid fa-lock"></i> Đổi mật khẩu</a></li>
+                </ul>
+            </aside>
+
+            <!-- Cột Giữa: Nơi chứa các Tab Nội dung -->
+            <main class="main-content card">
+                
+                <!-- TAB 1: FORM THÔNG TIN -->
+                <div id="tab-profile" class="tab-content active">
+                    <div class="section-header">
+                        <h2>Thông tin cá nhân</h2>
+                        <p>Cập nhật thông tin để hoàn thiện hồ sơ của bạn</p>
+                    </div>
+                    <form id="profile-form">
+                        <div class="form-grid">
+                            <div class="form-group"><label>Họ và tên <span>*</span></label><div class="input-box"><i class="fa-regular fa-user icon-left"></i><input id="profile-name" type="text" value="" required></div></div>
+                            <div class="form-group"><label>Số điện thoại</label><div class="input-box"><i class="fa-solid fa-phone icon-left"></i><input id="profile-phone" type="tel" value="" placeholder="Bạn tự bổ sung"></div></div>
+                            <div class="form-group"><label>Email</label><div class="input-box"><i class="fa-regular fa-envelope icon-left"></i><input id="profile-email" type="email" value="" readonly></div></div>
+                            <div class="form-group"><label>Ngày sinh</label><div class="input-box"><i class="fa-regular fa-calendar icon-left"></i><input id="profile-birth-date" type="date" value=""></div></div>
+                            <div class="form-group">
+                                <label>Giới tính</label>
+                                <div class="input-box"><i class="fa-regular fa-user icon-left"></i><select id="profile-gender"><option value="">Chưa cập nhật</option><option value="nu">Nữ</option><option value="nam">Nam</option><option value="khac">Khác</option></select><i class="fa-solid fa-chevron-down icon-down"></i></div>
+                            </div>
+                            <div class="form-group"><label>Địa chỉ</label><div class="input-box"><i class="fa-solid fa-location-dot icon-left"></i><input id="profile-address" type="text" value="" placeholder="Bạn tự bổ sung"></div></div>
+                            <div class="form-group"><label>Nghề nghiệp / Trường học</label><div class="input-box"><i class="fa-solid fa-graduation-cap icon-left"></i><input id="profile-occupation" type="text" value="" placeholder="Bạn tự bổ sung"></div></div>
+                            <div class="form-group"><label>Ngày tham gia</label><div class="input-box"><i class="fa-regular fa-calendar icon-left"></i><input id="profile-joined-at" type="text" value="" readonly></div></div>
+                            <div class="form-group full-width"><label>Khu vực quan tâm</label><div class="input-box"><i class="fa-solid fa-tags icon-left"></i><input id="profile-interests" type="text" value="" placeholder="Ví dụ: làm sạch sông hồ, trồng cây"></div></div>
+                            <div class="form-group full-width"><label>Giới thiệu bản thân</label><div class="input-box"><textarea id="profile-bio" rows="3" placeholder="Bạn tự giới thiệu về mình"></textarea></div></div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-save"><i class="fa-solid fa-floppy-disk"></i> Lưu thay đổi</button>
+                            <button type="button" class="btn-cancel">Hủy</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- TAB 2: LỊCH SỬ THAM GIA -->
+                <div id="tab-history" class="tab-content">
+                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: flex-end;">
+                        <div>
+                            <h2>Hoạt động gần đây</h2>
+                            <p>Các chiến dịch bạn đã đăng ký và tham gia</p>
+                        </div>
+                        <select style="padding: 6px 10px; border: 1px solid #e5e7eb; border-radius: 6px; outline: none; background: white; cursor: pointer;">
+                            <option>Mới nhất</option>
+                            <option>Đã hoàn thành</option>
+                        </select>
+                    </div>
+                    <div class="history-list" id="campaign-history">
+                        <div class="empty-history">Bạn chưa đăng ký chiến dịch nào.</div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: ĐỔI MẬT KHẨU -->
+                <div id="tab-password" class="tab-content">
+                    <div class="section-header">
+                        <h2>Đổi mật khẩu</h2>
+                        <p>Cập nhật mật khẩu để bảo vệ tài khoản của bạn tốt hơn.</p>
+                    </div>
+                    <form id="password-form">
+                        <div style="display: flex; flex-direction: column; gap: 20px; max-width: 500px;">
+                            <div class="form-group">
+                                <label>Mật khẩu hiện tại <span>*</span></label>
+                                <div class="input-box">
+                                    <i class="fa-solid fa-lock icon-left"></i>
+                                    <input type="password" id="old-pwd" placeholder="Nhập mật khẩu cũ" required>
+                                    <i class="fa-solid fa-eye-slash icon-eye" onclick="togglePassword('old-pwd', this)" title="Hiện/Ẩn mật khẩu"></i>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Mật khẩu mới <span>*</span></label>
+                                <div class="input-box">
+                                    <i class="fa-solid fa-key icon-left"></i>
+                                    <input type="password" id="new-pwd" placeholder="Nhập mật khẩu mới" required>
+                                    <i class="fa-solid fa-eye-slash icon-eye" onclick="togglePassword('new-pwd', this)" title="Hiện/Ẩn mật khẩu"></i>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Xác nhận mật khẩu mới <span>*</span></label>
+                                <div class="input-box">
+                                    <i class="fa-solid fa-check-double icon-left"></i>
+                                    <input type="password" id="confirm-pwd" placeholder="Nhập lại mật khẩu mới" required>
+                                    <i class="fa-solid fa-eye-slash icon-eye" onclick="togglePassword('confirm-pwd', this)" title="Hiện/Ẩn mật khẩu"></i>
+                                </div>
+                                <p id="pwd-error" style="color: #ef4444; font-size: 13px; font-weight: 600; display: none; margin-top: 8px;">
+                                    <i class="fa-solid fa-circle-exclamation"></i> Mật khẩu xác nhận không khớp!
+                                </p>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-save"><i class="fa-solid fa-shield-halved"></i> Cập nhật mật khẩu</button>
+                        </div>
+                    </form>
+                </div>
+
+            </main>
+
+            <!-- Cột Phải: Thông tin hoạt động -->
+            <aside class="sidebar-right">
+                <div class="card">
+                    <div class="section-header" style="border:none; padding-bottom:5px; margin-bottom: 15px;">
+                        <h2 style="font-size: 16px;"><i class="fa-solid fa-chart-simple" style="color:var(--primary-green); margin-right:5px;"></i> Thông tin hoạt động</h2>
+                        <p style="font-size: 12px;">Hành trình đóng góp vì một Hà Nội xanh hơn</p>
+                    </div>
+                    
+                    <div class="stat-card" onclick="switchTab('tab-history', document.querySelectorAll('.menu-link')[1])">
+                        <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                        <div style="flex:1;"><h4 id="profile-campaign-count" style="margin: 0; font-size: 18px;">0</h4><p style="margin: 0; font-size: 12px; color: var(--text-gray);">Chiến dịch đã đăng ký</p></div>
+                        <i class="fa-solid fa-chevron-right" style="color: #9ca3af; font-size: 12px;"></i>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-regular fa-clock"></i></div>
+                        <div style="flex:1;"><h4 id="profile-hours" style="margin: 0; font-size: 18px;">0h</h4><p style="margin: 0; font-size: 12px; color: var(--text-gray);">Số giờ tình nguyện</p></div>
+                        <i class="fa-solid fa-chevron-right" style="color: #9ca3af; font-size: 12px;"></i>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-trophy"></i></div>
+                        <div style="flex:1;"><h4 id="profile-badges" style="margin: 0; font-size: 18px;">0</h4><p style="margin: 0; font-size: 12px; color: var(--text-gray);">Huy hiệu</p></div>
+                        <i class="fa-solid fa-chevron-right" style="color: #9ca3af; font-size: 12px;"></i>
+                    </div>
+                </div>
+
+                <div class="card" style="padding-bottom: 15px;">
+                    <div class="section-header" style="border:none; padding-bottom:5px; margin-bottom: 10px;">
+                        <h2 style="font-size: 16px;"><i class="fa-solid fa-lock" style="color:var(--primary-green); margin-right:5px;"></i> Đổi mật khẩu</h2>
+                        <p style="font-size: 12px;">Cập nhật mật khẩu để bảo vệ tài khoản của bạn tốt hơn.</p>
+                    </div>
+                    <div class="stat-card" style="margin-bottom: 0; padding: 10px 15px;" onclick="switchTab('tab-password', document.querySelectorAll('.menu-link')[2])">
+                        <div class="stat-icon" style="background: white; border: 1px solid var(--border-color); color: var(--text-dark); width: 30px; height: 30px; font-size: 12px;"><i class="fa-solid fa-lock"></i></div>
+                        <div style="flex:1; font-weight: 600; font-size: 14px;">Đổi mật khẩu</div>
+                        <i class="fa-solid fa-chevron-right" style="color: #9ca3af; font-size: 12px;"></i>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Lời nhắn gửi đến Hà Nội Xanh</h4>
+                <p>Cùng chia sẻ ý kiến và lan tỏa những hành động tốt đẹp vì môi trường Thủ đô.</p>
+            </div>
+            <div class="footer-col">
+                <div class="footer-logo-area"><img src="../home/logo.jpg" alt="Logo Hà Nội Xanh">HÀ NỘI <span>XANH</span></div>
+                <p>Cùng nhau hành động nhỏ, tạo nên thay đổi lớn cho môi trường Thủ đô.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Liên kết nhanh</h4>
+                <ul class="footer-links">
+                    <li><a onclick="navigateParent('/')">› Trang chủ</a></li>
+                    <li><a onclick="navigateParent('/ve-ha-noi-xanh')">› Về Hà Nội Xanh</a></li>
+                    <li><a onclick="navigateParent('/chien-dich')">› Chiến dịch</a></li>
+                    <li><a onclick="navigateParent('/tac-dong')">› Tác động cộng đồng</a></li>
+                    <li><a onclick="navigateParent('/tin-tuc')">› Tin tức &amp; câu chuyện</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Liên hệ</h4>
+                <ul class="contact-info">
+                    <li><i class="fa-solid fa-phone"></i> +84 98 723 18 32</li>
+                    <li><i class="fa-solid fa-envelope"></i> hanoixanhh@gmail.com</li>
+                    <li><i class="fa-solid fa-location-dot"></i> 117 Xuân Thủy, Cầu Giấy, Hà Nội</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">&copy; 2026 Hà Nội Xanh. All rights reserved.</div>
+    </footer>
+
+    <!-- MODAL CẮT ẢNH -->
+    <div id="cropper-modal">
+        <div class="cropper-container-box">
+            <h3 style="margin-bottom: 15px;">Căn chỉnh ảnh đại diện</h3>
+            <div class="img-container"><img id="image-to-crop" src=""></div>
+            <div class="cropper-actions">
+                <button class="btn-cancel-crop" onclick="closeCropper()">Hủy</button>
+                <button class="btn-confirm-crop" onclick="confirmCrop()">Đồng ý cắt</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT ĐIỀU KHIỂN -->
+    <script>
+        // --- 1. TÍNH NĂNG ẨN / HIỆN MẬT KHẨU ---
+        function togglePassword(inputId, iconElement) {
+            const inputField = document.getElementById(inputId);
+            if (inputField.type === "password") {
+                inputField.type = "text";
+                iconElement.classList.remove("fa-eye-slash");
+                iconElement.classList.add("fa-eye");
+            } else {
+                inputField.type = "password";
+                iconElement.classList.remove("fa-eye");
+                iconElement.classList.add("fa-eye-slash");
+            }
+        }
+
+        // --- 2. XỬ LÝ ĐỔI MẬT KHẨU ---
+        document.getElementById('password-form').addEventListener('submit', function(e){
+            e.preventDefault();
+            const currentPwd = document.getElementById('old-pwd').value;
+            const newPwd = document.getElementById('new-pwd').value;
+            const confirmPwd = document.getElementById('confirm-pwd').value;
+            const errorMsg = document.getElementById('pwd-error');
+
+            if (newPwd !== confirmPwd) {
+                errorMsg.style.display = 'block';
+                return;
+            }
+            if (newPwd.length < 6) {
+                alert('Mật khẩu mới phải có ít nhất 6 ký tự.');
+                return;
+            }
+            errorMsg.style.display = 'none';
+            const submitButton = this.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Đang xác minh...';
+            window.parent.postMessage({ type: 'hnx:password-update', currentPassword: currentPwd, newPassword: newPwd }, window.location.origin);
+        });
+
+        // --- 3. CHUYỂN TAB ---
+        function switchTab(tabId, element) {
+            document.getElementById('dropdown-menu').classList.remove('show');
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.menu-link').forEach(link => link.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            
+            if(element && element.classList.contains('menu-link')){ element.classList.add('active'); } 
+            else if(tabId === 'tab-profile') { document.querySelectorAll('.menu-link')[0].classList.add('active'); } 
+            else if(tabId === 'tab-history') { document.querySelectorAll('.menu-link')[1].classList.add('active'); } 
+            else if(tabId === 'tab-password') { document.querySelectorAll('.menu-link')[2].classList.add('active'); }
+
+            if(tabId === 'tab-profile') {
+                document.getElementById('breadcrumb-text').innerHTML = '<i class="fa-solid fa-house"></i> > Tài khoản > <strong>Hồ sơ cá nhân</strong>';
+                document.getElementById('banner-title').innerText = 'Hồ sơ cá nhân';
+                document.getElementById('banner-desc').innerHTML = 'Cập nhật thông tin cá nhân để kết nối tốt hơn với cộng đồng Hà Nội Xanh<br>và cùng nhau lan tỏa những giá trị tốt đẹp vì một Thủ đô xanh – sạch – đẹp hơn mỗi ngày.';
+            } else if (tabId === 'tab-history') {
+                document.getElementById('breadcrumb-text').innerHTML = '<i class="fa-solid fa-house"></i> > Tài khoản > <strong>Lịch sử tham gia</strong>';
+                document.getElementById('banner-title').innerText = 'Lịch sử tham gia';
+                document.getElementById('banner-desc').innerText = 'Hành trình cống hiến vì một Hà Nội xanh sạch đẹp qua các chiến dịch mà bạn đã đồng hành.';
+            } else if (tabId === 'tab-password') {
+                document.getElementById('breadcrumb-text').innerHTML = '<i class="fa-solid fa-house"></i> > Tài khoản > <strong>Đổi mật khẩu</strong>';
+                document.getElementById('banner-title').innerText = 'Đổi mật khẩu';
+                document.getElementById('banner-desc').innerText = 'Cập nhật mật khẩu để bảo vệ tài khoản của bạn tốt hơn.';
+            }
+        }
+
+        // --- 4. CROP ẢNH ---
+        const fileUpload = document.getElementById('file-upload');
+        const cropperModal = document.getElementById('cropper-modal');
+        const imageToCrop = document.getElementById('image-to-crop');
+        const mainAvatar = document.getElementById('main-profile-avatar');
+        const headerAvatar = document.getElementById('header-avatar');
+        let cropper;
+        let pendingAvatarFile = null;
+
+        function navigateParent(path) {
+            window.parent.postMessage({ type: 'hnx:navigate', path: path }, window.location.origin);
+        }
+
+        fileUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                imageToCrop.src = url;
+                cropperModal.style.display = 'flex';
+                if (cropper) { cropper.destroy(); }
+                cropper = new Cropper(imageToCrop, { aspectRatio: 1, viewMode: 1, dragMode: 'move', autoCropArea: 0.8 });
+            }
+            this.value = null; 
+        });
+
+        function closeCropper() { cropperModal.style.display = 'none'; if (cropper) { cropper.destroy(); } }
+        function confirmCrop() {
+            if (!cropper) return;
+            const canvas = cropper.getCroppedCanvas({ width: 250, height: 250 });
+            const croppedImageUrl = canvas.toDataURL("image/png");
+            mainAvatar.src = croppedImageUrl; headerAvatar.src = croppedImageUrl;
+            canvas.toBlob(function(blob) {
+                if (blob) pendingAvatarFile = new File([blob], 'avatar.png', { type: 'image/png' });
+            }, 'image/png');
+            closeCropper();
+        }
+
+        // --- 5. ĐĂNG NHẬP / ĐĂNG XUẤT ---
+        const dropdownMenu = document.getElementById('dropdown-menu');
+        const loginScreen = document.getElementById('login-screen');
+        const mainApp = document.getElementById('main-app');
+
+        function toggleDropdown() { dropdownMenu.classList.toggle('show'); }
+        window.onclick = function(event) { if (!event.target.closest('.user-dropdown-container')) dropdownMenu.classList.remove('show'); }
+
+        function handleLogout() { if (!window.confirm('Bạn có chắc chắn muốn đăng xuất không?')) return; dropdownMenu.classList.remove('show'); window.parent.postMessage({ type: 'hnx:signout' }, window.location.origin); }
+        function handleLogin(event) { event.preventDefault(); loginScreen.style.display = 'none'; mainApp.style.display = 'block'; }
+        
+        document.getElementById('profile-form').addEventListener('submit', function(e){ 
+            e.preventDefault();
+            window.parent.postMessage({
+                type: 'hnx:profile-update',
+                fullName: document.getElementById('profile-name').value.trim(),
+                phone: document.getElementById('profile-phone').value.trim(),
+                birthDate: document.getElementById('profile-birth-date').value,
+                gender: document.getElementById('profile-gender').value,
+                address: document.getElementById('profile-address').value.trim(),
+                occupation: document.getElementById('profile-occupation').value.trim(),
+                interests: document.getElementById('profile-interests').value.trim(),
+                bio: document.getElementById('profile-bio').value.trim(),
+                image: pendingAvatarFile
+            }, window.location.origin);
+        });
+
+        function renderCampaignHistory(items) {
+            const list = document.getElementById('campaign-history');
+            list.innerHTML = '';
+            if (!items || !items.length) {
+                list.innerHTML = '<div class="empty-history">Bạn chưa đăng ký chiến dịch nào.</div>';
+                return;
+            }
+            items.forEach(function(item) {
+                const date = item.date ? new Date(item.date) : null;
+                const row = document.createElement('div');
+                row.className = 'history-item';
+                const statusText = item.status === 'attended' ? 'Đã tham gia' : 'Đã đăng ký';
+                row.innerHTML = '<div class="history-date"><h3></h3><p></p></div><div class="history-info"><h4></h4><div class="history-meta"><span class="history-location"><i class="fa-solid fa-location-dot"></i> </span><span><i class="fa-regular fa-clock"></i> ' + Number(item.hours || 0) + ' giờ</span></div></div><div class="history-status"></div>';
+                row.querySelector('.history-date h3').textContent = date && !isNaN(date) ? String(date.getDate()).padStart(2, '0') : '--';
+                row.querySelector('.history-date p').textContent = date && !isNaN(date) ? 'Tháng ' + String(date.getMonth() + 1).padStart(2, '0') : 'Chưa rõ';
+                row.querySelector('.history-info h4').textContent = item.title;
+                row.querySelector('.history-location').append(document.createTextNode(item.location));
+                row.querySelector('.history-status').textContent = statusText;
+                list.appendChild(row);
+            });
+        }
+        // Sync the profile page with the React authentication layer.
+        window.addEventListener('message', function(event) {
+            if (event.origin !== window.location.origin || !event.data) return;
+            var message = event.data;
+            if (message.type === 'hnx:auth-state' && message.user) {
+                document.getElementById('profile-name').value = message.user.name || '';
+                document.getElementById('profile-phone').value = message.user.phone || '';
+                document.getElementById('profile-email').value = message.user.email || '';
+                document.getElementById('profile-birth-date').value = message.user.birthDate || '';
+                document.getElementById('profile-gender').value = message.user.gender || '';
+                document.getElementById('profile-address').value = message.user.address || '';
+                document.getElementById('profile-occupation').value = message.user.occupation || '';
+                document.getElementById('profile-interests').value = message.user.interests || '';
+                document.getElementById('profile-bio').value = message.user.bio || '';
+                document.getElementById('profile-joined-at').value = message.user.joinedAt ? new Date(message.user.joinedAt).toLocaleDateString('vi-VN') : '';
+                document.getElementById('header-user-name').textContent = message.user.name || 'Thành viên';
+                document.getElementById('profile-user-name').textContent = message.user.name || 'Thành viên';
+                document.getElementById('profile-level').innerHTML = '<i class="fa-solid fa-leaf"></i> ' + (message.user.level || 'Thành viên mới');
+                document.getElementById('profile-campaign-count').textContent = String(message.user.camps || 0);
+                document.getElementById('profile-hours').textContent = String(message.user.hours || 0) + 'h';
+                document.getElementById('profile-badges').textContent = String(message.user.badges || 0);
+                renderCampaignHistory(message.user.history || []);
+                if (message.user.avatarUrl) {
+                    document.getElementById('main-profile-avatar').src = message.user.avatarUrl;
+                    document.getElementById('header-avatar').src = message.user.avatarUrl;
+                }
+            }
+            if (message.type === 'hnx:profile-update-result') {
+                alert(message.ok ? 'Lưu thông tin cá nhân thành công!' : (message.message || 'Không thể cập nhật hồ sơ.'));
+                if (message.ok) pendingAvatarFile = null;
+            }
+            if (message.type === 'hnx:password-update-result') {
+                const form = document.getElementById('password-form');
+                const submitButton = form.querySelector('button[type="submit"]');
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Cập nhật mật khẩu';
+                if (!message.ok) {
+                    alert(message.message || 'Mật khẩu hiện tại không đúng.');
+                    document.getElementById('old-pwd').focus();
+                    return;
+                }
+                alert('Cập nhật mật khẩu mới thành công!');
+                form.reset();
+                document.querySelectorAll('.icon-eye').forEach(function(icon) {
+                    icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash');
+                });
+                document.getElementById('old-pwd').type = 'password';
+                document.getElementById('new-pwd').type = 'password';
+                document.getElementById('confirm-pwd').type = 'password';
+            }
+        });
+        window.parent.postMessage({ type: 'hnx:profile-ready' }, window.location.origin);
+    </script>
+</body>
+</html>

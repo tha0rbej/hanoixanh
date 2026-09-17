@@ -13,7 +13,7 @@ import { AuthModal } from "./app/AuthModal"
 import { AuthProvider, useAuth } from "./app/AuthContext"
 import { tableInsert, tableInsertMinimal, tableSelect, updateProfile, uploadPublicFile } from "./lib/supabase"
 
-type SourcePage = "home" | "about" | "remaining"
+type SourcePage = "home" | "about" | "remaining" | "profile"
 
 const allowedPaths = new Set([
   "/",
@@ -22,10 +22,19 @@ const allowedPaths = new Set([
   "/tac-dong",
   "/tin-tuc",
   "/tham-gia",
+  "/ho-so",
   "/admin",
 ])
 
-type ParticipationSummaryRow = { status?: string; attended_hours?: number | string; trash_kg?: number | string }
+type ParticipationSummaryRow = {
+  status?: string
+  attended_hours?: number | string
+  trash_kg?: number | string
+  campaign_id?: string | null
+  campaign_key?: string | null
+  created_at?: string
+}
+type CampaignSummaryRow = { id: string; title?: string; location?: string; start_at?: string }
 
 function volunteerLevel(campaigns: number, hours: number) {
   if (campaigns >= 15 && hours >= 100) return "Đại sứ Xanh"
@@ -48,7 +57,7 @@ function SourceFrame({
 }) {
   const location = useLocation()
   const navigate = useNavigate()
-  const { session, profile, loading: authLoading, refreshProfile, signOut } = useAuth()
+  const { session, profile, loading: authLoading, refreshProfile, signOut, changePassword } = useAuth()
   const frameRef = useRef<HTMLIFrameElement>(null)
   const pendingReportRef = useRef<{ location?: string; description?: string; latitude?: number; longitude?: number; image?: File | null; images?: File[] } | null>(null)
   const baseUrl = import.meta.env.BASE_URL.endsWith("/")
@@ -64,12 +73,31 @@ function SourceFrame({
     let campaigns = 0
     let hours = 0
     let trashKg = 0
+    let history: Array<{ title: string; location: string; date: string; status: string; hours: number }> = []
     try {
       const registrations = await tableSelect<ParticipationSummaryRow>("campaign_registrations", "*", session.access_token, `&user_id=eq.${encodeURIComponent(session.user.id)}`)
-      const attended = registrations.filter(item => item.status === "attended")
-      campaigns = attended.length
+      const campaignRows = await tableSelect<CampaignSummaryRow>("campaigns", "id,title,location,start_at", session.access_token)
+      const campaignMap = new Map(campaignRows.map(item => [item.id, item]))
+      const activeRegistrations = Array.from(new Map(
+        registrations
+          .filter(item => item.status !== "cancelled")
+          .filter(item => campaignMap.has(item.campaign_id || item.campaign_key || ""))
+          .map(item => [item.campaign_id || item.campaign_key || item.created_at || "", item]),
+      ).values())
+      const attended = activeRegistrations.filter(item => item.status === "attended")
+      campaigns = activeRegistrations.length
       hours = attended.reduce((sum, item) => sum + Number(item.attended_hours || 0), 0)
       trashKg = attended.reduce((sum, item) => sum + Number(item.trash_kg || 0), 0)
+      history = activeRegistrations.map(item => {
+        const campaign = campaignMap.get(item.campaign_id || item.campaign_key || "")
+        return {
+          title: campaign?.title || "Chiến dịch Hà Nội Xanh",
+          location: campaign?.location || "Chưa cập nhật địa điểm",
+          date: campaign?.start_at || item.created_at || "",
+          status: item.status || "registered",
+          hours: Number(item.attended_hours || 0),
+        }
+      })
     } catch {
       // Keep the profile available even before the participation migration is applied.
     }
@@ -80,10 +108,20 @@ function SourceFrame({
         name: profile.full_name,
         email: profile.email,
         phone: profile.phone,
+        avatarUrl: profile.avatar_url,
         volunteerCode: profile.volunteer_code,
+        birthDate: profile.birth_date,
+        gender: profile.gender,
+        address: profile.address,
+        occupation: profile.occupation,
+        interests: profile.interests,
+        bio: profile.bio,
+        joinedAt: profile.created_at,
         role: profile.role,
         camps: campaigns,
         hours,
+        badges: campaigns === 0 && hours === 0 ? 0 : Math.floor(campaigns / 3),
+        history,
         trash: `${trashKg.toLocaleString("vi-VN")} kg`,
         level: volunteerLevel(campaigns, hours),
       },
@@ -93,7 +131,7 @@ function SourceFrame({
   useEffect(() => {
     const receiveNavigation = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return
-      const message = event.data as { type?: string; path?: string; tab?: "login" | "register" | "reset"; campaignKey?: string; location?: string; description?: string; email?: string; latitude?: number; longitude?: number; fullName?: string; phone?: string; image?: File; images?: File[] }
+      const message = event.data as { type?: string; path?: string; tab?: "login" | "register" | "reset"; campaignKey?: string; location?: string; description?: string; email?: string; latitude?: number; longitude?: number; fullName?: string; phone?: string; birthDate?: string; gender?: string; address?: string; occupation?: string; interests?: string; bio?: string; currentPassword?: string; newPassword?: string; image?: File; images?: File[] }
       if (message?.type === "hnx:navigate" && message.path && allowedPaths.has(message.path)) {
         if (message.path !== location.pathname) navigate(message.path)
         return
@@ -147,17 +185,33 @@ function SourceFrame({
         void (async () => {
           try {
             const avatarUrl = message.image instanceof File ? await uploadPublicFile(message.image, session.access_token) : undefined
-            await updateProfile(session.user.id, { full_name: message.fullName, phone: message.phone, ...(avatarUrl ? { avatar_url: avatarUrl } : {}) }, session.access_token)
+            await updateProfile(session.user.id, {
+              full_name: message.fullName,
+              phone: message.phone,
+              birth_date: message.birthDate || null,
+              gender: message.gender || null,
+              address: message.address || null,
+              occupation: message.occupation || null,
+              interests: message.interests || null,
+              bio: message.bio || null,
+              ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
+            }, session.access_token)
             await refreshProfile()
             frameRef.current?.contentWindow?.postMessage({ type: "hnx:profile-update-result", ok: true }, window.location.origin)
           } catch (error) { frameRef.current?.contentWindow?.postMessage({ type: "hnx:profile-update-result", ok: false, message: error instanceof Error ? error.message : "Không cập nhật được hồ sơ." }, window.location.origin) }
         })()
       }
+      if (message?.type === "hnx:password-update") {
+        void changePassword(message.currentPassword || "", message.newPassword || "")
+          .then(() => frameRef.current?.contentWindow?.postMessage({ type: "hnx:password-update-result", ok: true }, window.location.origin))
+          .catch((error: Error) => frameRef.current?.contentWindow?.postMessage({ type: "hnx:password-update-result", ok: false, message: error.message || "Mật khẩu hiện tại không đúng." }, window.location.origin))
+        return
+      }
       if (message?.type === "hnx:signout") { void signOut(); return }
     }
     window.addEventListener("message", receiveNavigation)
     return () => window.removeEventListener("message", receiveNavigation)
-  }, [location.pathname, navigate, onAuth, profile, refreshProfile, session, signOut])
+  }, [changePassword, location.pathname, navigate, onAuth, profile, refreshProfile, session, signOut])
 
   useEffect(() => {
     const report = pendingReportRef.current
@@ -276,6 +330,16 @@ function AppRoutes() {
             page="remaining"
             view="tin-tuc"
             title="Tin tức và câu chuyện" onAuth={openAuth}
+          />
+        }
+      />
+      <Route
+        path="ho-so"
+        element={
+          <SourceFrame
+            page="profile"
+            title="Hồ sơ cá nhân - Hà Nội Xanh"
+            onAuth={openAuth}
           />
         }
       />

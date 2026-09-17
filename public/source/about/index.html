@@ -82,6 +82,10 @@
     .account-menu.open .account-dropdown { display: block; }
     .account-dropdown button { width: 100%; border: 0; border-radius: 7px; background: transparent; padding: 9px 12px; text-align: left; color: #b91c1c; font-weight: 700; cursor: pointer; }
     .account-dropdown button:hover { background: #fef2f2; }
+    .account-trigger { display:inline-flex; align-items:center; gap:8px; border:0 !important; padding:3px 0 3px 10px !important; color:#111827 !important; text-transform:none !important; }
+    .account-avatar { width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid #d1fae5; }
+    .account-dropdown .profile-action { color:#166534; }
+    .account-dropdown .profile-action:hover { background:#ecfdf5; }
 
     /* VIEW 1: CHIẾN DỊCH */
     #page-chien-dich { display: block; }
@@ -474,7 +478,7 @@
     <div class="header-actions">
       <a onclick="navigateParent('/tham-gia')" class="btn-join" id="nav-btn-thamgia">THAM GIA</a>
       <a href="#" class="donate-btn" onclick="event.preventDefault(); openDonateModal()"><i class="fa-regular fa-heart"></i> QUYÊN TẶNG</a>
-      <div class="account-menu" id="accountMenu"><a onclick="handleHeaderAuthClick()" class="btn-login" id="headerLoginBtn">ĐĂNG NHẬP</a><div class="account-dropdown"><button type="button" onclick="handleLogout(); document.getElementById('accountMenu').classList.remove('open')">Đăng xuất</button></div></div>
+      <div class="account-menu" id="accountMenu"><a onclick="handleHeaderAuthClick()" class="btn-login account-trigger" id="headerLoginBtn"><img id="headerAccountAvatar" class="account-avatar" src="logo.jpg" alt="Avatar" hidden><span id="headerAccountName">ĐĂNG NHẬP</span><i id="headerAccountCaret" class="fa-solid fa-chevron-down" hidden></i></a><div class="account-dropdown"><button class="profile-action" type="button" onclick="navigateParent('/ho-so'); document.getElementById('accountMenu').classList.remove('open')">Hồ sơ cá nhân</button><button type="button" onclick="if (confirm('Bạn có chắc chắn muốn đăng xuất không?')) { handleLogout(); document.getElementById('accountMenu').classList.remove('open'); }">Đăng xuất</button></div></div>
     </div>
   </header>
 
@@ -1594,7 +1598,10 @@
       if (currentUser) {
         loggedOutBox.style.display = 'none';
         loggedInBox.style.display = 'grid';
-        loginHeaderBtn.innerText = currentUser.name.toUpperCase();
+        document.getElementById('headerAccountName').innerText = currentUser.name;
+        document.getElementById('headerAccountAvatar').src = currentUser.avatarUrl || currentUser.avatar || 'logo.jpg';
+        document.getElementById('headerAccountAvatar').hidden = false;
+        document.getElementById('headerAccountCaret').hidden = false;
         document.getElementById('uName').innerText = currentUser.name;
         document.getElementById('uVolunteerCode').innerText = currentUser.volunteerCode ? `#${currentUser.volunteerCode}` : 'Đang cấp mã';
         document.getElementById('uLevel').innerText = currentUser.level || 'Thành viên mới';
@@ -1612,7 +1619,9 @@
       } else {
         loggedOutBox.style.display = 'flex';
         loggedInBox.style.display = 'none';
-        loginHeaderBtn.innerText = "ĐĂNG NHẬP";
+        document.getElementById('headerAccountName').innerText = "ĐĂNG NHẬP";
+        document.getElementById('headerAccountAvatar').hidden = true;
+        document.getElementById('headerAccountCaret').hidden = true;
         document.getElementById('accountMenu')?.classList.remove('open');
         if(noHistoryBox) noHistoryBox.style.display = 'block';
       }

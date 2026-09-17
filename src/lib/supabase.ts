@@ -12,6 +12,12 @@ export type HnxProfile = {
   phone?: string | null
   avatar_url?: string | null
   volunteer_code?: string | null
+  birth_date?: string | null
+  gender?: string | null
+  address?: string | null
+  occupation?: string | null
+  interests?: string | null
+  bio?: string | null
   role: UserRole
   created_at?: string
 }
@@ -126,21 +132,64 @@ export async function requestPasswordReset(email: string) {
   await parseResponse<unknown>(response)
 }
 
+export async function updatePassword(currentPassword: string, newPassword: string, token: string) {
+  requireConfig()
+  const response = await fetch(`${supabaseUrl}/auth/v1/user`, {
+    method: "PUT",
+    headers: authHeaders(token),
+    body: JSON.stringify({ password: newPassword, current_password: currentPassword }),
+  })
+  await parseResponse<unknown>(response)
+}
+
 export async function getProfile(id: string, token?: string): Promise<HnxProfile> {
   const response = await fetch(`${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(id)}&select=*`, { headers: authHeaders(token) })
   const rows = await parseResponse<HnxProfile[]>(response)
   if (!rows[0]) throw new Error("Tài khoản chưa có hồ sơ profiles.")
-  return rows[0]
+  if (!token) return rows[0]
+  try {
+    const authResponse = await fetch(`${supabaseUrl}/auth/v1/user`, { headers: authHeaders(token) })
+    const authUser = await parseResponse<{ user_metadata?: Partial<HnxProfile> }>(authResponse)
+    const metadata = authUser.user_metadata || {}
+    return {
+      ...rows[0],
+      birth_date: rows[0].birth_date ?? metadata.birth_date ?? null,
+      gender: rows[0].gender ?? metadata.gender ?? null,
+      address: rows[0].address ?? metadata.address ?? null,
+      occupation: rows[0].occupation ?? metadata.occupation ?? null,
+      interests: rows[0].interests ?? metadata.interests ?? null,
+      bio: rows[0].bio ?? metadata.bio ?? null,
+    }
+  } catch {
+    return rows[0]
+  }
 }
 
-export async function updateProfile(id: string, values: Partial<Pick<HnxProfile, "full_name" | "phone" | "avatar_url">>, token: string) {
-  const response = await fetch(`${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(id)}`, {
-    method: "PATCH",
-    headers: { ...authHeaders(token), Prefer: "return=representation" },
-    body: JSON.stringify(values),
-  })
-  const rows = await parseResponse<HnxProfile[]>(response)
-  return rows[0]
+export async function updateProfile(id: string, values: Partial<Pick<HnxProfile, "full_name" | "phone" | "avatar_url" | "birth_date" | "gender" | "address" | "occupation" | "interests" | "bio">>, token: string) {
+  const patchProfiles = async (payload: Partial<HnxProfile>) => {
+    const response = await fetch(`${supabaseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      headers: { ...authHeaders(token), Prefer: "return=representation" },
+      body: JSON.stringify(payload),
+    })
+    const rows = await parseResponse<HnxProfile[]>(response)
+    return rows[0]
+  }
+  try {
+    return await patchProfiles(values)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : ""
+    if (!/schema cache|column/i.test(message)) throw error
+    const { birth_date, gender, address, occupation, interests, bio, ...coreValues } = values
+    const profile = await patchProfiles(coreValues)
+    const metadataResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      method: "PUT",
+      headers: authHeaders(token),
+      body: JSON.stringify({ data: { birth_date, gender, address, occupation, interests, bio } }),
+    })
+    await parseResponse<unknown>(metadataResponse)
+    return { ...profile, birth_date, gender, address, occupation, interests, bio }
+  }
 }
 
 export async function tableSelect<T>(table: string, select = "*", token: string, query = "") {

@@ -89,6 +89,10 @@
     .account-menu.open .account-dropdown { display: block; }
     .account-dropdown button { width: 100%; border: 0; border-radius: 7px; background: transparent; padding: 9px 12px; text-align: left; color: #b91c1c; font-weight: 700; cursor: pointer; }
     .account-dropdown button:hover { background: #fef2f2; }
+    .account-trigger { display:inline-flex; align-items:center; gap:8px; border:0 !important; padding:3px 0 3px 10px !important; color:#111827 !important; text-transform:none !important; }
+    .account-avatar { width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid #d1fae5; }
+    .account-dropdown .profile-action { color:#166534; }
+    .account-dropdown .profile-action:hover { background:#ecfdf5; }
 
     /* VIEW 1: CHIẾN DỊCH */
     #page-chien-dich { display: block; }
@@ -402,7 +406,7 @@
     <div class="header-actions">
       <a onclick="navigateParent('/tham-gia')" class="btn-join">THAM GIA</a>
       <a href="#" class="donate-btn" onclick="event.preventDefault(); openDonateModal()"><i class="fa-regular fa-heart"></i> QUYÊN TẶNG</a>
-      <div class="account-menu" id="accountMenu"><a onclick="handleHeaderAuthClick()" class="btn-login" id="headerLoginBtn">ĐĂNG NHẬP</a><div class="account-dropdown"><button type="button" onclick="handleLogout(); document.getElementById('accountMenu').classList.remove('open')">Đăng xuất</button></div></div>
+      <div class="account-menu" id="accountMenu"><a onclick="handleHeaderAuthClick()" class="btn-login account-trigger" id="headerLoginBtn"><img id="headerAccountAvatar" class="account-avatar" src="logo.jpg" alt="Avatar" hidden><span id="headerAccountName">ĐĂNG NHẬP</span><i id="headerAccountCaret" class="fa-solid fa-chevron-down" hidden></i></a><div class="account-dropdown"><button class="profile-action" type="button" onclick="navigateParent('/ho-so'); document.getElementById('accountMenu').classList.remove('open')">Hồ sơ cá nhân</button><button type="button" onclick="if (confirm('Bạn có chắc chắn muốn đăng xuất không?')) { handleLogout(); document.getElementById('accountMenu').classList.remove('open'); }">Đăng xuất</button></div></div>
     </div>
   </header>
 
@@ -636,9 +640,6 @@
             <div>
               <h3 style="font-size: 19px; font-weight: 900;" id="uName">Nguyễn Thị Bình</h3>
               <p style="font-size: 14px; color: var(--text-sub);">Mã TNV: <strong id="uVolunteerCode">Đang cấp mã</strong> | Cấp độ: <span style="color: var(--primary); font-weight: bold;" id="uLevel">Tình nguyện viên tích cực</span></p>
-              <div class="profile-btn-group">
-                <button class="btn-edit-profile" onclick="openEditProfileModal()">Chỉnh sửa hồ sơ</button>
-              </div>
             </div>
           </div>
           
@@ -1218,24 +1219,32 @@
       if (currentUser) {
         loggedOutBox.style.display = 'none';
         loggedInBox.style.display = 'grid';
-        loginHeaderBtn.innerText = currentUser.name.toUpperCase();
+        document.getElementById('headerAccountName').innerText = currentUser.name;
+        document.getElementById('headerAccountAvatar').src = currentUser.avatarUrl || currentUser.avatar || 'logo.jpg';
+        document.getElementById('headerAccountAvatar').hidden = false;
+        document.getElementById('headerAccountCaret').hidden = false;
         document.getElementById('uName').innerText = currentUser.name;
         document.getElementById('uVolunteerCode').innerText = currentUser.volunteerCode ? `#${currentUser.volunteerCode}` : 'Đang cấp mã';
         document.getElementById('uLevel').innerText = currentUser.level || 'Thành viên mới';
-        document.getElementById('uHour').innerText = currentUser.hours;
-        document.getElementById('uCamp').innerText = currentUser.camps;
-        document.getElementById('uTrash').innerText = currentUser.trash;
+        const campaignCount = Number(currentUser.camps) || 0;
+        document.getElementById('uHour').innerText = Number(currentUser.hours) || 0;
+        document.getElementById('uCamp').innerText = campaignCount;
+        document.getElementById('uTrash').innerText = currentUser.trash || '0 kg';
+        document.getElementById('uNoHistoryBox').style.display = campaignCount === 0 ? 'block' : 'none';
 
         const avatarBox = document.getElementById('uAvatarCircle');
-        if (currentUser.avatar) {
-          avatarBox.innerHTML = `<img src="${currentUser.avatar}" alt="Avatar">`;
+        const avatarUrl = currentUser.avatarUrl || currentUser.avatar;
+        if (avatarUrl) {
+          avatarBox.innerHTML = `<img src="${avatarUrl}" alt="Ảnh đại diện của ${currentUser.name}">`;
         } else {
           avatarBox.innerHTML = `<span id="uAvatarText">${currentUser.name.charAt(0).toUpperCase()}</span>`;
         }
       } else {
         loggedOutBox.style.display = 'flex';
         loggedInBox.style.display = 'none';
-        loginHeaderBtn.innerText = "ĐĂNG NHẬP";
+        document.getElementById('headerAccountName').innerText = "ĐĂNG NHẬP";
+        document.getElementById('headerAccountAvatar').hidden = true;
+        document.getElementById('headerAccountCaret').hidden = true;
         document.getElementById('accountMenu')?.classList.remove('open');
       }
     }

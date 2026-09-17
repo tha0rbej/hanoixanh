@@ -3,6 +3,7 @@ import {
   getProfile,
   getStoredSession,
   requestPasswordReset,
+  updatePassword as apiUpdatePassword,
   refreshSession,
   signIn as apiSignIn,
   signOut as apiSignOut,
@@ -20,6 +21,7 @@ type AuthContextValue = {
   signIn: (email: string, password: string) => Promise<void>
   signUp: (input: { email: string; password: string; fullName: string; phone?: string }) => Promise<boolean>
   resetPassword: (email: string) => Promise<void>
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>
   signOut: () => Promise<void>
   refreshProfile: () => Promise<void>
 }
@@ -78,6 +80,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return false
     },
     resetPassword: requestPasswordReset,
+    async changePassword(currentPassword, newPassword) {
+      if (!session) throw new Error("Bạn cần đăng nhập để đổi mật khẩu.")
+      await apiUpdatePassword(currentPassword, newPassword, session.access_token)
+    },
     async signOut() {
       try { if (session) await apiSignOut(session.access_token) } finally { setSession(null); setProfile(null) }
     },
