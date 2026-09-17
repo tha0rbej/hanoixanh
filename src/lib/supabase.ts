@@ -127,7 +127,17 @@ export async function requestPasswordReset(email: string) {
   const response = await fetch(`${supabaseUrl}/auth/v1/recover`, {
     method: "POST",
     headers: authHeaders(),
-    body: JSON.stringify({ email }),
+    body: JSON.stringify({ email, redirect_to: `${window.location.origin}/dat-lai-mat-khau` }),
+  })
+  await parseResponse<unknown>(response)
+}
+
+export async function updateRecoveredPassword(password: string, token: string) {
+  requireConfig()
+  const response = await fetch(`${supabaseUrl}/auth/v1/user`, {
+    method: "PUT",
+    headers: authHeaders(token),
+    body: JSON.stringify({ password }),
   })
   await parseResponse<unknown>(response)
 }

@@ -11,6 +11,7 @@ import { AdminDashboard } from "./app/AdminDashboard"
 import { ConnectedAdminDashboard } from "./app/ConnectedAdminDashboard"
 import { AuthModal } from "./app/AuthModal"
 import { AuthProvider, useAuth } from "./app/AuthContext"
+import { ResetPasswordPage } from "./app/ResetPasswordPage"
 import { tableInsert, tableInsertMinimal, tableSelect, updateProfile, uploadPublicFile } from "./lib/supabase"
 
 type SourcePage = "home" | "about" | "remaining" | "profile"
@@ -207,7 +208,10 @@ function SourceFrame({
           .catch((error: Error) => frameRef.current?.contentWindow?.postMessage({ type: "hnx:password-update-result", ok: false, message: error.message || "Mật khẩu hiện tại không đúng." }, window.location.origin))
         return
       }
-      if (message?.type === "hnx:signout") { void signOut(); return }
+      if (message?.type === "hnx:signout") {
+        void signOut().finally(() => navigate("/"))
+        return
+      }
     }
     window.addEventListener("message", receiveNavigation)
     return () => window.removeEventListener("message", receiveNavigation)
@@ -275,6 +279,18 @@ function SourceFrame({
 function AppRoutes() {
   const [authTab, setAuthTab] = useState<("login" | "register" | "reset") | null>(null)
   const navigate = useNavigate()
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get("auth") === "login") {
+      setAuthTab("login")
+      window.history.replaceState({}, "", window.location.pathname)
+    }
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""))
+    const isRecovery = hash.get("type") === "recovery" || Boolean(hash.get("access_token"))
+    if (isRecovery && window.location.pathname !== "/dat-lai-mat-khau") {
+      navigate(`/dat-lai-mat-khau${window.location.hash}`, { replace: true })
+    }
+  }, [navigate])
   const openAuth = (tab: "login" | "register" | "reset") => setAuthTab(tab)
   const closeAuth = () => setAuthTab(null)
   return (
@@ -345,6 +361,7 @@ function AppRoutes() {
         }
       />
       <Route path="admin" element={<ConnectedAdminDashboard onLogin={() => setAuthTab("login")} />} />
+      <Route path="dat-lai-mat-khau" element={<ResetPasswordPage />} />
       <Route
         path="gioi-thieu"
         element={<Navigate to="/ve-ha-noi-xanh" replace />}
