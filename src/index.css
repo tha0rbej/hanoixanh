@@ -154,4 +154,35 @@
 .admin-locked h1 { color: #0f382c; }
 .admin-locked a { color: #15803d; font-weight: 700; }
 @media (max-width: 850px) { .admin-sidebar { width: 205px; flex-basis: 205px; } .admin-stat-grid { grid-template-columns: repeat(2,1fr); } .admin-grid-2 { grid-template-columns: 1fr; } }
-@media (max-width: 620px) { .admin-shell { display: block; } .admin-sidebar { position: static; width: auto; height: auto; overflow: visible; } .admin-sidebar nav { grid-template-columns: repeat(2,1fr); } .admin-sidebar-actions { margin-top: 12px; } .admin-topbar { align-items: flex-start; flex-direction: column; } .admin-user { text-align: left; } .form-grid { grid-template-columns: 1fr; } }
+@media (max-width: 620px) {
+  .auth-backdrop { align-items: start; overflow-y: auto; padding: 14px; }
+  .auth-card { margin: auto 0; padding: 28px 20px 22px; border-radius: 16px; }
+  .auth-card h2 { padding-right: 24px; font-size: 24px; }
+  .auth-card input { font-size: 16px; }
+  .auth-switch { align-items: flex-start; flex-direction: column; }
+  .admin-shell { display: block; }
+  .admin-sidebar { position: static; width: auto; height: auto; overflow: visible; padding: 18px 12px; }
+  .admin-brand { padding-bottom: 14px; }
+  .admin-sidebar nav { display: flex; gap: 8px; margin: 0 -12px; padding: 0 12px 8px; overflow-x: auto; }
+  .admin-nav-group { display: flex; flex: 0 0 auto; gap: 6px; align-items: center; }
+  .admin-nav-group > p { display: none; }
+  .admin-sidebar nav button { width: auto; white-space: nowrap; border: 1px solid rgba(209,250,229,.14); }
+  .admin-sidebar-actions { margin-top: 8px; padding-top: 8px; }
+  .admin-home-link { text-align: center; }
+  .admin-content { padding: 20px 12px 32px; }
+  .admin-topbar { align-items: flex-start; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+  .admin-user { text-align: left; }
+  .admin-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .admin-stat { padding: 14px; }
+  .admin-stat strong { font-size: 24px; }
+  .admin-panel { padding: 15px 12px; border-radius: 11px; }
+  .admin-row { align-items: flex-start; flex-direction: column; }
+  .form-grid { grid-template-columns: 1fr; }
+  .admin-panel input, .admin-panel textarea, .admin-panel select { font-size: 16px; }
+  .admin-table-wrap, .admin-panel:has(> table) { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .admin-table-wrap table, .admin-panel > table { min-width: 720px; }
+}
+
+@media (max-width: 380px) {
+  .admin-stat-grid { grid-template-columns: 1fr; }
+}

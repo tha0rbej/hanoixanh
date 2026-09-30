@@ -2,7 +2,15 @@ import { useEffect, useState, type ChangeEvent } from "react"
 import { tableInsert, tableUpdate, uploadPublicFile } from "../lib/supabase"
 
 type MetricRow = Record<string, unknown> & { id: string }
-type BeforeAfterItem = { title: string; description: string; before_url: string; after_url: string }
+type BeforeAfterItem = {
+  title: string
+  description: string
+  before_url: string
+  after_url: string
+  completed_at?: string
+  location?: string
+  participants?: string
+}
 
 const defaultOverview: Record<string, number> = {
   campaigns: 230,
@@ -21,9 +29,9 @@ const defaultMonthly: Record<string, number> = {
 }
 
 const defaultBeforeAfter: BeforeAfterItem[] = [
-  { title: "Dự án 1 – Chợ Tứ Liên (Tây Hồ)", description: "Mương nước ngập rác sinh hoạt dày đặc → Đã khơi thông dòng chảy hoàn toàn.", before_url: "Picture1.jpg", after_url: "Picture2.jpg" },
-  { title: "Dự án 2 – Ngõ 236 Âu Cơ, Hồng Hà", description: "Nước dềnh ngập rác tràn vào ngõ → Đã thu gom và khử khuẩn lối đi an toàn.", before_url: "Picture3.jpg", after_url: "Picture4.jpg" },
-  { title: "Dự án 3 – Bãi bồi Cầu Long Biên", description: "Hàng tấn phế thải trong bãi cỏ → Tình nguyện viên đã thu gom và làm sạch.", before_url: "Picture5.jpg", after_url: "Picture6.jpg" },
+  { title: "Dự án 1 – Chợ Tứ Liên (Tây Hồ)", description: "Mương nước ngập rác sinh hoạt dày đặc → Đã khơi thông dòng chảy hoàn toàn.", before_url: "Picture1.jpg", after_url: "Picture2.jpg", completed_at: "2026-07-27", location: "Chợ Tứ Liên, Tây Hồ, Hà Nội", participants: "45" },
+  { title: "Dự án 2 – Ngõ 236 Âu Cơ, Hồng Hà", description: "Nước dềnh ngập rác tràn vào ngõ → Đã thu gom và khử khuẩn lối đi an toàn.", before_url: "Picture3.jpg", after_url: "Picture4.jpg", completed_at: "2026-07-12", location: "Ngõ 236 Âu Cơ, P. Hồng Hà, Hà Nội", participants: "80" },
+  { title: "Dự án 3 – Bãi bồi Cầu Long Biên", description: "Hàng tấn phế thải trong bãi cỏ → Tình nguyện viên đã thu gom và làm sạch.", before_url: "Picture5.jpg", after_url: "Picture6.jpg", completed_at: "2026-06-01", location: "Bãi bồi Cầu Long Biên, Hoàn Kiếm, Hà Nội", participants: "90" },
 ]
 
 function previewUrl(url: string) {
@@ -46,7 +54,12 @@ export function ImpactContentEditor({ rows, session, onSaved }: { rows: MetricRo
     const nextBeforeAfter = value("before_after")
     if (nextOverview) setOverview({ ...defaultOverview, ...(nextOverview as Record<string, number>) })
     if (nextMonthly) setMonthly(nextMonthly as Record<string, number>)
-    if (Array.isArray(nextBeforeAfter)) setBeforeAfter(nextBeforeAfter as BeforeAfterItem[])
+    if (Array.isArray(nextBeforeAfter)) {
+      setBeforeAfter((nextBeforeAfter as BeforeAfterItem[]).map((item, index) => ({
+        ...(defaultBeforeAfter[index] || {}),
+        ...item,
+      })))
+    }
   }, [rows])
 
   async function save(key: string, metricValue: unknown) {
@@ -119,13 +132,16 @@ export function ImpactContentEditor({ rows, session, onSaved }: { rows: MetricRo
       {beforeAfter.map((item, index) => <div key={index} style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid #e5e7eb" }}>
         <div className="form-grid">
           <label>Tiêu đề<input value={item.title} onChange={event => setBeforeAfter(items => items.map((current, itemIndex) => itemIndex === index ? { ...current, title: event.target.value } : current))} /></label>
+          <label>Ngày hoàn thành<input type="date" value={item.completed_at || ""} onChange={event => setBeforeAfter(items => items.map((current, itemIndex) => itemIndex === index ? { ...current, completed_at: event.target.value } : current))} /></label>
+          <label>Địa điểm<input value={item.location || ""} onChange={event => setBeforeAfter(items => items.map((current, itemIndex) => itemIndex === index ? { ...current, location: event.target.value } : current))} /></label>
+          <label>Số người tham gia<input type="number" min="0" value={item.participants || ""} onChange={event => setBeforeAfter(items => items.map((current, itemIndex) => itemIndex === index ? { ...current, participants: event.target.value } : current))} /></label>
           <label className="wide-field">Mô tả<textarea value={item.description} onChange={event => setBeforeAfter(items => items.map((current, itemIndex) => itemIndex === index ? { ...current, description: event.target.value } : current))} /></label>
           <label>Ảnh trước<input type="file" accept="image/*" onChange={event => void uploadProjectImage(index, "before_url", event)} />{uploading === `${index}-before_url` && <small>Đang tải…</small>}{item.before_url && <img src={previewUrl(item.before_url)} alt="Ảnh trước" style={{ display: "block", width: 150, height: 90, objectFit: "cover", marginTop: 8, borderRadius: 8 }} />}</label>
           <label>Ảnh sau<input type="file" accept="image/*" onChange={event => void uploadProjectImage(index, "after_url", event)} />{uploading === `${index}-after_url` && <small>Đang tải…</small>}{item.after_url && <img src={previewUrl(item.after_url)} alt="Ảnh sau" style={{ display: "block", width: 150, height: 90, objectFit: "cover", marginTop: 8, borderRadius: 8 }} />}</label>
         </div>
         <button type="button" className="link-danger" onClick={() => setBeforeAfter(items => items.filter((_, itemIndex) => itemIndex !== index))}>Xóa dự án</button>
       </div>)}
-      <button type="button" onClick={() => setBeforeAfter(items => [...items, { title: "", description: "", before_url: "", after_url: "" }])}>+ Thêm dự án trước – sau</button>{" "}
+      <button type="button" onClick={() => setBeforeAfter(items => [...items, { title: "", description: "", before_url: "", after_url: "", completed_at: "", location: "", participants: "" }])}>+ Thêm dự án trước – sau</button>{" "}
       <button className="admin-primary" onClick={() => void save("before_after", beforeAfter)}>Lưu dashboard trước – sau</button>
     </section>
   </div>

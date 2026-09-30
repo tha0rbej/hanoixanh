@@ -372,19 +372,54 @@
             .map-overlay-top { flex-direction: column; align-items: flex-end; }
         }
         @media (max-width: 480px) {
+            html, body { width: 100%; overflow-x: hidden; }
+            header { padding: 10px 14px; gap: 9px; background: #fff; border-bottom-color: #e5e7eb; }
+            header:not(.scrolled) .logo-area, header:not(.scrolled) nav ul li a, header:not(.scrolled) .btn-login { color: #0c5c31; }
+            header:not(.scrolled) .btn-login { border-color: #0c5c31; }
+            .logo-area { gap: 7px; font-size: 13px; flex: 0 0 auto; }
+            .logo-area img { width: 40px; height: 40px; }
+            .header-actions { margin-left: auto; min-width: 0; }
             .header-actions .btn-join { display: none; }
-            .header-actions .donate-btn { font-size: 10px; padding: 9px 10px; }
-            .hero { min-height: 730px; }
+            .header-actions .donate-btn { display: none; }
+            .account-trigger { max-width: 145px; min-width: 0; }
+            #homeAccountName { max-width: 88px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            nav { margin: 0 -14px; padding: 0 14px; }
+            nav ul { gap: 18px; padding-bottom: 2px; }
+            nav ul li a { font-size: 12px; }
+            .hero { min-height: 0; padding: 180px 18px 50px; }
             .hero h1 { font-size: 32px; }
+            .hero > p { margin-bottom: 24px; }
+            .hero-actions { margin-bottom: 30px; }
+            .stats-container { position: static; width: 100%; transform: none; margin-top: 6px; }
             .stats-container { gap: 8px; }
             .stat-card { padding: 15px 8px; }
             .stat-card h3 { font-size: 24px; }
             .stat-card p { font-size: 9px; }
+            .mission-section { padding: 0 16px; }
+            .mission-content { margin-top: 0; padding: 42px 0; gap: 28px; }
+            .mission-text h2, .section-header h2, .map-title-area h2 { font-size: 27px; line-height: 1.25; }
             .mission-img-main { height: 230px; }
+            .cards-grid, .schedule-grid, .news-grid, .map-header, .map-container, .donate-container { max-width: 100%; }
+            .impact-section, .schedule-section, .map-section, .news-section { padding-left: 16px; padding-right: 16px; }
+            .schedule-card, .news-card, .impact-card { min-width: 0; }
             .qr-img { width: 180px; height: 180px; }
             .footer { padding-left: 6%; padding-right: 6%; }
             .map-filters { flex-direction: column; width: 100%; }
+            .map-search, .map-select { width: 100%; }
             .map-search input { width: 100%; }
+            .map-container { border-radius: 12px; }
+            .map-view { flex: none; width: 100%; height: 340px; }
+            .map-sidebar { flex: none; width: 100%; max-height: none; }
+            .sidebar-list { padding: 14px; }
+            .map-card { padding: 14px; }
+            .map-overlay-top { top: 10px; left: 10px; align-items: flex-start; }
+            .map-btn { padding: 7px 9px; font-size: 10px; }
+            .map-detail-card { padding: 12px; gap: 10px; }
+            .map-detail-card img { width: 64px; height: 64px; }
+            .home-campaign-dialog { padding: 24px 18px; }
+            .home-campaign-dialog h2 { font-size: 21px; line-height: 1.3; }
+            .home-campaign-actions { flex-direction: column-reverse; }
+            .home-modal-close, .home-modal-register { width: 100%; }
         }
     </style>
 </head>
@@ -709,14 +744,14 @@
                         <span class="date" id="detail-date">Cập nhật: 28/08/2026</span>
                     </div>
                     <h3 id="detail-title">Sông Tô Lịch – Đoạn Hoàng Quốc Việt</h3>
-                    <p>Trưởng nhóm: <strong id="detail-leader">Nguyễn Văn Hùng</strong></p>
+                    <p>Số lượng tình nguyện viên: <strong id="detail-volunteers">45 người</strong></p>
                 </div>
                 <div class="action">
                     <div class="amount">
-                        Đã vớt:
+                        <span id="detail-amount-label">Kết quả:</span>
                         <strong id="detail-amount">1.2 Tấn</strong>
                     </div>
-                    <button class="btn-thamgia">Tham Gia Ngay</button>
+                    <button class="btn-thamgia" id="detail-join" type="button">Tham Gia Ngay</button>
                 </div>
             </div>
         </div>
@@ -1009,7 +1044,11 @@
             return;
         }
         if (event.data?.type === 'hnx:scroll-top') { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; return; }
-        if (event.data?.type === 'hnx:campaigns-data') { renderHomeCampaigns(event.data.campaigns); return; }
+        if (event.data?.type === 'hnx:campaigns-data') {
+            renderHomeCampaigns(event.data.campaigns);
+            if (typeof window.updateHomeCampaignMap === 'function') window.updateHomeCampaignMap(event.data.campaigns);
+            return;
+        }
         if (event.data?.type === 'hnx:homepage-metrics') {
             const metrics = Object.fromEntries((event.data.metrics || []).map(m => [m.metric_key, m.metric_value]));
             const overview = metrics.overview || {};
@@ -1074,53 +1113,13 @@
     document.addEventListener("DOMContentLoaded", function() {
         
         // 1. Cấu hình các điểm trên bản đồ với tọa độ thực tế tại Hà Nội
-        const locations = {
-            1: {
-                title: "Sông Tô Lịch – Đoạn Hoàng Quốc Việt",
-                shortLoc: "Cầu Giấy",
-                date: "Cập nhật: 28/08/2026",
-                leader: "Nguyễn Văn Hùng",
-                amount: "1.2 Tấn",
-                img: "trangchu3.jpg",
-                coords: [21.0456, 105.7951], status: "Sắp ra quân", color: "#ef4444"
-            },
-            2: {
-                title: "Sông Lừ – Khương Trung",
-                shortLoc: "Thanh Xuân",
-                date: "Cập nhật: 25/08/2026",
-                leader: "Trần Thị Mai",
-                amount: "2.5 Tấn",
-                img: "trangchu2.jpg",
-                coords: [20.9950, 105.8190], status: "Sắp ra quân", color: "#ef4444"
-            },
-            3: {
-                title: "Kênh Nhuệ – Từ Liêm",
-                shortLoc: "Nam Từ Liêm",
-                date: "Cập nhật: 20/08/2026",
-                leader: "Lê Văn Tuấn",
-                amount: "4.1 Tấn",
-                img: "trangchu1.jpg",
-                coords: [21.0315, 105.7533], status: "Đã hoàn thành", color: "#10b981"
-            },
-            4: {
-                title: "Sông Sét – Định Công",
-                shortLoc: "Hoàng Mai",
-                date: "Cập nhật: 30/08/2026",
-                leader: "Phạm Hoàng",
-                amount: "1.8 Tấn",
-                img: "sau.jpg",
-                coords: [20.9830, 105.8420], status: "Sắp ra quân", color: "#ef4444"
-            },
-            5: {
-                title: "Sông Kim Ngưu – Mai Động",
-                shortLoc: "Hai Bà Trưng",
-                date: "Cập nhật: 01/09/2026",
-                leader: "Vũ Nam",
-                amount: "0 Tấn",
-                img: "truoc.jpg",
-                coords: [20.9972, 105.8625], status: "Sắp ra quân", color: "#ef4444"
-            }
+        const defaultHomeMapLocations = {
+            upcoming_1: { title: "Ra quân làm sạch kênh mương - Xanh bầu trời", shortLoc: "Đường CN8, P. Xuân Phương", date: "Cập nhật: 12/09/2026", volunteers: "70–100 người", amountLabel: "Quy mô:", amount: "100 TNV", img: "../remaining/Picture7.jpg", coords: [21.042, 105.748], status: "Sắp ra quân", color: "#ef4444", completed: false, campaignKey: "upcoming_1" },
+            comp_1: { title: "Dự án 1 – Chợ Tứ Liên (Tây Hồ)", shortLoc: "Chợ Tứ Liên, Tây Hồ", date: "Cập nhật: 27/07/2026", volunteers: "45 người", amountLabel: "Kết quả:", amount: "Đã làm sạch", img: "../remaining/Picture2.jpg", coords: [21.065, 105.820], status: "Đã hoàn thành", color: "#10b981", completed: true, campaignKey: "comp_1" },
+            comp_2: { title: "Dự án 2 – Ngõ 236 Âu Cơ, Hồng Hà", shortLoc: "Ngõ 236 Âu Cơ, P. Hồng Hà", date: "Cập nhật: 12/07/2026", volunteers: "80 người", amountLabel: "Kết quả:", amount: "Đã làm sạch", img: "../remaining/Picture4.jpg", coords: [21.070, 105.835], status: "Đã hoàn thành", color: "#10b981", completed: true, campaignKey: "comp_2" },
+            comp_3: { title: "Dự án 3 – Bãi bồi Cầu Long Biên", shortLoc: "Bãi bồi Cầu Long Biên, Hoàn Kiếm", date: "Cập nhật: 06/2026", volunteers: "90 người", amountLabel: "Kết quả:", amount: "Đã làm sạch", img: "../remaining/Picture6.jpg", coords: [21.030, 105.852], status: "Đã hoàn thành", color: "#10b981", completed: true, campaignKey: "comp_3" }
         };
+        let locations = { ...defaultHomeMapLocations };
 
         const map = L.map('real-map', {zoomControl: false}).setView([21.015, 105.805], 12);
 
@@ -1130,38 +1129,49 @@
         }).addTo(map);
 
         const markers = {};
-        const cards = document.querySelectorAll(".map-card");
+        let cards = [];
 
         const detailImg = document.getElementById("detail-img");
         const detailTagLoc = document.getElementById("detail-tag-loc");
         const detailDate = document.getElementById("detail-date");
         const detailTitle = document.getElementById("detail-title");
-        const detailLeader = document.getElementById("detail-leader");
+        const detailVolunteers = document.getElementById("detail-volunteers");
+        const detailAmountLabel = document.getElementById("detail-amount-label");
         const detailAmount = document.getElementById("detail-amount");
+        const detailJoin = document.getElementById("detail-join");
+        const sidebarList = document.querySelector('.map-sidebar .sidebar-list');
+        const sidebarHeaderCount = document.querySelector('.map-sidebar .sidebar-header span:first-child');
+        const trackedCount = document.querySelector('.map-overlay-top .map-btn');
 
-        Object.keys(locations).forEach(id => {
-            const loc = locations[id];
-            const iconHTML = `
-                <div class="pin ${id == 1 ? 'active' : ''}" id="pin-${id}" data-id="${id}" style="--pin-color: ${loc.color}" title="${loc.status}">
-                    ${id}
-                    <div class="map-tooltip">${loc.title}</div>
-                </div>
-            `;
-            const customIcon = L.divIcon({
-                className: 'custom-leaflet-icon',
-                html: iconHTML,
-                iconSize: [32, 32],
-                iconAnchor: [16, 16]
+        function clearMapMarkers() {
+            Object.keys(markers).forEach(id => {
+                map.removeLayer(markers[id]);
+                delete markers[id];
             });
-            const marker = L.marker(loc.coords, { icon: customIcon }).addTo(map);
-            markers[id] = marker;
+        }
 
-            marker.on('click', function() {
-                activateLocation(id);
+        function renderMapCardsAndMarkers() {
+            clearMapMarkers();
+            const entries = Object.entries(locations);
+            if (sidebarHeaderCount) sidebarHeaderCount.textContent = `DANH SÁCH CHIẾN DỊCH (${entries.length})`;
+            if (trackedCount) trackedCount.innerHTML = `<i class="fa-solid fa-circle" style="color:#10b981;font-size:10px"></i> ${entries.length} ĐIỂM ĐANG THEO DÕI`;
+            sidebarList.innerHTML = entries.map(([id, loc], index) => `<div class="map-card ${loc.completed ? 'completed' : 'warning'}${index === 0 ? ' active' : ''}" data-id="${escapeNewsHtml(id)}"><div class="card-top"><h4>${escapeNewsHtml(loc.title)}</h4><span class="status-badge ${loc.completed ? 'done' : 'need-help'}">${escapeNewsHtml(loc.status)}</span></div><div class="loc"><i class="fa-solid fa-location-dot"></i> ${escapeNewsHtml(loc.shortLoc)}</div><div class="card-stats"><div class="volunteers">Tình nguyện viên:<strong>${escapeNewsHtml(loc.volunteers)}</strong></div><div class="trash">${escapeNewsHtml(loc.amountLabel)}<strong>${escapeNewsHtml(loc.amount)}</strong></div></div></div>`).join('');
+            cards = Array.from(sidebarList.querySelectorAll('.map-card'));
+
+            entries.forEach(([id, loc], index) => {
+                const iconHTML = `<div class="pin ${index === 0 ? 'active' : ''}" data-id="${escapeNewsHtml(id)}" style="--pin-color:${loc.color}" title="${escapeNewsHtml(loc.status)}">${index + 1}<div class="map-tooltip">${escapeNewsHtml(loc.title)}</div></div>`;
+                const customIcon = L.divIcon({ className: 'custom-leaflet-icon', html: iconHTML, iconSize: [32, 32], iconAnchor: [16, 16] });
+                const marker = L.marker(loc.coords, { icon: customIcon }).addTo(map);
+                markers[id] = marker;
+                marker.on('click', () => activateLocation(id));
             });
-        });
 
-        function activateLocation(id, scrollCard = true) {
+            cards.forEach(card => card.addEventListener('click', function() { activateLocation(this.dataset.id); }));
+            if (entries.length > 1) map.fitBounds(L.latLngBounds(entries.map(([, loc]) => loc.coords)), { padding: [28, 28], maxZoom: 12 });
+            if (entries.length) activateLocation(entries[0][0], false, false);
+        }
+
+        function activateLocation(id, scrollCard = true, moveMap = true) {
             document.querySelectorAll('.pin').forEach(pin => {
                 if (pin.getAttribute("data-id") == id) {
                     pin.classList.add("active");
@@ -1185,17 +1195,85 @@
                 detailTagLoc.textContent = data.shortLoc;
                 detailDate.textContent = data.date;
                 detailTitle.textContent = data.title;
-                detailLeader.textContent = data.leader;
+                detailVolunteers.textContent = data.volunteers;
+                detailAmountLabel.textContent = data.amountLabel;
                 detailAmount.textContent = data.amount;
-                map.flyTo(data.coords, 14, { animate: true, duration: 1.2 });
+                detailImg.onerror = function() { this.onerror = null; this.src = 'trangchu3.jpg'; };
+                detailJoin.style.display = data.completed ? 'none' : 'inline-flex';
+                detailJoin.onclick = function() {
+                    if (data.campaignKey && homeCampaigns.has(String(data.campaignKey))) openHomeCampaignModal(data.campaignKey);
+                    else window.parent.postMessage({ type: 'hnx:navigate', path: '/chien-dich' }, '*');
+                };
+                if (moveMap) map.flyTo(data.coords, 14, { animate: true, duration: 1.2 });
             }
         }
 
-        cards.forEach(card => {
-            card.addEventListener("click", function() {
-                activateLocation(this.getAttribute("data-id"));
+        function homeCampaignCompleted(campaign) {
+            const status = String(campaign?.status || '').toLowerCase();
+            if (['completed', 'done', 'finished'].includes(status)) return true;
+            const endAt = campaign?.end_at || campaign?.start_at;
+            return Boolean(endAt && new Date(endAt).getTime() < Date.now() && status !== 'upcoming');
+        }
+
+        function validHomeMapCoordinate(latitude, longitude) {
+            const lat = Number(latitude), lng = Number(longitude);
+            return Number.isFinite(lat) && Number.isFinite(lng) && lat >= 20.5 && lat <= 21.5 && lng >= 104.5 && lng <= 106.5;
+        }
+
+        function normalizeCampaignText(value) {
+            return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        }
+
+        function fallbackHomeMapLocation(campaign) {
+            const text = normalizeCampaignText(`${campaign?.title || ''} ${campaign?.location || ''}`);
+            return Object.values(defaultHomeMapLocations).find(location => text.includes(normalizeCampaignText(location.shortLoc)) || text.includes(normalizeCampaignText(location.title)) || normalizeCampaignText(location.shortLoc).split(',').some(part => part.trim().length > 4 && text.includes(part.trim())));
+        }
+
+        function homeCampaignResult(campaign, completed) {
+            const tons = Number(campaign?.trash_tons || 0);
+            const kilograms = Number(campaign?.trash_kg || campaign?.collected_waste_kg || 0);
+            if (tons > 0) return `${tons.toLocaleString('vi-VN')} tấn`;
+            if (kilograms > 0) return `${kilograms.toLocaleString('vi-VN')} kg`;
+            if (campaign?.result_text) return String(campaign.result_text);
+            const capacity = Number(campaign?.capacity || 0);
+            return completed ? 'Đã hoàn thành' : (capacity > 0 ? `${capacity.toLocaleString('vi-VN')} TNV` : 'Đang cập nhật');
+        }
+
+        window.updateHomeCampaignMap = function(campaigns) {
+            const rows = Array.isArray(campaigns) ? campaigns : [];
+            const nextLocations = {};
+            rows.forEach((campaign, index) => {
+                const fallback = fallbackHomeMapLocation(campaign);
+                const latitude = Number(campaign.latitude), longitude = Number(campaign.longitude);
+                const hasCoordinates = validHomeMapCoordinate(latitude, longitude);
+                const coords = hasCoordinates ? [latitude, longitude] : fallback?.coords;
+                if (!coords) return;
+                const completed = homeCampaignCompleted(campaign);
+                const dateValue = campaign.end_at || campaign.start_at;
+                const date = dateValue ? new Date(dateValue) : null;
+                const dateText = date && !Number.isNaN(date.getTime()) ? date.toLocaleDateString('vi-VN') : 'Đang cập nhật';
+                const capacity = Number(campaign.capacity || 0);
+                const id = String(campaign.id || `campaign_${index}`);
+                nextLocations[id] = {
+                    title: campaign.title || 'Chiến dịch Hà Nội Xanh',
+                    shortLoc: campaign.location || fallback?.shortLoc || 'Hà Nội',
+                    date: `Cập nhật: ${dateText}`,
+                    volunteers: capacity > 0 ? `${capacity.toLocaleString('vi-VN')} người` : 'Đang cập nhật',
+                    amountLabel: completed ? 'Kết quả:' : 'Quy mô:',
+                    amount: homeCampaignResult(campaign, completed),
+                    img: campaign.image_url || fallback?.img || 'trangchu3.jpg',
+                    coords,
+                    status: completed ? 'Đã hoàn thành' : 'Sắp ra quân',
+                    color: completed ? '#10b981' : '#ef4444',
+                    completed,
+                    campaignKey: id
+                };
             });
-        });
+            locations = Object.keys(nextLocations).length ? nextLocations : { ...defaultHomeMapLocations };
+            renderMapCardsAndMarkers();
+        };
+
+        renderMapCardsAndMarkers();
 
         const normalize = value => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const districtSelect = document.getElementById('mapDistrictSelect');
@@ -1261,7 +1339,10 @@
         window.addEventListener('resize', updateHeaderOnScroll);
         updateHeaderOnScroll();
         
-        setTimeout(() => activateLocation(1, false), 500);
+        setTimeout(() => {
+            const firstCampaignId = Object.keys(locations)[0];
+            if (firstCampaignId) activateLocation(firstCampaignId, false, false);
+        }, 500);
     });
 </script>
 

@@ -481,6 +481,64 @@
       .profile-logged-in { grid-template-columns: 1fr; }
       .picker-footer { align-items: stretch; flex-direction: column; }
     }
+    @media (max-width: 480px) {
+      html, body { width: 100%; overflow-x: hidden; }
+      body { font-size: 15px; }
+      .container { padding-left: 14px; padding-right: 14px; }
+      #top.home-toolbar { padding: 10px 14px; gap: 9px; }
+      #top .logo-area { flex: 0 0 auto; gap: 7px; font-size: 13px; }
+      #top .logo-area img { width: 40px; height: 40px; }
+      #top .header-actions { margin-left: auto; min-width: 0; }
+      #top .header-actions .btn-join, #top .donate-btn { display: none; }
+      #top .account-trigger { max-width: 145px; min-width: 0; }
+      #headerAccountName { max-width: 88px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      #top nav { margin: 0 -14px; padding: 0 14px; }
+      #top nav ul { gap: 18px; padding-bottom: 2px; }
+      #top nav a { font-size: 12px; }
+      .account-menu .account-dropdown { position: fixed; top: 72px; right: 12px; width: min(230px, calc(100vw - 24px)); }
+      .intro-section { align-items: stretch; flex-direction: column; gap: 18px; margin: 22px 0; }
+      .intro-title h1, .news-hero h1 { font-size: 24px; line-height: 1.25; }
+      .summary-bar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; padding: 8px; }
+      .stat-item { min-width: 0; padding: 12px; border-right: 0; border-bottom: 1px solid var(--border-color); }
+      .stat-item:nth-child(odd) { border-right: 1px solid var(--border-color); }
+      .stat-item:nth-last-child(-n+2) { border-bottom: 0; }
+      .stat-val { font-size: 18px; }
+      .main-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+      .col-box { min-width: 0; padding: 16px; }
+      .camp-card { align-items: flex-start; }
+      .card-thumb { width: 105px; height: 105px; }
+      .card-info { width: calc(100% - 117px); min-width: 0; }
+      .map-search-form { flex-direction: column; }
+      .btn-map-search { min-height: 42px; }
+      .map-container, #boundaryMap { min-height: 380px; }
+      .map-legend { top: 8px; right: 8px; padding: 7px 9px; font-size: 10px; }
+      .map-popup { left: 8px; bottom: 8px; width: calc(100% - 16px); }
+      .cta-banner, .cta-left { align-items: flex-start; flex-direction: column; }
+      .cta-banner { gap: 16px; padding: 18px; }
+      .btn-cta { width: 100%; text-align: center; }
+      .profile-card, .chart-panel { padding: 16px; }
+      .profile-info { align-items: flex-start; flex-direction: column; }
+      .profile-btn-group { align-items: stretch; flex-direction: column; }
+      .profile-btn-group button { width: 100%; }
+      .stats-inline { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 12px 6px; }
+      .stat-profile-num { font-size: 21px; }
+      .stat-profile-lbl { font-size: 11px; }
+      .chart-panel { overflow-x: auto; }
+      .chart-header { align-items: flex-start; flex-direction: column; gap: 10px; }
+      .chart-container { min-width: 470px; }
+      .news-hero { padding: 30px 20px; }
+      .news-main-card img { height: 190px; }
+      .news-main-body { padding: 16px; }
+      .news-filter-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; }
+      .news-filter-btn { flex: 0 0 auto; }
+      .modal { padding: 12px; }
+      .modal-content { width: 100%; max-width: 100%; padding: 22px 16px; border-radius: 12px; }
+      .picker-content, .gallery-content { width: 100%; max-width: 100%; }
+      .picker-content { height: min(82vh, 620px); }
+      .thamgia-form-grid-2 { grid-template-columns: 1fr; }
+      .thamgia-form-card { padding: 18px 14px; }
+      .footer-grid { gap: 28px; }
+    }
   </style>
 </head>
 <body>

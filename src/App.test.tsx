@@ -58,6 +58,26 @@ describe("source HTML routes", () => {
     expect(screen.getByTitle("Về Hà Nội Xanh")).toBeInTheDocument()
   })
 
+  it("preserves a requested section when navigating to the impact dashboard", async () => {
+    window.history.replaceState({}, "", "/chien-dich")
+    render(<App />)
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent("message", {
+          origin: window.location.origin,
+          data: {
+            type: "hnx:navigate",
+            path: "/tac-dong",
+            section: "before-after",
+          },
+        }),
+      )
+    })
+    await waitFor(() => expect(window.location.pathname).toBe("/tac-dong"))
+    expect(window.location.hash).toBe("#before-after")
+    expect(screen.getByTitle("Tác động cộng đồng")).toBeInTheDocument()
+  })
+
   it("keeps the old introduction URL working", async () => {
     window.history.replaceState({}, "", "/gioi-thieu")
     render(<App />)

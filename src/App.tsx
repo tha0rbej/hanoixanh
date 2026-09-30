@@ -132,9 +132,11 @@ function SourceFrame({
   useEffect(() => {
     const receiveNavigation = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return
-      const message = event.data as { type?: string; path?: string; tab?: "login" | "register" | "reset"; campaignKey?: string; location?: string; description?: string; email?: string; latitude?: number; longitude?: number; fullName?: string; phone?: string; organization?: string; organizationType?: string; birthDate?: string; gender?: string; address?: string; occupation?: string; interests?: string; bio?: string; currentPassword?: string; newPassword?: string; image?: File; images?: File[] }
+      const message = event.data as { type?: string; path?: string; section?: string; tab?: "login" | "register" | "reset"; campaignKey?: string; location?: string; description?: string; email?: string; latitude?: number; longitude?: number; fullName?: string; phone?: string; organization?: string; organizationType?: string; birthDate?: string; gender?: string; address?: string; occupation?: string; interests?: string; bio?: string; currentPassword?: string; newPassword?: string; image?: File; images?: File[] }
       if (message?.type === "hnx:navigate" && message.path && allowedPaths.has(message.path)) {
-        if (message.path !== location.pathname) navigate(message.path)
+        const section = message.section?.replace(/[^a-z0-9-]/gi, "")
+        const destination = section ? `${message.path}#${section}` : message.path
+        if (destination !== `${location.pathname}${location.hash}`) navigate(destination)
         return
       }
       if (message?.type === "hnx:auth-open") { onAuth(message.tab || "login"); return }
@@ -244,6 +246,8 @@ function SourceFrame({
     if (token) void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/homepage_metrics?select=metric_key,metric_value`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(metrics => frameRef.current?.contentWindow?.postMessage({ type: "hnx:homepage-metrics", metrics }, window.location.origin))
     if (token) void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/posts?select=*&status=eq.published&order=published_at.desc.nullslast,created_at.desc`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(posts => frameRef.current?.contentWindow?.postMessage({ type: "hnx:posts-data", posts: Array.isArray(posts) ? posts : [] }, window.location.origin))
     if (session) void tableSelect<{ campaign_key: string | null }>("campaign_registrations", "campaign_key", session.access_token, `&user_id=eq.${encodeURIComponent(session.user.id)}`).then(items => frameRef.current?.contentWindow?.postMessage({ type: "hnx:registered-campaigns", keys: items.map(x => x.campaign_key).filter(Boolean) }, window.location.origin))
+    const section = location.hash.replace(/^#/, "")
+    if (section) window.setTimeout(() => frameRef.current?.contentWindow?.postMessage({ type: "hnx:scroll-section", section }, window.location.origin), 50)
   }
 
   useEffect(() => {

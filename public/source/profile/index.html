@@ -234,6 +234,43 @@
             .history-meta { flex-direction: column; gap: 7px; }
             .footer-grid { grid-template-columns: 1fr; }
         }
+
+        @media (max-width: 480px) {
+            html, body { width: 100%; overflow-x: hidden; }
+            header { padding: 10px 14px; gap: 9px; }
+            .logo { gap: 7px; font-size: 13px; }
+            .logo img { width: 40px; height: 40px; }
+            .header-actions { min-width: 0; }
+            .user-menu { min-width: 0; max-width: 150px; }
+            .user-name { min-width: 0; }
+            #header-user-name { display: inline-block; max-width: 88px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
+            .nav-links { margin: 0 -14px; padding: 0 14px 3px; gap: 18px; }
+            .nav-links a { flex: 0 0 auto; font-size: 12px; }
+            .dropdown-menu { position: fixed; top: 70px; right: 12px; width: min(230px, calc(100vw - 24px)); }
+            .profile-banner { min-height: 270px; padding: 35px 0 100px; }
+            .banner-text h1 { font-size: 30px; line-height: 1.2; }
+            .banner-text p { font-size: 13px; line-height: 1.55; }
+            .profile-layout { margin-top: -55px; }
+            .container { padding-left: 14px; padding-right: 14px; }
+            .card { padding: 18px 15px; border-radius: 12px; }
+            .sidebar-left { padding: 20px 14px; }
+            .profile-avatar { width: 104px; height: 104px; }
+            .side-menu a { padding: 12px; }
+            .section-header h2 { font-size: 18px; }
+            .form-grid { gap: 15px; }
+            .input-box input, .input-box select, .input-box textarea { font-size: 16px; }
+            .form-actions { flex-direction: column; gap: 10px; }
+            .form-actions button { width: 100%; }
+            .history-item { padding: 16px 14px; }
+            .history-date { flex-basis: 62px; }
+            .history-info { min-width: calc(100% - 90px); }
+            .history-status { margin-left: 76px; }
+            .img-container { height: 280px; }
+            .cropper-container-box { width: calc(100% - 24px); padding: 14px; }
+            .cropper-actions { flex-direction: column-reverse; }
+            .cropper-actions button { width: 100%; }
+            footer { padding-left: 18px; padding-right: 18px; }
+        }
     </style>
 </head>
 <body>
