@@ -272,6 +272,7 @@
             footer { padding-left: 18px; padding-right: 18px; }
         }
     </style>
+    <link rel="stylesheet" href="../site-header.css">
 </head>
 <body>
 
@@ -292,10 +293,10 @@
     <!-- MÀN HÌNH CHÍNH APP -->
     <div id="main-app">
         <!-- HEADER -->
-        <header>
+        <header class="site-header">
             <a href="#" class="logo" onclick="event.preventDefault(); navigateParent('/')">
-                <img src="../home/logo.jpg" alt="Logo Hà Nội Xanh">
-                <span>HÀ NỘI<br>XANH</span>
+                <img src="../home/logo.png" alt="Logo Hà Nội Xanh">
+                <span class="site-brand-copy"><strong>HÀ NỘI XANH</strong><small>Vì một Hà Nội xanh</small></span>
             </a>
             <nav class="nav-links">
                 <a onclick="navigateParent('/')">Trang chủ</a>
@@ -309,7 +310,7 @@
                 <a class="donate-btn" onclick="navigateParent('/tac-dong')"><i class="fa-regular fa-heart"></i> QUYÊN TẶNG</a>
                 <div class="user-dropdown-container">
                     <div class="user-menu" onclick="toggleDropdown()">
-                        <img id="header-avatar" src="../home/logo.jpg" alt="Avatar">
+                        <img id="header-avatar" src="../home/logo.png" alt="Avatar">
                         <span id="header-user-name">Thành viên</span> <i class="fa-solid fa-chevron-down" style="font-size: 10px;"></i>
                     </div>
                     <div id="dropdown-menu" class="dropdown-menu">
@@ -340,7 +341,7 @@
             
             <!-- Cột Trái: Menu Chuyển Tab -->
             <aside class="sidebar-left card">
-                <img id="main-profile-avatar" class="avatar-lg" src="../home/logo.jpg" alt="Avatar">
+                <img id="main-profile-avatar" class="avatar-lg" src="../home/logo.png" alt="Avatar">
                 <input type="file" id="file-upload" accept="image/*">
                 <button class="btn-change-photo" onclick="document.getElementById('file-upload').click();"><i class="fa-solid fa-camera"></i> Đổi ảnh</button>
                 <h3 id="profile-user-name">Thành viên</h3>
@@ -497,7 +498,7 @@
                 <p>Cùng chia sẻ ý kiến và lan tỏa những hành động tốt đẹp vì môi trường Thủ đô.</p>
             </div>
             <div class="footer-col">
-                <div class="footer-logo-area"><img src="../home/logo.jpg" alt="Logo Hà Nội Xanh">HÀ NỘI <span>XANH</span></div>
+                <div class="footer-logo-area"><img src="../home/logo.png" alt="Logo Hà Nội Xanh">HÀ NỘI <span>XANH</span></div>
                 <p>Cùng nhau hành động nhỏ, tạo nên thay đổi lớn cho môi trường Thủ đô.</p>
             </div>
             <div class="footer-col">

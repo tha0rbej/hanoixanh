@@ -281,9 +281,9 @@
         .donate-info > p { color: #cbdad1; font-size: 14px; max-width: 650px; margin-bottom: 25px; }
         .bank-details { border-top: 1px solid rgba(255,255,255,0.12); padding-top: 18px; }
         .bank-details p { font-size: 13px; color: #d4e1da; margin-bottom: 7px; }
-        .bank-details span { color: white; font-weight: 700; }
+        .bank-details span { color: white; font-weight: 700; overflow-wrap: anywhere; }
         .donate-qr { text-align: center; }
-        .qr-img { width: 220px; height: 220px; object-fit: contain; border: 3px dashed rgba(255,255,255,0.7); background: #ffffff; margin: 0 auto 25px; display: block; }
+        .qr-img { width: min(240px, 100%); height: auto; aspect-ratio: 1; object-fit: contain; border: 0; border-radius: 8px; background: #ffffff; margin: 0 auto 25px; display: block; box-shadow: 0 12px 30px rgba(0,0,0,.18); }
         .donate-qr h4 { font-size: 18px; margin-bottom: 5px; }
 
         /* =========================
@@ -402,7 +402,7 @@
             .cards-grid, .schedule-grid, .news-grid, .map-header, .map-container, .donate-container { max-width: 100%; }
             .impact-section, .schedule-section, .map-section, .news-section { padding-left: 16px; padding-right: 16px; }
             .schedule-card, .news-card, .impact-card { min-width: 0; }
-            .qr-img { width: 180px; height: 180px; }
+            .qr-img { width: min(200px, 100%); height: auto; }
             .footer { padding-left: 6%; padding-right: 6%; }
             .map-filters { flex-direction: column; width: 100%; }
             .map-search, .map-select { width: 100%; }
@@ -422,6 +422,7 @@
             .home-modal-close, .home-modal-register { width: 100%; }
         }
     </style>
+    <link rel="stylesheet" href="../site-header.css">
 </head>
 
 <body>
@@ -429,10 +430,10 @@
 <!-- =====================================================
      HEADER 
 ===================================================== -->
-<header>
+<header class="site-header">
     <div class="logo-area">
-        <img src="logo.jpg" alt="Logo Hà Nội Xanh">
-        <span>HÀ NỘI<br>XANH</span>
+        <img src="logo.png" alt="Logo Hà Nội Xanh">
+        <span class="site-brand-copy"><strong>HÀ NỘI XANH</strong><small>Vì một Hà Nội xanh</small></span>
     </div>
 
     <nav>
@@ -451,7 +452,7 @@
             <i class="fa-regular fa-heart"></i>
             QUYÊN TẶNG
         </a>
-        <a href="#" onclick="event.preventDefault(); window.parent.postMessage({type:'hnx:auth-open', tab:'login'}, '*')" class="btn-login account-trigger"><img id="homeAccountAvatar" class="account-avatar" src="logo.jpg" alt="Avatar" hidden><span id="homeAccountName">ĐĂNG NHẬP</span><i id="homeAccountCaret" class="fa-solid fa-chevron-down" hidden></i></a>
+        <a href="#" onclick="event.preventDefault(); window.parent.postMessage({type:'hnx:auth-open', tab:'login'}, '*')" class="btn-login account-trigger"><img id="homeAccountAvatar" class="account-avatar" src="logo.png" alt="Avatar" hidden><span id="homeAccountName">ĐĂNG NHẬP</span><i id="homeAccountCaret" class="fa-solid fa-chevron-down" hidden></i></a>
     </div>
 </header>
 
@@ -775,17 +776,17 @@
             </p>
             <div class="bank-details">
                 <p>Ngân hàng: <span>MB Bank (Ngân hàng Quân Đội)</span></p>
-                <p>Chủ tài khoản: <span>QUY HA NOI XANH</span></p>
-                <p>Số tài khoản: <span>1234 567 890</span></p>
+                <p>Chủ tài khoản: <span>CONG TY CO PHAN DOANH NGHIEP HA NOI XANH</span></p>
+                <p>Số tài khoản: <span>1018</span></p>
                 <p>Nội dung chuyển khoản: <span>Hovaten - SDT - Ung ho HN Xanh</span></p>
             </div>
         </div>
 
         <div class="donate-qr">
-            <img class="qr-img" src="qr-donate.png" alt="Mã QR quyên góp">
+            <img class="qr-img" src="https://img.vietqr.io/image/MB-1018-qr_only.png?accountName=CONG%20TY%20CO%20PHAN%20DOANH%20NGHIEP%20HA%20NOI%20XANH" alt="Mã QR MB Bank, số tài khoản 1018">
             <h4>Quét mã để ủng hộ</h4>
             <p style="font-size:14px; color:#d1d5db; margin:0; line-height:1.5;">
-                Hỗ trợ thanh toán nhanh qua ứng dụng Ngân hàng, Momo, ZaloPay, VNPay...
+                Quét bằng ứng dụng ngân hàng hỗ trợ VietQR để chuyển khoản nhanh.
             </p>
         </div>
     </div>
@@ -878,9 +879,9 @@
     <div class="home-campaign-dialog">
         <h2 id="homeCampaignTitle"></h2>
         <div class="home-campaign-meta" id="homeCampaignMeta"></div>
-        <div class="home-campaign-detail"><strong>⚠️ Tình trạng ô nhiễm tại điểm ra quân:</strong><p id="homeCampaignPollution"></p></div>
-        <div class="home-campaign-detail"><strong>🎯 Kế hoạch &amp; Mục tiêu hành động:</strong><p id="homeCampaignPlan"></p></div>
-        <div class="home-campaign-detail"><strong>🛡️ Trang bị hỗ trợ từ Hà Nội Xanh:</strong><p id="homeCampaignSupport"></p></div>
+        <div class="home-campaign-detail"><strong>Tình trạng ô nhiễm tại điểm ra quân:</strong><p id="homeCampaignPollution"></p></div>
+        <div class="home-campaign-detail"><strong>Kế hoạch &amp; Mục tiêu hành động:</strong><p id="homeCampaignPlan"></p></div>
+        <div class="home-campaign-detail"><strong>Trang bị hỗ trợ từ Hà Nội Xanh:</strong><p id="homeCampaignSupport"></p></div>
         <div class="home-campaign-actions">
             <button type="button" class="home-modal-close" onclick="closeHomeCampaignModal()">ĐÓNG</button>
             <button type="button" class="home-modal-register" id="homeCampaignRegister">ĐĂNG KÝ THAM GIA NGAY</button>
@@ -905,7 +906,7 @@
 
         <div class="footer-col">
             <div class="footer-logo-area">
-                <img src="logo.jpg" alt="Logo Hà Nội Xanh">
+                <img src="logo.png" alt="Logo Hà Nội Xanh">
                 HÀ NỘI<span>XANH</span>
             </div>
             <p>Cùng nhau hành động nhỏ, tạo nên thay đổi lớn cho môi trường Thủ đô.</p>
@@ -1071,7 +1072,7 @@
             accountName.textContent = event.data.user?.name || 'ĐĂNG NHẬP';
             accountAvatar.hidden = !event.data.user;
             accountCaret.hidden = !event.data.user;
-            if (event.data.user) accountAvatar.src = event.data.user.avatarUrl || 'logo.jpg';
+            if (event.data.user) accountAvatar.src = event.data.user.avatarUrl || 'logo.png';
             loginButton.onclick = function(e) {
                 e.preventDefault();
                 if (!event.data.user) { window.parent.postMessage({type:'hnx:auth-open', tab:'login'}, '*'); return; }
@@ -1098,6 +1099,19 @@
         return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
     }
 
+    function resolveHomeNewsImage(imageUrl) {
+        const value = String(imageUrl || '').trim();
+        if (!value) return 'news-hanoi-xanh.png';
+        if (/^(?:https?:|data:|blob:|\/)/i.test(value)) return value;
+        const fileName = value.split(/[\\/]/).pop();
+        const sharedNewsImages = new Set([
+            'news-bad-air-2025.jpg',
+            'news-to-lich.jpg',
+            'news-to-lich-park.jpg'
+        ]);
+        return sharedNewsImages.has(fileName) ? `../remaining/${fileName}` : value;
+    }
+
     function renderHomeNews(posts) {
         const grid = document.querySelector('.news-section .news-grid');
         if (!grid || !Array.isArray(posts)) return;
@@ -1105,7 +1119,8 @@
         grid.innerHTML = posts.slice(0, 3).map(post => {
             const date = new Date(post.published_at || post.created_at).toLocaleDateString('vi-VN');
             const url = post.source_url || '#';
-            return `<article class="news-card"><img class="news-img" src="${escapeNewsHtml(post.image_url || 'news-hanoi-xanh.png')}" alt="${escapeNewsHtml(post.title)}"><div class="news-body"><div class="news-meta"><span><i class="fa-regular fa-calendar"></i> ${date}</span><span><i class="fa-solid fa-newspaper"></i> ${escapeNewsHtml(post.source_name || post.category || 'Hà Nội Xanh')}</span></div><h3 class="news-title"><a href="${escapeNewsHtml(url)}" target="_blank" rel="noopener">${escapeNewsHtml(post.title)}</a></h3><p class="news-desc">${escapeNewsHtml(post.excerpt || post.content || '')}</p><a href="${escapeNewsHtml(url)}" target="_blank" rel="noopener" class="read-more">Đọc tiếp <i class="fa-solid fa-chevron-right"></i></a></div></article>`;
+            const image = resolveHomeNewsImage(post.image_url);
+            return `<article class="news-card"><img class="news-img" src="${escapeNewsHtml(image)}" alt="${escapeNewsHtml(post.title)}" onerror="this.onerror=null;this.src='news-hanoi-xanh.png'"><div class="news-body"><div class="news-meta"><span><i class="fa-regular fa-calendar"></i> ${date}</span><span><i class="fa-solid fa-newspaper"></i> ${escapeNewsHtml(post.source_name || post.category || 'Hà Nội Xanh')}</span></div><h3 class="news-title"><a href="${escapeNewsHtml(url)}" target="_blank" rel="noopener">${escapeNewsHtml(post.title)}</a></h3><p class="news-desc">${escapeNewsHtml(post.excerpt || post.content || '')}</p><a href="${escapeNewsHtml(url)}" target="_blank" rel="noopener" class="read-more">Đọc tiếp <i class="fa-solid fa-chevron-right"></i></a></div></article>`;
         }).join('');
     }
 

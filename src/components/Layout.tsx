@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import logoImg from "@/imports/image-1.png";
+import logoImg from "@/imports/logo-hnx.png";
 import { useAppData } from "@/app/AppContext";
 import Header from "./Header";
 

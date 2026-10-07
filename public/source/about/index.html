@@ -540,12 +540,13 @@
       .footer-grid { gap: 28px; }
     }
   </style>
+  <link rel="stylesheet" href="../site-header.css">
 </head>
 <body>
 
   <!-- Thanh công cụ dùng chung, đồng bộ từ Trang chủ -->
-  <header id="top" class="home-toolbar">
-    <div class="logo-area" onclick="navigateParent('/')"><img src="logo.jpg" alt="Logo Hà Nội Xanh"><span>HÀ NỘI<br>XANH</span></div>
+  <header id="top" class="home-toolbar site-header">
+     <div class="logo-area" onclick="navigateParent('/')"><img src="logo.png" alt="Logo Hà Nội Xanh"><span class="site-brand-copy"><strong>HÀ NỘI XANH</strong><small>Vì một Hà Nội xanh</small></span></div>
     <nav><ul>
       <li><a onclick="navigateParent('/')" id="nav-home">Trang chủ</a></li>
       <li><a onclick="switchMainView('ve-chung-toi')" id="nav-ve-chung-toi">Về Hà Nội Xanh</a></li>
@@ -556,7 +557,7 @@
     <div class="header-actions">
       <a onclick="navigateParent('/tham-gia')" class="btn-join" id="nav-btn-thamgia">THAM GIA</a>
       <a href="#" class="donate-btn" onclick="event.preventDefault(); openDonateModal()"><i class="fa-regular fa-heart"></i> QUYÊN TẶNG</a>
-      <div class="account-menu" id="accountMenu"><a onclick="handleHeaderAuthClick()" class="btn-login account-trigger" id="headerLoginBtn"><img id="headerAccountAvatar" class="account-avatar" src="logo.jpg" alt="Avatar" hidden><span id="headerAccountName">ĐĂNG NHẬP</span><i id="headerAccountCaret" class="fa-solid fa-chevron-down" hidden></i></a><div class="account-dropdown"><button class="profile-action" type="button" onclick="navigateParent('/ho-so'); document.getElementById('accountMenu').classList.remove('open')">Hồ sơ cá nhân</button><button type="button" onclick="if (confirm('Bạn có chắc chắn muốn đăng xuất không?')) { handleLogout(); document.getElementById('accountMenu').classList.remove('open'); }">Đăng xuất</button></div></div>
+       <div class="account-menu" id="accountMenu"><a onclick="handleHeaderAuthClick()" class="btn-login account-trigger" id="headerLoginBtn"><img id="headerAccountAvatar" class="account-avatar" src="logo.png" alt="Avatar" hidden><span id="headerAccountName">ĐĂNG NHẬP</span><i id="headerAccountCaret" class="fa-solid fa-chevron-down" hidden></i></a><div class="account-dropdown"><button class="profile-action" type="button" onclick="navigateParent('/ho-so'); document.getElementById('accountMenu').classList.remove('open')">Hồ sơ cá nhân</button><button type="button" onclick="if (confirm('Bạn có chắc chắn muốn đăng xuất không?')) { handleLogout(); document.getElementById('accountMenu').classList.remove('open'); }">Đăng xuất</button></div></div>
     </div>
   </header>
 
@@ -1288,7 +1289,7 @@
 
         <div class="footer-col">
           <div class="footer-brand">
-            <img src="logo.jpg" alt="Hà Nội Xanh Logo" style="height: 38px; width: 38px; object-fit: contain; border-radius: 50%;">
+             <img src="logo.png" alt="Hà Nội Xanh Logo" style="height: 38px; width: 38px; object-fit: contain; border-radius: 50%;">
             <span>HÀ NỘI <strong>XANH</strong></span>
           </div>
           <p>Cùng nhau hành động nhỏ, tạo nên thay đổi lớn cho môi trường Thủ đô.</p>
@@ -1445,11 +1446,11 @@
     <div class="modal-content" style="text-align: center; width: 440px;">
       <h3 class="modal-header-title">Ủng hộ quỹ Hà Nội Xanh</h3>
       <p style="font-size: 14px; color: var(--text-sub); margin-bottom: 14px;">Quét mã QR bên dưới để chung tay đóng góp tài chính cho các chiến dịch làm sạch.</p>
-      <img src="qr-donate.png" alt="QR Quyên góp" style="width: 180px; height: 180px; object-fit: contain; margin: 10px auto; border-radius: 6px; border: 1px solid #ccc; display: block;">
-      <div style="background: var(--primary-light); padding: 12px; border-radius: 6px; text-align: left; margin: 14px 0; font-size: 13.5px; color: var(--text-main);">
+      <img src="https://img.vietqr.io/image/MB-1018-qr_only.png?accountName=CONG%20TY%20CO%20PHAN%20DOANH%20NGHIEP%20HA%20NOI%20XANH" alt="Mã QR MB Bank, số tài khoản 1018" style="width: min(220px, 100%); height: auto; aspect-ratio: 1; object-fit: contain; margin: 10px auto; border-radius: 8px; border: 1px solid #d1d5db; display: block;">
+      <div style="background: var(--primary-light); padding: 12px; border-radius: 6px; text-align: left; margin: 14px 0; font-size: 13.5px; color: var(--text-main); overflow-wrap: anywhere;">
         <p><strong>Ngân hàng:</strong> MB Bank</p>
-        <p><strong>Số tài khoản:</strong> 123456789999</p>
-        <p><strong>Chủ tài khoản:</strong> NGUYEN TIEN HUY (Hà Nội Xanh)</p>
+        <p><strong>Số tài khoản:</strong> 1018</p>
+        <p><strong>Chủ tài khoản:</strong> CONG TY CO PHAN DOANH NGHIEP HA NOI XANH</p>
       </div>
       <p style="font-size: 12.5px; color: var(--text-sub); font-style: italic; margin-bottom: 16px;">"Tất cả các khoản tiền quyên góp của bạn sẽ được sử dụng và kê khai công khai."</p>
       <button class="btn-pill btn-join-pill" onclick="closeModal('donateModal')" style="width: 100%;">Đã hiểu / Đóng</button>
@@ -1677,7 +1678,7 @@
         loggedOutBox.style.display = 'none';
         loggedInBox.style.display = 'grid';
         document.getElementById('headerAccountName').innerText = currentUser.name;
-        document.getElementById('headerAccountAvatar').src = currentUser.avatarUrl || currentUser.avatar || 'logo.jpg';
+         document.getElementById('headerAccountAvatar').src = currentUser.avatarUrl || currentUser.avatar || 'logo.png';
         document.getElementById('headerAccountAvatar').hidden = false;
         document.getElementById('headerAccountCaret').hidden = false;
         document.getElementById('uName').innerText = currentUser.name;

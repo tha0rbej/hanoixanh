@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import logoImg from "@/imports/image-1.png";
+import logoImg from "@/imports/logo-hnx.png";
 
 const links = [["Trang chủ", "/"], ["Về Hà Nội Xanh", "/ve-ha-noi-xanh"], ["Chiến dịch", "/chien-dich"], ["Bản đồ", "/ban-do"], ["Tác động", "/tac-dong"], ["Tin tức", "/tin-tuc"]];
 
