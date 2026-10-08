@@ -878,9 +878,9 @@
     <div class="home-campaign-dialog">
         <h2 id="homeCampaignTitle"></h2>
         <div class="home-campaign-meta" id="homeCampaignMeta"></div>
-        <div class="home-campaign-detail"><strong>⚠️ Tình trạng ô nhiễm tại điểm ra quân:</strong><p id="homeCampaignPollution"></p></div>
-        <div class="home-campaign-detail"><strong>🎯 Kế hoạch &amp; Mục tiêu hành động:</strong><p id="homeCampaignPlan"></p></div>
-        <div class="home-campaign-detail"><strong>🛡️ Trang bị hỗ trợ từ Hà Nội Xanh:</strong><p id="homeCampaignSupport"></p></div>
+        <div class="home-campaign-detail"><strong><i class="fa-solid fa-triangle-exclamation"></i> Tình trạng ô nhiễm tại điểm ra quân:</strong><p id="homeCampaignPollution"></p></div>
+        <div class="home-campaign-detail"><strong><i class="fa-solid fa-bullseye"></i> Kế hoạch &amp; Mục tiêu hành động:</strong><p id="homeCampaignPlan"></p></div>
+        <div class="home-campaign-detail"><strong><i class="fa-solid fa-shield-halved"></i> Trang bị hỗ trợ từ Hà Nội Xanh:</strong><p id="homeCampaignSupport"></p></div>
         <div class="home-campaign-actions">
             <button type="button" class="home-modal-close" onclick="closeHomeCampaignModal()">ĐÓNG</button>
             <button type="button" class="home-modal-register" id="homeCampaignRegister">ĐĂNG KÝ THAM GIA NGAY</button>
@@ -981,7 +981,7 @@
         activeHomeCampaignId = String(id);
         const start = new Date(campaign.start_at);
         document.getElementById('homeCampaignTitle').textContent = campaign.title || 'Chiến dịch Hà Nội Xanh';
-        document.getElementById('homeCampaignMeta').textContent = `📍 ${campaign.location || 'Chưa cập nhật địa điểm'}  📅 ${start.toLocaleString('vi-VN')}`;
+        document.getElementById('homeCampaignMeta').textContent = `${campaign.location || 'Chưa cập nhật địa điểm'}  •  ${start.toLocaleString('vi-VN')}`;
         document.getElementById('homeCampaignPollution').textContent = campaign.pollution_status || 'Chưa cập nhật';
         document.getElementById('homeCampaignPlan').textContent = campaign.action_plan || campaign.description || 'Chưa cập nhật';
         document.getElementById('homeCampaignSupport').textContent = campaign.support_equipment || 'Hà Nội Xanh sẽ thông báo trước ngày ra quân';
