@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hà Nội Xanh - Chiến dịch, Tác động cộng đồng & Tin tức</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     :root {
@@ -23,7 +26,7 @@
       --status-gray: #64748b;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
     html { scroll-behavior: smooth; }
     body { background-color: var(--bg-page); color: var(--text-main); font-size: 16px; line-height: 1.65; }
     .container { width: 1320px; max-width: 98%; margin: 0 auto; }
@@ -62,7 +65,7 @@
     
     .search-box { position: relative; }
     .search-box input { border-radius: 22px; border: 1px solid var(--border-color); padding: 9px 14px 9px 34px; font-size: 13.5px; outline: none; width: 145px; background: #fff; height: 42px; }
-    .search-box::before { content: "\f002"; position: absolute; left: 11px; top: 11px; font-family: "Font Awesome 6 Free"; font-size: 12px; font-weight: 900; opacity: 0.6; }
+    .search-box::before { content: "🔍"; position: absolute; left: 11px; top: 11px; font-size: 12px; opacity: 0.6; }
 
     .btn-login-custom {
       display: inline-flex;
@@ -191,6 +194,13 @@
     .btn-submit-report:hover { background: #08431e; }
     .trust-badge { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-sub); margin-top: 8px; }
 
+    .cta-banner { background: var(--primary-light); border: 1px solid #d4ecd9; border-radius: 8px; padding: 20px 28px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
+    .cta-left { display: flex; align-items: center; gap: 16px; }
+    .cta-icon { font-size: 32px; }
+    .cta-text h3 { font-size: 17px; font-weight: 800; color: var(--primary-dark); }
+    .cta-text p { font-size: 14.5px; color: var(--text-sub); }
+    .btn-cta { background: var(--primary-dark); color: #fff; text-decoration: none; padding: 11px 26px; border-radius: 6px; font-size: 14px; font-weight: 700; white-space: nowrap; }
+
     /* VIEW 2: TÁC ĐỘNG CỘNG ĐỒNG */
     #page-tac-dong { display: none; margin-top: 28px; }
     .section-title { font-size: 22px; font-weight: 900; color: var(--text-main); margin-bottom: 18px; }
@@ -238,50 +248,102 @@
     .ba-body h4 { font-size: 16.5px; font-weight: 900; margin-bottom: 6px; color: var(--text-main); }
     .ba-body p { font-size: 14px; color: var(--text-sub); }
 
-    /* VIEW 3: TIN TỨC & CÂU CHUYỆN (ĐỒNG BỘ VISUAL TUYỆT ĐỐI) */
-    #page-tin-tuc { display: none; margin-top: 28px; }
-    
+    /* VIEW 3: TIN TỨC & CÂU CHUYỆN */
+    #page-tin-tuc { display: none; margin-top: 0; padding-bottom: 68px; }
+
     .news-hero {
-      background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('news-hanoi-xanh.png') center/cover;
-      color: white; padding: 45px 50px; border-radius: 12px; margin-bottom: 24px; position: relative; overflow: hidden;
+      width: 100vw;
+      min-height: 470px;
+      margin-left: calc(50% - 50vw);
+      margin-bottom: 56px;
+      color: #fff;
+      display: flex;
+      align-items: flex-end;
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(2, 52, 37, .88) 0%, rgba(3, 73, 49, .64) 43%, rgba(3, 73, 49, .14) 78%),
+        linear-gradient(0deg, rgba(3, 44, 31, .42), transparent 55%),
+        url('../home/figma-about.png') center 58% / cover no-repeat;
     }
-    .news-hero h1 { font-size: 28px; font-weight: 900; margin-bottom: 8px; }
-    .news-hero p { font-size: 14.5px; opacity: 0.95; line-height: 1.5; }
-    .news-hero-icon { position: absolute; right: 40px; bottom: -20px; font-size: 110px; opacity: 0.15; color: white; }
+    .news-hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 70%, rgba(3, 48, 34, .22));
+      pointer-events: none;
+    }
+    .news-hero-inner {
+      width: min(1320px, 92%);
+      margin: 0 auto;
+      padding: 72px 0 66px;
+      position: relative;
+      z-index: 1;
+    }
+    .news-hero h1 {
+      max-width: 760px;
+      font-size: clamp(42px, 5.2vw, 72px);
+      line-height: .98;
+      letter-spacing: -2px;
+      font-weight: 900;
+      margin-bottom: 20px;
+    }
+    .news-hero p {
+      max-width: 620px;
+      font-size: 18px;
+      line-height: 1.65;
+      color: rgba(255, 255, 255, .9);
+    }
 
-    .news-filter-tabs { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
-    .news-filter-btn { background: var(--bg-card); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 20px; font-size: 13.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-sub); transition: 0.2s; text-decoration: none; }
-    .news-filter-btn.active { background: var(--primary); color: #white; border-color: var(--primary); color: #fff; }
-    .news-filter-btn:hover:not(.active) { background: var(--primary-light); color: var(--primary); }
+    .news-featured {
+      display: grid;
+      grid-template-columns: minmax(0, 1.18fr) minmax(340px, .82fr);
+      min-height: 430px;
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid #dfe9e2;
+      border-radius: 22px;
+      box-shadow: 0 18px 50px rgba(18, 75, 51, .09);
+      margin-bottom: 58px;
+    }
+    .news-featured-media { min-height: 430px; overflow: hidden; }
+    .news-featured-media img { width: 100%; height: 100%; display: block; object-fit: cover; transition: transform .45s ease; }
+    .news-featured:hover .news-featured-media img { transform: scale(1.025); }
+    .news-featured-body { padding: clamp(32px, 4vw, 58px); display: flex; flex-direction: column; justify-content: center; }
+    .news-kicker { color: var(--primary); font-size: 12px; line-height: 1; font-weight: 800; letter-spacing: 1.7px; text-transform: uppercase; margin-bottom: 18px; }
+    .news-featured h2 { color: #123c2d; font-size: clamp(26px, 2.5vw, 38px); line-height: 1.22; letter-spacing: -.7px; margin-bottom: 18px; }
+    .news-featured p { color: #5b6f66; font-size: 15.5px; line-height: 1.75; margin-bottom: 26px; }
+    .news-meta-row { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding-top: 20px; border-top: 1px solid #e5ece8; font-size: 13px; color: #74847c; }
+    .news-link-read { color: var(--primary); font-weight: 800; text-decoration: none; white-space: nowrap; }
+    .news-link-read:hover { color: var(--primary-dark); }
 
-    .news-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 40px; }
-    .news-main-card { background: var(--bg-card); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-    .news-main-card img { width: 100%; height: 240px; object-fit: cover; }
-    .news-main-body { padding: 22px; }
-    .news-tag { background: var(--primary-light); color: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 800; display: inline-block; margin-bottom: 10px; }
-    .news-main-card h3 { font-size: 18px; font-weight: 900; color: var(--text-main); margin-bottom: 10px; line-height: 1.4; }
-    .news-main-card p { font-size: 14px; color: var(--text-sub); line-height: 1.6; margin-bottom: 16px; }
-    .news-meta-row { display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: var(--text-sub); border-top: 1px solid var(--border-color); padding-top: 12px; }
-    .news-link-read { color: var(--primary); font-weight: 800; text-decoration: none; }
-    .news-link-read:hover { text-decoration: underline; }
-
-    .news-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-    .news-sub-card { background: var(--bg-card); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); display: flex; flex-direction: column; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-    .news-sub-card img { width: 100%; height: 110px; object-fit: cover; }
-    .news-sub-body { padding: 14px; display: flex; flex-direction: column; flex-grow: 1; }
-    .news-sub-card h4 { font-size: 13.5px; font-weight: 800; color: var(--text-main); margin-bottom: 6px; line-height: 1.35; }
-    .news-sub-card p { font-size: 12px; color: var(--text-sub); margin-bottom: 10px; flex-grow: 1; }
-    .news-sub-meta { font-size: 11px; color: var(--status-gray); }
-
-    .news-sidebar-box { background: var(--bg-card); border-radius: 10px; padding: 20px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-    .news-sidebar-title { font-size: 15px; font-weight: 900; color: var(--primary); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
-    .news-sidebar-title a { font-size: 12px; color: var(--text-sub); text-decoration: none; font-weight: 700; }
-    
-    .news-side-item { display: flex; gap: 12px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border-color); align-items: center; text-decoration: none; color: inherit; }
-    .news-side-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-    .news-side-item img { width: 70px; height: 55px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
-    .news-side-info h5 { font-size: 12.5px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; line-height: 1.3; }
-    .news-side-info span { font-size: 11px; color: var(--status-gray); }
+    .news-section-head { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 24px; }
+    .news-section-head h2 { color: #123c2d; font-size: clamp(28px, 3.2vw, 42px); line-height: 1.15; letter-spacing: -.8px; }
+    .news-section-head p { max-width: 460px; color: #65766e; font-size: 14px; line-height: 1.65; text-align: right; }
+    .news-story-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+    .news-story-card {
+      min-width: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      color: inherit;
+      text-decoration: none;
+      background: #fff;
+      border: 1px solid #dfe9e2;
+      border-radius: 18px;
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+    .news-story-card:hover { transform: translateY(-6px); border-color: #b9d6c5; box-shadow: 0 18px 38px rgba(18, 75, 51, .11); }
+    .news-story-media { aspect-ratio: 16 / 9; overflow: hidden; background: #eaf2ed; }
+    .news-story-media img { width: 100%; height: 100%; display: block; object-fit: cover; transition: transform .4s ease; }
+    .news-story-card:hover .news-story-media img { transform: scale(1.045); }
+    .news-story-body { padding: 22px 22px 20px; display: flex; flex: 1; flex-direction: column; }
+    .news-story-card h3 { color: #173d30; font-size: 18px; line-height: 1.42; font-weight: 800; margin-bottom: 10px; }
+    .news-story-card p { color: #65766e; font-size: 13.5px; line-height: 1.65; margin-bottom: 22px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .news-story-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: auto; padding-top: 16px; border-top: 1px solid #e8eeea; color: #7d8b84; font-size: 12px; }
+    .news-story-arrow { color: var(--primary); font-size: 19px; line-height: 1; transition: transform .2s ease; }
+    .news-story-card:hover .news-story-arrow { transform: translateX(4px); }
+    .news-empty { grid-column: 1 / -1; padding: 56px 24px; border-radius: 18px; background: #f3f8f5; color: #536a60; text-align: center; }
 
     /* FOOTER */
     footer { background-color: var(--footer-bg); color: #e2e8f0; padding: 50px 0 24px; border-top: 2px solid var(--primary-dark); }
@@ -425,14 +487,21 @@
       .main-grid { grid-template-columns: minmax(250px, 0.85fr) minmax(0, 1.4fr); }
       .main-grid > :last-child { grid-column: 1 / -1; }
       .impact-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .before-after-grid, .news-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .news-layout { grid-template-columns: 1fr; }
+      .before-after-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .news-story-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .news-featured { grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr); }
       .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 900px) { #top.home-toolbar { height: auto; min-height: 75px; flex-wrap: wrap; padding: 15px 5%; gap: 15px; } #top nav { order: 3; width: 100%; overflow-x: auto; } #top nav ul { justify-content: flex-start; min-width: max-content; padding: 0 10px 5px 5px; } }
     @media (max-width: 480px) { #top .header-actions .btn-join { display: none; } #top .donate-btn { font-size: 10px; padding: 9px 10px; } #top .btn-login { padding: 8px 11px; font-size: 11px; } }
     @media (max-width: 700px) {
-      .main-grid, .impact-overview-grid, .before-after-grid, .news-grid-3, .footer-grid { grid-template-columns: 1fr; }
+      .main-grid, .impact-overview-grid, .before-after-grid, .news-story-grid, .footer-grid { grid-template-columns: 1fr; }
+      .news-hero { min-height: 410px; margin-bottom: 38px; }
+      .news-hero-inner { padding: 56px 0 50px; }
+      .news-featured { grid-template-columns: 1fr; margin-bottom: 42px; }
+      .news-featured-media { min-height: 320px; aspect-ratio: 16 / 9; }
+      .news-section-head { align-items: flex-start; flex-direction: column; gap: 8px; }
+      .news-section-head p { text-align: left; }
       .main-grid > :last-child { grid-column: auto; }
       .profile-logged-in { grid-template-columns: 1fr; }
       .picker-footer { align-items: stretch; flex-direction: column; }
@@ -476,6 +545,9 @@
       .map-container, #boundaryMap { min-height: 380px; }
       .map-legend { top: 8px; right: 8px; padding: 7px 9px; font-size: 10px; }
       .map-popup { left: 8px; bottom: 8px; width: calc(100% - 16px); }
+      .cta-banner, .cta-left { align-items: flex-start; flex-direction: column; }
+      .cta-banner { gap: 16px; padding: 18px; }
+      .btn-cta { width: 100%; text-align: center; }
       .profile-card, .chart-panel { padding: 16px; }
       .profile-info { align-items: flex-start; flex-direction: column; }
       .profile-btn-group { align-items: stretch; flex-direction: column; }
@@ -486,11 +558,19 @@
       .chart-panel { overflow-x: auto; }
       .chart-header { align-items: flex-start; flex-direction: column; gap: 10px; }
       .chart-container { min-width: 470px; }
-      .news-hero { padding: 30px 20px; }
-      .news-main-card img { height: 190px; }
-      .news-main-body { padding: 16px; }
-      .news-filter-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; }
-      .news-filter-btn { flex: 0 0 auto; }
+      #page-tin-tuc { padding-bottom: 42px; }
+      .news-hero { min-height: 370px; margin-bottom: 28px; background-position: 57% center; }
+      .news-hero-inner { width: calc(100% - 28px); padding: 44px 0 38px; }
+      .news-hero h1 { font-size: 38px; line-height: 1.02; letter-spacing: -1px; }
+      .news-hero p { max-width: 330px; font-size: 14px; line-height: 1.55; }
+      .news-featured { border-radius: 16px; margin-bottom: 36px; }
+      .news-featured-media { min-height: 210px; }
+      .news-featured-body { padding: 24px 20px; }
+      .news-featured h2 { font-size: 24px; }
+      .news-meta-row { align-items: flex-start; flex-direction: column; gap: 10px; }
+      .news-section-head h2 { font-size: 28px; }
+      .news-story-grid { gap: 16px; }
+      .news-story-card { border-radius: 14px; }
       .modal { padding: 12px; }
       .modal-content { width: 100%; max-width: 100%; padding: 22px 16px; border-radius: 12px; }
       .detail-modal-content { padding: 22px 18px 0; }
@@ -502,147 +582,86 @@
       .footer-grid { gap: 28px; }
     }
 
-    /* ===== CAMPAIGN PAGE: VERTICAL SECTION LAYOUT ===== */
-    #page-chien-dich { padding-bottom: 16px; }
-    .summary-bar { width: min(100%, 1120px); gap: 16px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
-    .stat-item { min-width: 0; padding: 22px; border: 1px solid #e4ece7; border-radius: 14px; background: #fff; box-shadow: 0 4px 14px rgba(15, 70, 42, .055); text-align: left; }
-    .stat-item:last-child { padding-right: 22px; border: 1px solid #e4ece7; }
-    .stat-val { margin-bottom: 7px; font-size: 25px; }
-    .stat-label { line-height: 1.45; }
-
-    .explore-section { margin: 48px 0 40px; }
-    .section-heading { max-width: 680px; margin: 0 auto 30px; text-align: center; }
-    .section-heading > span, .report-eyebrow { color: #168a45; font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
-    .section-heading h2 { margin-top: 9px; color: #153b28; font-size: clamp(28px, 3vw, 40px); line-height: 1.2; }
-    .section-heading p { margin-top: 11px; color: #63746b; font-size: 15px; line-height: 1.7; }
-    .campaign-explorer { display: grid; grid-template-columns: minmax(340px, 35fr) minmax(0, 65fr); gap: 24px; align-items: stretch; }
-    .campaign-explorer .col-box { min-width: 0; height: 700px; padding: 24px; border: 1px solid #e3ebe6; border-radius: 18px; box-shadow: 0 8px 28px rgba(15, 70, 42, .07); }
-    .campaign-explorer .col-header { margin-bottom: 18px; color: #173d2a; font-size: 17px; letter-spacing: -.01em; text-transform: none; }
-    .map-col .col-header > i { color: #0f7a45; }
-    .campaign-list-panel { overflow: hidden; }
-    .campaign-list-panel .tab-nav { flex: 0 0 auto; gap: 20px; margin-bottom: 16px; }
-    .campaign-list-panel .tab-pane.active { min-height: 0; flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; padding: 2px 8px 4px 2px; scrollbar-color: #b9d7c3 transparent; scrollbar-width: thin; }
-    .campaign-list-panel .tab-pane::-webkit-scrollbar { width: 6px; }
-    .campaign-list-panel .tab-pane::-webkit-scrollbar-thumb { border-radius: 999px; background: #b9d7c3; }
-    .camp-card { flex: 0 0 auto; padding: 13px; border-color: #e5ece7; border-radius: 13px; cursor: pointer; transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
-    .camp-card:hover, .camp-card:focus-visible, .camp-card.is-map-active { border-color: #41a968; box-shadow: 0 9px 24px rgba(17, 102, 58, .11); outline: none; transform: translateY(-1px); }
-    .camp-card.map-highlight { border: 2px solid #16a34a; background: #f1fbf4; box-shadow: 0 12px 28px rgba(22, 163, 74, .22); }
-    .card-thumb { border-radius: 10px; }
-    .btn-view { border-radius: 8px; }
-    .map-col { min-height: 700px; }
-    .map-search-form { gap: 9px; margin-bottom: 14px; }
-    .map-search-form input { min-height: 44px; padding: 10px 15px; border-radius: 10px; }
-    .btn-map-search { min-width: 84px; border-radius: 10px; }
-    .map-container, #boundaryMap { min-height: 600px; border-radius: 13px; }
-
-    .report-section { margin: 0 0 28px; padding: 52px; border: 1px solid #dcebe1; border-radius: 22px; background: #eef8f1; }
-    .report-layout { display: grid; grid-template-columns: minmax(0, 42fr) minmax(420px, 58fr); gap: 56px; align-items: center; }
-    .report-copy h2 { margin-top: 10px; color: #153b28; font-size: clamp(30px, 3vw, 44px); line-height: 1.15; }
-    .report-copy .report-intro { max-width: 520px; margin: 18px 0 24px; color: #52675b; font-size: 15px; line-height: 1.75; }
-    .report-visual { position: relative; min-height: 270px; overflow: hidden; border-radius: 16px; background: #dbece0; }
-    .report-visual img { width: 100%; height: 270px; display: block; object-fit: cover; }
-    .report-visual::after { content: ""; position: absolute; inset: 45% 0 0; background: linear-gradient(transparent, rgba(6,55,31,.88)); }
-    .report-visual > div { position: absolute; right: 20px; bottom: 18px; left: 20px; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 12px; color: #fff; font-size: 13px; line-height: 1.45; text-align: center; }
-    .report-visual > div i { display: grid; width: 36px; height: 36px; flex: 0 0 36px; place-items: center; border-radius: 10px; background: rgba(255,255,255,.16); }
-    .report-form-card { padding: 30px; border: 1px solid #e0e9e3; border-radius: 18px; background: #fff; box-shadow: 0 12px 34px rgba(14, 78, 43, .08); }
-    .report-form-card .form-group { margin-bottom: 18px; }
-    .report-form-card .form-group label { color: #243d30; font-size: 13px; }
-    .report-form-card .form-group input, .report-form-card .form-group textarea { border-color: #dce6df; border-radius: 10px; padding: 12px 14px; }
-    .report-form-card .btn-pick-location, .report-form-card .upload-box { border-radius: 10px; }
-    .report-form-card .btn-submit-report { min-height: 48px; border-radius: 10px; }
-    .report-form-card .trust-badge { justify-content: center; margin-top: 12px; text-align: center; }
-
-    /* Modern map campaign card */
-    .map-detail-card { right: auto; bottom: 16px; left: 16px; width: 228px; max-width: calc(100% - 32px); padding: 0; display: block; overflow: hidden; border: 0; border-radius: 13px; background: #fff; box-shadow: 0 12px 30px rgba(15, 42, 29, .2); font-size: 12px; }
-    .map-detail-body { padding: 13px; }
-    .map-detail-meta { margin: 0 0 8px; white-space: normal; color: #718078; font-size: 10px; }
-    .map-detail-meta .status-tag { display: inline-flex; padding: 4px 8px; border-radius: 999px; font-size: 10px; }
-    .map-detail-card h3 { margin: 0; color: #173a28; font-size: 15px; font-weight: 800; line-height: 1.35; }
-    .map-detail-join { width: 100%; min-height: 38px; margin-top: 12px; padding: 9px 12px; display: inline-flex; align-items: center; justify-content: center; border-radius: 9px; background: #118247; box-shadow: 0 5px 12px rgba(17,130,71,.18); font-size: 12px; transition: background .2s ease, box-shadow .2s ease, transform .2s ease; }
-    .map-detail-join:hover { background: #0b6b39; box-shadow: 0 9px 22px rgba(11,107,57,.26); transform: translateY(-1px); }
-    .map-detail-join:focus-visible { outline: 3px solid rgba(22,138,69,.24); outline-offset: 2px; }
-
-    /* Trustworthy, touch-friendly report form */
-    .report-form-card .form-group input, .report-form-card .form-group textarea { width: 100%; min-height: 48px; border: 1.5px solid #cbd9d0; border-radius: 9px; background: #fff; padding: 12px 14px; color: #1f3529; font: inherit; transition: border-color .18s ease, box-shadow .18s ease, background .18s ease; }
-    .report-form-card .form-group textarea { min-height: 132px; resize: vertical; line-height: 1.55; }
-    .report-form-card .form-group input::placeholder, .report-form-card .form-group textarea::placeholder { color: #93a098; }
-    .report-form-card .form-group input:hover, .report-form-card .form-group textarea:hover { border-color: #9eb9a8; }
-    .report-form-card .form-group input:focus, .report-form-card .form-group textarea:focus { border-color: #168a45; background: #fcfffd; box-shadow: 0 0 0 4px rgba(22,138,69,.12); outline: none; }
-    .report-form-card .btn-pick-location { min-height: 46px; border: 1.5px solid #168a45; transition: background .18s ease, color .18s ease, box-shadow .18s ease; }
-    .report-form-card .btn-pick-location:hover { background: #eaf7ee; box-shadow: 0 4px 12px rgba(22,138,69,.09); }
-    .report-form-card .upload-box { min-height: 118px; display: grid; place-items: center; border: 1.5px dashed #9eb9a8; background: #f9fcfa; transition: border-color .18s ease, background .18s ease, box-shadow .18s ease; }
-    .report-form-card .upload-box:hover { border-color: #168a45; background: #f1f9f4; box-shadow: 0 0 0 4px rgba(22,138,69,.07); }
-    .report-form-card .btn-submit-report { transition: background .2s ease, box-shadow .2s ease, transform .2s ease; }
-    .report-form-card .btn-submit-report:hover { background: #073f24; box-shadow: 0 8px 20px rgba(7,63,36,.2); transform: translateY(-1px); }
-    .report-form-card .btn-submit-report:focus-visible, .report-form-card .btn-pick-location:focus-visible, .report-form-card .upload-box:focus-visible { outline: 3px solid rgba(22,138,69,.22); outline-offset: 2px; }
-
-    @media (max-width: 1050px) {
-      .campaign-explorer { grid-template-columns: 1fr; }
-      .campaign-explorer .col-box { height: auto; }
-      .campaign-list-panel { max-height: 620px; }
-      .campaign-list-panel .tab-pane.active { max-height: 500px; }
-      .map-col { min-height: 650px; }
-      .report-section { padding: 38px; }
-      .report-layout { grid-template-columns: 1fr 1.15fr; gap: 34px; }
+    /* TÁC ĐỘNG CỘNG ĐỒNG 2026 — đồng bộ với thiết kế Trang chủ */
+    #page-tac-dong,
+    #page-tac-dong :where(h1, h2, h3, h4, p, span, strong, small, button, a, div) { font-family: "Inter", sans-serif; }
+    #page-tac-dong { margin-top: 0; padding: 0 0 52px; color: #19352c; }
+    .impact-hero-panel {
+      width: 100vw;
+      min-height: 348px;
+      margin-left: calc(50% - 50vw);
+      margin-bottom: 36px;
+      padding: 48px max(22px, calc((100vw - 1320px) / 2)) 46px;
+      border-radius: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(90deg, rgba(3, 53, 37, .9) 0%, rgba(5, 82, 53, .68) 47%, rgba(5, 82, 53, .16) 84%), linear-gradient(0deg, rgba(3, 44, 31, .36), transparent 60%), url('../home/figma-impact-2.png') center / cover no-repeat;
+      color: #fff;
+      box-shadow: none;
     }
-    @media (max-width: 760px) {
-      .summary-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-      .stat-item, .stat-item:last-child { padding: 16px; border: 1px solid #e4ece7; }
-      .explore-section { margin: 34px 0 28px; }
-      .campaign-explorer { gap: 16px; }
-      .campaign-explorer .col-box { padding: 16px; border-radius: 15px; }
-      .campaign-list-panel { max-height: 600px; }
-      .map-col { min-height: 570px; }
-      .map-container, #boundaryMap { min-height: 470px; }
-      .report-section { margin-bottom: 24px; padding: 28px 18px; border-radius: 17px; }
-      .report-layout { grid-template-columns: 1fr; gap: 24px; }
-      .report-visual { min-height: 220px; }
-      .report-visual img { height: 220px; }
-      .report-form-card { min-width: 0; padding: 20px 16px; }
+    .impact-hero-panel::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 54%, rgba(3, 44, 31, .2)); pointer-events: none; }
+    .impact-hero-panel > * { position: relative; z-index: 1; }
+    .impact-hero-panel .impact-kicker { display: none; }
+    .impact-hero-panel h1 { max-width: 760px; margin-bottom: 10px; font-size: clamp(40px, 5vw, 64px); line-height: 1.04; letter-spacing: -.035em; }
+    .impact-hero-panel > p:last-child { max-width: 620px; margin: 0; color: rgba(255,255,255,.9); font-size: 16px; line-height: 1.6; }
+    #page-tac-dong .impact-section-heading { margin-bottom: 22px; }
+    #page-tac-dong .impact-section-heading .impact-kicker { display: block; margin-bottom: 9px; color: #16734a; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+    #page-tac-dong .section-title { margin: 0; color: #19352c; font-size: clamp(30px, 3vw, 42px); line-height: 1.2; font-weight: 700; letter-spacing: -.025em; }
+    #page-tac-dong .impact-section-heading p { max-width: 760px; margin-top: 10px; color: #607168; font-size: 15px; }
+    #page-tac-dong .profile-card { margin-bottom: 34px; padding: clamp(24px, 3vw, 38px); gap: 22px; border: 1px solid #dce5dc; border-radius: 12px; background: #fff; box-shadow: none; }
+    #page-tac-dong .profile-logged-out { padding: clamp(28px, 4vw, 48px); border: 0; border-radius: 10px; background: #eaf2e9; }
+    #page-tac-dong .profile-logged-out p { max-width: 700px; color: #465d52; font-size: 15px; line-height: 1.7; }
+    #page-tac-dong .btn-pill { min-height: 44px; padding: 0 18px; border-radius: 6px; font-size: 13px; font-weight: 600; text-transform: none; }
+    #page-tac-dong .profile-logged-in { gap: 30px; }
+    #page-tac-dong .avatar-circle { background: #16734a; border-color: #d5e9aa; }
+    #page-tac-dong .stats-inline { border: 0; border-radius: 10px; background: #eaf2e9; }
+    #page-tac-dong .stat-profile-num { color: #16734a; font-size: 29px; font-weight: 700; }
+    #page-tac-dong .stat-profile-lbl { color: #607168; font-size: 13px; font-weight: 500; }
+    #page-tac-dong .no-history { border-radius: 8px; background: #f7faf8; }
+    #page-tac-dong .impact-overview-grid { gap: 8px; margin-bottom: 34px; }
+    #page-tac-dong .impact-box { min-height: 158px; padding: 26px 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 0; border-radius: 0; background: #fff; box-shadow: 0 18px 34px rgba(16,62,46,.12); }
+    #page-tac-dong .impact-box .big-num { color: #166400; font-family: "Anton", sans-serif; font-size: clamp(48px, 4vw, 62px); font-weight: 400; line-height: 1; letter-spacing: -.02em; }
+    #page-tac-dong .impact-box .sub-lbl { margin-top: 11px; color: #607168; font-size: 13px; font-weight: 500; line-height: 1.45; }
+    #page-tac-dong .chart-panel { margin-bottom: 36px; padding: clamp(24px, 3vw, 38px); border: 1px solid #dce5dc; border-radius: 12px; background: #fff; }
+    #page-tac-dong .chart-header { align-items: flex-start; gap: 20px; }
+    #page-tac-dong .chart-header h4 { color: #19352c !important; font-size: 21px !important; line-height: 1.35; }
+    #page-tac-dong .chart-header span { color: #607168 !important; }
+    #page-tac-dong .chart-container { height: 250px; border-bottom-color: #dce5dc; }
+    #page-tac-dong .bar-col { width: 50px; border-radius: 4px 4px 0 0; background: linear-gradient(180deg, #68b779 0%, #2b8656 100%); }
+    #page-tac-dong .bar-col:hover { background: #16734a; }
+    #page-tac-dong .bar-col::after { color: #19352c; font-size: 12px; }
+    #page-tac-dong .bar-lbl { color: #607168; font-size: 13px; font-weight: 500; }
+    #page-tac-dong .before-after-grid { gap: 24px; margin-bottom: 8px; }
+    #page-tac-dong .ba-card { border: 1px solid #dce5dc; border-radius: 12px; background: #fff; box-shadow: none; }
+    #page-tac-dong .ba-card:hover { border-color: #bfd2c5; box-shadow: 0 18px 36px rgba(16,62,46,.1); }
+    #page-tac-dong .ba-split { height: 230px; }
+    #page-tac-dong .ba-badge { bottom: auto; top: 12px; left: 12px; border-radius: 99px; background: rgba(16,62,46,.88); font-size: 10px; font-weight: 600; letter-spacing: .04em; }
+    #page-tac-dong .ba-body { padding: 22px; }
+    #page-tac-dong .ba-body h4 { margin-bottom: 9px; color: #19352c; font-size: 20px; line-height: 1.35; font-weight: 700; }
+    #page-tac-dong .ba-body p { color: #607168; font-size: 14px; line-height: 1.65; }
+    @media (max-width: 820px) {
+      #page-tac-dong .impact-overview-grid { grid-template-columns: 1fr 1fr; }
+      #page-tac-dong .impact-box { min-height: 132px; }
+      #page-tac-dong .before-after-grid { grid-template-columns: 1fr 1fr; }
+      #page-tac-dong .before-after-grid > :last-child { grid-column: span 2; }
     }
-    @media (max-width: 480px) {
-      .summary-bar { gap: 8px; }
-      .stat-val { font-size: 20px; }
-      .stat-label { font-size: 11px; }
-      .campaign-explorer .camp-card { display: grid; grid-template-columns: 92px minmax(0, 1fr); }
-      .campaign-explorer .card-thumb { width: 92px; height: 112px; }
-      .campaign-explorer .card-info { width: auto; }
-      .map-col { min-height: 540px; }
-      .map-container, #boundaryMap { min-height: 440px; }
-      .map-detail-card { right: 10px; bottom: 10px; left: auto; width: 220px; max-width: calc(100% - 20px); }
-      .map-detail-body { padding: 13px; }
-      .map-detail-join { min-height: 44px; margin-top: 11px; }
-    }
-
-    /* Hero campaign: image-led, high-contrast and unmistakable */
-    .intro-section { position: relative; isolation: isolate; min-height: 410px; justify-content: center; border: 0; border-radius: 22px; background: linear-gradient(110deg, rgba(3, 55, 31, .94) 0%, rgba(5, 91, 48, .82) 54%, rgba(5, 55, 34, .72) 100%), url('Picture7.jpg') center 42% / cover; box-shadow: 0 20px 52px rgba(4, 67, 36, .2); }
-    .intro-section::after { content: ""; position: absolute; z-index: -1; inset: 0; background: radial-gradient(circle at 78% 18%, rgba(178, 239, 195, .2), transparent 28%), linear-gradient(0deg, rgba(1, 30, 17, .18), transparent 52%); }
-    .intro-title { position: relative; z-index: 1; }
-    .intro-title::after { content: ""; display: block; width: 56px; height: 4px; margin: 24px auto 0; border-radius: 999px; background: #8ee6a9; box-shadow: 0 0 0 6px rgba(142,230,169,.12); }
-    .intro-title h1 { color: #fff; text-shadow: 0 3px 20px rgba(0, 25, 13, .28); }
-    .intro-title p { max-width: 780px; color: rgba(255,255,255,.9); text-shadow: 0 2px 12px rgba(0, 25, 13, .24); }
-    @media (max-width: 760px) {
-      .intro-section { min-height: 390px; border-radius: 17px; background-position: 58% center; }
-      .intro-title h1 { font-size: 35px; }
-    }
-
-    /* Final spacing and containment adjustments */
-    .intro-section { min-height: 320px; margin-bottom: 26px; padding: 46px 40px 42px; }
-    .explore-section { margin-top: 0; }
-    .map-col { overflow: hidden; }
-    .map-search-form input { padding-left: 40px; }
-    .map-container { min-height: 0; flex: 1 1 auto; }
-    #boundaryMap { min-height: 0; height: 100%; }
-    @media (max-width: 1050px) {
-      .map-col { min-height: 650px; }
-      .map-container { min-height: 0; height: 560px; flex: 0 0 560px; }
-      #boundaryMap { min-height: 0; }
-    }
-    @media (max-width: 760px) {
-      .intro-section { min-height: 300px; margin-bottom: 20px; padding: 38px 22px 34px; }
-      .map-col { min-height: 620px; }
-      .map-container { height: 440px; flex-basis: 440px; }
-      #boundaryMap { min-height: 0; }
+    @media (max-width: 640px) {
+      #page-tac-dong { padding-top: 0; }
+      .impact-hero-panel { min-height: 292px; margin-bottom: 28px; padding: 34px 20px 32px; background-position: 58% center; }
+      .impact-hero-panel h1 { font-size: 38px; }
+      .impact-hero-panel > p:last-child { max-width: 340px; font-size: 14px; line-height: 1.55; }
+      #page-tac-dong .profile-logged-out > div { width: 100%; flex-direction: column; }
+      #page-tac-dong .profile-logged-out .btn-pill { width: 100%; }
+      #page-tac-dong .impact-overview-grid { gap: 7px; }
+      #page-tac-dong .impact-box { min-height: 116px; padding: 18px 8px; }
+      #page-tac-dong .impact-box .big-num { font-size: 39px; }
+      #page-tac-dong .impact-box .sub-lbl { font-size: 11px; }
+      #page-tac-dong .chart-container { min-width: 470px; }
+      #page-tac-dong .before-after-grid { grid-template-columns: 1fr; }
+      #page-tac-dong .before-after-grid > :last-child { grid-column: auto; }
     }
 
     /* Campaign page layout — kept scoped to the campaign view. */
@@ -720,14 +739,15 @@
       #page-chien-dich .map-container, #page-chien-dich #boundaryMap { min-height: 440px; }
     }
   </style>
+  <link rel="stylesheet" href="../site-header.css">
 </head>
 <body>
 
   <!-- Thanh công cụ dùng chung, đồng bộ từ Trang chủ -->
-  <header id="top" class="home-toolbar">
+  <header id="top" class="home-toolbar site-header">
     <div class="logo-area" onclick="navigateParent('/')">
-      <img src="logo.jpg" alt="Logo Hà Nội Xanh">
-      <span>HÀ NỘI<br>XANH</span>
+      <img src="logo.png" alt="Logo Hà Nội Xanh">
+      <span class="site-brand-copy"><strong>HÀ NỘI XANH</strong><small>Vì một Hà Nội xanh</small></span>
     </div>
     <nav>
       <ul>
@@ -736,12 +756,13 @@
         <li><a onclick="switchMainView('chien-dich')" id="nav-chien-dich" class="active">Chiến dịch</a></li>
         <li><a onclick="switchMainView('tac-dong')" id="nav-tac-dong">Tác động cộng đồng</a></li>
         <li><a onclick="switchMainView('tin-tuc')" id="nav-tin-tuc">Tin tức &amp; câu chuyện</a></li>
+        <li class="mobile-donate-link"><a href="#" onclick="event.preventDefault(); openDonateModal()">Quyên tặng</a></li>
       </ul>
     </nav>
+    <button class="site-menu-toggle" type="button" aria-label="Mở menu" aria-expanded="false"><span></span><span></span><span></span></button>
     <div class="header-actions">
-      <a onclick="navigateParent('/tham-gia')" class="btn-join">THAM GIA</a>
-      <a href="#" class="donate-btn" onclick="event.preventDefault(); openDonateModal()"><i class="fa-regular fa-heart"></i> QUYÊN TẶNG</a>
-      <div class="account-menu" id="accountMenu"><a onclick="handleHeaderAuthClick()" class="btn-login account-trigger" id="headerLoginBtn"><img id="headerAccountAvatar" class="account-avatar" src="logo.jpg" alt="Avatar" hidden><span id="headerAccountName">ĐĂNG NHẬP</span><i id="headerAccountCaret" class="fa-solid fa-chevron-down" hidden></i></a><div class="account-dropdown"><button class="profile-action" type="button" onclick="navigateParent('/ho-so'); document.getElementById('accountMenu').classList.remove('open')">Hồ sơ cá nhân</button><button type="button" onclick="if (confirm('Bạn có chắc chắn muốn đăng xuất không?')) { handleLogout(); document.getElementById('accountMenu').classList.remove('open'); }">Đăng xuất</button></div></div>
+      <a href="#" class="donate-btn" onclick="event.preventDefault(); openDonateModal()"><i class="fa-regular fa-heart"></i> Quyên tặng</a>
+      <div class="account-menu" id="accountMenu"><a onclick="handleHeaderAuthClick()" class="btn-login account-trigger" id="headerLoginBtn"><img id="headerAccountAvatar" class="account-avatar" src="logo.png" alt="Avatar" hidden><span id="headerAccountName">ĐĂNG NHẬP</span><i id="headerAccountCaret" class="fa-solid fa-chevron-down" hidden></i></a><div class="account-dropdown"><button class="profile-action" type="button" onclick="navigateParent('/ho-so'); document.getElementById('accountMenu').classList.remove('open')">Hồ sơ cá nhân</button><button type="button" onclick="if (confirm('Bạn có chắc chắn muốn đăng xuất không?')) { handleLogout(); document.getElementById('accountMenu').classList.remove('open'); }">Đăng xuất</button></div></div>
     </div>
   </header>
 
@@ -940,8 +961,15 @@
 
     <!-- ==================== VIEW 2: TÁC ĐỘNG CỘNG ĐỒNG ==================== -->
     <div id="page-tac-dong">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
-        <h2 class="section-title" style="margin: 0;"><i class="fa-regular fa-user ui-icon" aria-hidden="true"></i> Hồ sơ tình nguyện viên</h2>
+      <section class="impact-hero-panel">
+        <h1>Tác động cộng đồng</h1>
+        <p>Mỗi buổi ra quân để lại một thay đổi có thể nhìn thấy — từ dòng nước được khơi thông đến những thói quen xanh được lan tỏa.</p>
+      </section>
+
+      <div class="impact-section-heading">
+        <span class="impact-kicker">HÀNH TRÌNH CỦA BẠN</span>
+        <h2 class="section-title">Hồ sơ tình nguyện viên</h2>
+        <p>Theo dõi thời gian đóng góp, chiến dịch đã tham dự và kết quả bạn cùng cộng đồng tạo nên.</p>
       </div>
 
       <div class="profile-card">
@@ -986,7 +1014,11 @@
         </div>
       </div>
 
-      <h2 class="section-title"><i class="fa-solid fa-chart-column ui-icon" aria-hidden="true"></i> Tổng quan dữ liệu toàn hệ thống</h2>
+      <div class="impact-section-heading">
+        <span class="impact-kicker">TÁC ĐỘNG ĐƯỢC ĐO ĐẾM</span>
+        <h2 class="section-title">Tổng quan dữ liệu toàn hệ thống</h2>
+        <p>Các chỉ số được tổng hợp từ hoạt động thực tế của Hà Nội Xanh trên toàn thành phố.</p>
+      </div>
       <div class="impact-overview-grid" id="impactOverviewGrid">
         <div class="impact-box">
           <div class="big-num">230+</div>
@@ -1020,7 +1052,11 @@
         </div>
       </div>
 
-      <h2 class="section-title" id="impact-before-after"><i class="fa-solid fa-camera ui-icon" aria-hidden="true"></i> Dashboard: Trước – Sau khi làm sạch</h2>
+      <div class="impact-section-heading" id="impact-before-after">
+        <span class="impact-kicker">THAY ĐỔI CÓ THỂ NHÌN THẤY</span>
+        <h2 class="section-title">Trước và sau khi làm sạch</h2>
+        <p>So sánh hiện trạng tại những điểm nóng trước và sau mỗi chiến dịch cộng đồng.</p>
+      </div>
       <div class="before-after-grid" id="beforeAfterGrid">
         <div class="ba-card" onclick="openGalleryModal('comp_1')">
           <div class="ba-split">
@@ -1078,92 +1114,100 @@
     <!-- ==================== VIEW 3: TIN TỨC & CÂU CHUYỆN ==================== -->
     <div id="page-tin-tuc">
       <div class="news-hero">
-        <h1>Tin tức và câu chuyện</h1>
-        <p>Cùng cập nhật kiến thức, xu hướng môi trường<br>và những hành động xanh vì một Hà Nội bền vững hơn.</p>
-        <span style="font-size: 80px;" class="news-hero-icon"><i class="fa-solid fa-seedling" aria-hidden="true"></i></span>
+        <div class="news-hero-inner">
+          <h1>Tin tức &amp;<br>câu chuyện</h1>
+          <p>Những chuyển động mới, góc nhìn đáng nhớ và hành trình cùng nhau kiến tạo một Hà Nội xanh hơn mỗi ngày.</p>
+        </div>
       </div>
 
-      <div class="news-layout">
-        <div class="news-col-left">
-          <div class="news-main-card">
-            <img src="news-hanoi-xanh.png" alt="Nhà sáng lập Hà Nội Xanh dọn sông Tô Lịch">
-            <div class="news-main-body">
-              <span class="news-tag"><i class="fa-regular fa-newspaper" aria-hidden="true"></i> Báo tin tức</span>
-              <h3>Nhà sáng lập Hà Nội Xanh: “Người dân ném rác khi chúng tôi dọn sông Tô Lịch”</h3>
-              <p>Câu chuyện thật về hành trình làm sạch các dòng sông Hà Nội, những rủi ro của tình nguyện viên và kế hoạch mở rộng điểm xanh trên toàn thành phố.</p>
-              <div class="news-meta-row">
-                <span><i class="fa-regular fa-calendar" aria-hidden="true"></i> 10/09/2026 &nbsp;&nbsp; VnExpress</span>
-                <a href="https://vnexpress.net/nha-sang-lap-ha-noi-xanh-nguoi-dan-nem-rac-khi-chung-toi-don-song-to-lich-5118572.html" target="_blank" rel="noopener" class="news-link-read">Đọc tiếp →</a>
-              </div>
-            </div>
+      <section id="newsFeatured" class="news-featured" aria-label="Bài viết nổi bật">
+        <div class="news-featured-media">
+          <img src="news-hanoi-xanh.png" alt="Nhà sáng lập Hà Nội Xanh dọn sông Tô Lịch">
+        </div>
+        <div class="news-featured-body">
+          <div class="news-kicker">Câu chuyện mới nhất</div>
+          <h2>Nhà sáng lập Hà Nội Xanh: “Người dân ném rác khi chúng tôi dọn sông Tô Lịch”</h2>
+          <p>Câu chuyện thật về hành trình làm sạch các dòng sông Hà Nội, những rủi ro của tình nguyện viên và kế hoạch mở rộng điểm xanh trên toàn thành phố.</p>
+          <div class="news-meta-row">
+            <span>10/09/2026 &nbsp;·&nbsp; VnExpress</span>
+            <a href="https://vnexpress.net/nha-sang-lap-ha-noi-xanh-nguoi-dan-nem-rac-khi-chung-toi-don-song-to-lich-5118572.html" target="_blank" rel="noopener" class="news-link-read">Đọc bài viết →</a>
           </div>
+        </div>
+      </section>
 
-          <div class="news-grid-3">
-            <div class="news-sub-card" onclick="window.open('https://vnexpress.net/ha-noi-khuyen-cao-nguoi-dan-han-che-ra-ngoai-khi-khong-khi-o-nhiem-4989005.html','_blank')" style="cursor:pointer;">
+      <section aria-labelledby="newsLatestTitle">
+        <div class="news-section-head">
+          <h2 id="newsLatestTitle">Những câu chuyện đáng đọc</h2>
+          <p>Cập nhật các vấn đề môi trường, sáng kiến cộng đồng và những thay đổi đang diễn ra quanh Hà Nội.</p>
+        </div>
+        <div id="newsStoryGrid" class="news-story-grid">
+          <a class="news-story-card" href="https://vnexpress.net/ha-noi-khuyen-cao-nguoi-dan-han-che-ra-ngoai-khi-khong-khi-o-nhiem-4989005.html" target="_blank" rel="noopener">
+            <div class="news-story-media">
               <img src="news-air-pollution.jpg" alt="Ô nhiễm không khí Hà Nội">
-              <div class="news-sub-body">
-                <span class="news-tag" style="padding: 2px 6px; font-size: 10px;"><i class="fa-solid fa-leaf" aria-hidden="true"></i> Góc xanh</span>
-                <h4>Hà Nội khuyến cáo hạn chế ra ngoài khi không khí ô nhiễm</h4>
-                <p>Khuyến cáo bảo vệ sức khỏe trong những ngày chất lượng không khí xuống thấp.</p>
-                <div class="news-sub-meta">02/12/2025 • VnExpress</div>
-              </div>
             </div>
+            <div class="news-story-body">
+              <h3>Hà Nội khuyến cáo hạn chế ra ngoài khi không khí ô nhiễm</h3>
+              <p>Khuyến cáo bảo vệ sức khỏe trong những ngày chất lượng không khí xuống thấp.</p>
+              <div class="news-story-footer"><span>02/12/2025 · VnExpress</span><span class="news-story-arrow">→</span></div>
+            </div>
+          </a>
 
-            <div class="news-sub-card" onclick="window.open('https://www.vietnamplus.vn/vi-sao-khong-khi-o-ha-noi-o-nhiem-hon-thanh-pho-ho-chi-minh-post1023001.amp','_blank')" style="cursor:pointer;">
+          <a class="news-story-card" href="https://www.vietnamplus.vn/vi-sao-khong-khi-o-ha-noi-o-nhiem-hon-thanh-pho-ho-chi-minh-post1023001.amp" target="_blank" rel="noopener">
+            <div class="news-story-media">
               <img src="news-pm25.webp" alt="Bụi mịn tại Hà Nội">
-              <div class="news-sub-body">
-                <span class="news-tag" style="padding: 2px 6px; font-size: 10px;"><i class="fa-solid fa-box-archive" aria-hidden="true"></i> Ấn phẩm</span>
-                <h4>Vì sao không khí ở Hà Nội ô nhiễm hơn TP.HCM?</h4>
-                <p>Bụi đường, PM10, PM2.5 và điều kiện thời tiết là những nguyên nhân chính.</p>
-                <div class="news-sub-meta">27/03/2025 • VietnamPlus</div>
-              </div>
             </div>
+            <div class="news-story-body">
+              <h3>Vì sao không khí ở Hà Nội ô nhiễm hơn TP.HCM?</h3>
+              <p>Bụi đường, PM10, PM2.5 và điều kiện thời tiết là những nguyên nhân chính.</p>
+              <div class="news-story-footer"><span>27/03/2025 · VietnamPlus</span><span class="news-story-arrow">→</span></div>
+            </div>
+          </a>
 
-            <div class="news-sub-card" onclick="window.open('https://vov.vn/xa-hoi/bit-mui-di-hoc-ne-rac-di-lam-ha-noi-co-bat-luc-truoc-rac-thai-va-phe-thai-post1215281.vov','_blank')" style="cursor:pointer;">
+          <a class="news-story-card" href="https://vov.vn/xa-hoi/bit-mui-di-hoc-ne-rac-di-lam-ha-noi-co-bat-luc-truoc-rac-thai-va-phe-thai-post1215281.vov" target="_blank" rel="noopener">
+            <div class="news-story-media">
               <img src="news-waste-hanoi.jpg" alt="Rác và phế thải Hà Nội">
-              <div class="news-sub-body">
-                <span class="news-tag" style="padding: 2px 6px; font-size: 10px;"><i class="fa-solid fa-microphone" aria-hidden="true"></i> Podcast</span>
-                <h4>“Bịt mũi” đi học, “né rác” đi làm giữa Hà Nội</h4>
-                <p>Ghi nhận các điểm đổ trộm rác, phế thải xây dựng trên đường phố.</p>
-                <div class="news-sub-meta">17/07/2025 • VOV</div>
-              </div>
             </div>
-          </div>
-        </div>
-
-        <div class="news-col-right">
-          <div class="news-sidebar-box">
-            <div class="news-sidebar-title">
-              <span><i class="fa-solid fa-seedling" aria-hidden="true"></i> Xu hướng nổi bật</span>
-              <a href="https://vnexpress.net/chu-de/o-nhiem-khong-khi-3982" target="_blank" rel="noopener">Xem thêm →</a>
+            <div class="news-story-body">
+              <h3>“Bịt mũi” đi học, “né rác” đi làm giữa Hà Nội</h3>
+              <p>Ghi nhận các điểm đổ trộm rác, phế thải xây dựng trên đường phố.</p>
+              <div class="news-story-footer"><span>17/07/2025 · VOV</span><span class="news-story-arrow">→</span></div>
             </div>
+          </a>
 
-            <a href="https://vnexpress.net/song-to-lich-sau-gan-mot-nam-trien-khai-du-an-hoi-sinh-4935239.html" target="_blank" rel="noopener" class="news-side-item">
+          <a class="news-story-card" href="https://vnexpress.net/song-to-lich-sau-gan-mot-nam-trien-khai-du-an-hoi-sinh-4935239.html" target="_blank" rel="noopener">
+            <div class="news-story-media">
               <img src="news-to-lich.jpg" alt="Sông Tô Lịch">
-              <div class="news-side-info">
-                <h5>Sông Tô Lịch sau gần một năm triển khai dự án hồi sinh</h5>
-                <span>06/09/2025 • VnExpress</span>
-              </div>
-            </a>
+            </div>
+            <div class="news-story-body">
+              <h3>Sông Tô Lịch sau gần một năm triển khai dự án hồi sinh</h3>
+              <p>Những chuyển biến mới trên hành trình hồi sinh một trong những dòng sông quen thuộc của Thủ đô.</p>
+              <div class="news-story-footer"><span>06/09/2025 · VnExpress</span><span class="news-story-arrow">→</span></div>
+            </div>
+          </a>
 
-            <a href="https://vnexpress.net/ha-noi-se-xay-dung-cong-vien-doc-song-to-lich-4942042.html" target="_blank" rel="noopener" class="news-side-item">
+          <a class="news-story-card" href="https://vnexpress.net/ha-noi-se-xay-dung-cong-vien-doc-song-to-lich-4942042.html" target="_blank" rel="noopener">
+            <div class="news-story-media">
               <img src="news-to-lich-park.jpg" alt="Công viên dọc sông Tô Lịch">
-              <div class="news-side-info">
-                <h5>Hà Nội sẽ xây dựng công viên dọc sông Tô Lịch</h5>
-                <span>23/09/2025 • VnExpress</span>
-              </div>
-            </a>
+            </div>
+            <div class="news-story-body">
+              <h3>Hà Nội sẽ xây dựng công viên dọc sông Tô Lịch</h3>
+              <p>Không gian xanh ven sông được kỳ vọng tạo thêm điểm sinh hoạt cộng đồng cho người dân.</p>
+              <div class="news-story-footer"><span>23/09/2025 · VnExpress</span><span class="news-story-arrow">→</span></div>
+            </div>
+          </a>
 
-            <a href="https://dantri.com.vn/suc-khoe/tphcm-ha-noi-co-hang-chuc-ngay-khong-khi-rat-xau-trong-nam-2025-20250815111954796.htm" target="_blank" rel="noopener" class="news-side-item">
+          <a class="news-story-card" href="https://dantri.com.vn/suc-khoe/tphcm-ha-noi-co-hang-chuc-ngay-khong-khi-rat-xau-trong-nam-2025-20250815111954796.htm" target="_blank" rel="noopener">
+            <div class="news-story-media">
               <img src="news-bad-air-2025.jpg" alt="Không khí rất xấu tại Hà Nội">
-              <div class="news-side-info">
-                <h5>Hà Nội có hàng chục ngày không khí “rất xấu” trong năm 2025</h5>
-                <span>15/08/2025 • Dân trí</span>
-              </div>
-            </a>
-          </div>
+            </div>
+            <div class="news-story-body">
+              <h3>Hà Nội có hàng chục ngày không khí “rất xấu” trong năm 2025</h3>
+              <p>Dữ liệu chất lượng không khí cho thấy nhu cầu cấp thiết về các giải pháp giảm phát thải đô thị.</p>
+              <div class="news-story-footer"><span>15/08/2025 · Dân trí</span><span class="news-story-arrow">→</span></div>
+            </div>
+          </a>
         </div>
-      </div>
+      </section>
     </div>
 
   </div>
@@ -1220,9 +1264,9 @@
         <div class="footer-col">
           <h4>Liên hệ</h4>
           <ul class="contact-list">
-            <li><i class="fa-solid fa-phone ui-icon" aria-hidden="true"></i><a href="tel:+84987231832">+84 98 723 18 32</a></li>
-            <li><i class="fa-regular fa-envelope ui-icon" aria-hidden="true"></i><a href="mailto:hanoixanhh@gmail.com">hanoixanhh@gmail.com</a></li>
-            <li><i class="fa-solid fa-location-dot ui-icon" aria-hidden="true"></i><span>117 Xuân Thủy, Phường Dịch Vọng Hậu, Cầu Giấy, Hà Nội</span></li>
+            <li><span>📞</span><a href="tel:+84987231832">+84 98 723 18 32</a></li>
+            <li><span>✉️</span><a href="mailto:hanoixanhh@gmail.com">hanoixanhh@gmail.com</a></li>
+            <li><span>📍</span><span>117 Xuân Thủy, Phường Dịch Vọng Hậu, Cầu Giấy, Hà Nội</span></li>
           </ul>
         </div>
       </div>
@@ -1243,7 +1287,7 @@
       <div id="authLoginView">
         <div class="auth-title">
           <span>Đăng nhập</span>
-          <button aria-label="Đóng" style="border:none; background:none; font-size:20px; cursor:pointer; color:#64748b;" onclick="closeModal('authModal')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+          <button style="border:none; background:none; font-size:20px; cursor:pointer; color:#64748b;" onclick="closeModal('authModal')">✕</button>
         </div>
         <form onsubmit="handleLoginAction(event)">
           <div class="auth-group">
@@ -1254,7 +1298,7 @@
             <label>Mật khẩu</label>
             <div class="auth-input-wrap">
               <input type="password" id="loginPass" placeholder="Vui lòng nhập mật khẩu." required>
-              <button type="button" class="toggle-pass-btn" aria-label="Hiện mật khẩu" onclick="togglePasswordVisibility('loginPass', this)"><i class="fa-regular fa-eye" aria-hidden="true"></i></button>
+              <button type="button" class="toggle-pass-btn" onclick="togglePasswordVisibility('loginPass', this)">👁️</button>
             </div>
           </div>
           <div class="auth-link-row">
@@ -1270,7 +1314,7 @@
       <div id="authRegisterView" style="display: none;">
         <div class="auth-title">
           <span>Tạo tài khoản</span>
-          <button aria-label="Đóng" style="border:none; background:none; font-size:20px; cursor:pointer; color:#64748b;" onclick="closeModal('authModal')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+          <button style="border:none; background:none; font-size:20px; cursor:pointer; color:#64748b;" onclick="closeModal('authModal')">✕</button>
         </div>
         <form onsubmit="handleRegisterAction(event)">
           <div class="auth-group">
@@ -1285,14 +1329,14 @@
             <label>Mật khẩu*</label>
             <div class="auth-input-wrap">
               <input type="password" id="regPass" placeholder="Vui lòng nhập mật khẩu" required>
-              <button type="button" class="toggle-pass-btn" aria-label="Hiện mật khẩu" onclick="togglePasswordVisibility('regPass', this)"><i class="fa-regular fa-eye" aria-hidden="true"></i></button>
+              <button type="button" class="toggle-pass-btn" onclick="togglePasswordVisibility('regPass', this)">👁️</button>
             </div>
           </div>
           <div class="auth-group">
             <label>Xác nhận mật khẩu*</label>
             <div class="auth-input-wrap">
               <input type="password" id="regPassConfirm" placeholder="Nhập lại mật khẩu" required>
-              <button type="button" class="toggle-pass-btn" aria-label="Hiện mật khẩu" onclick="togglePasswordVisibility('regPassConfirm', this)"><i class="fa-regular fa-eye" aria-hidden="true"></i></button>
+              <button type="button" class="toggle-pass-btn" onclick="togglePasswordVisibility('regPassConfirm', this)">👁️</button>
             </div>
           </div>
           <button type="submit" class="btn-auth-submit" style="margin-top: 8px;">TẠO TÀI KHOẢN</button>
@@ -1305,7 +1349,7 @@
       <div id="authForgotView" style="display: none;">
         <div class="auth-title">
           <span>Quên mật khẩu</span>
-          <button aria-label="Đóng" style="border:none; background:none; font-size:20px; cursor:pointer; color:#64748b;" onclick="closeModal('authModal')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+          <button style="border:none; background:none; font-size:20px; cursor:pointer; color:#64748b;" onclick="closeModal('authModal')">✕</button>
         </div>
         <p style="font-size: 13.5px; color: #475569; margin-bottom: 16px; line-height: 1.5;">Nhập địa chỉ email của bạn để nhận hướng dẫn đặt lại mật khẩu.</p>
         <form onsubmit="handleForgotAction(event)">
@@ -1326,7 +1370,7 @@
     <div class="modal-content auth-modal-content">
       <div class="auth-title">
         <span>Chỉnh sửa hồ sơ</span>
-        <button aria-label="Đóng" style="border:none; background:none; font-size:20px; cursor:pointer; color:#64748b;" onclick="closeModal('editProfileModal')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        <button style="border:none; background:none; font-size:20px; cursor:pointer; color:#64748b;" onclick="closeModal('editProfileModal')">✕</button>
       </div>
       <form onsubmit="handleSaveProfile(event)">
         <div class="auth-group">
@@ -1350,9 +1394,9 @@
     <div class="modal-content" style="text-align: center; width: 440px;">
       <h3 class="modal-header-title">Ủng hộ quỹ Hà Nội Xanh</h3>
       <p style="font-size: 14px; color: var(--text-sub); margin-bottom: 14px;">Quét mã QR bên dưới để chung tay đóng góp tài chính cho các chiến dịch làm sạch.</p>
-      <img src="qr-donate.png" alt="QR Quyên góp" style="width: 180px; height: 180px; object-fit: contain; margin: 10px auto; border-radius: 6px; border: 1px solid #ccc; display: block;">
-      <div style="background: var(--primary-light); padding: 12px; border-radius: 6px; text-align: left; margin: 14px 0; font-size: 13.5px;">
-        <p><strong>Ngân hàng:</strong> MB Bank</p><p><strong>Số tài khoản:</strong> 123456789999</p><p><strong>Chủ tài khoản:</strong> NGUYEN TIEN HUY (Hà Nội Xanh)</p>
+      <img src="https://img.vietqr.io/image/MB-1018-qr_only.png?accountName=CONG%20TY%20CO%20PHAN%20DOANH%20NGHIEP%20HA%20NOI%20XANH" alt="Mã QR MB Bank, số tài khoản 1018" style="width: min(220px, 100%); height: auto; aspect-ratio: 1; object-fit: contain; margin: 10px auto; border-radius: 8px; border: 1px solid #d1d5db; display: block;">
+      <div style="background: var(--primary-light); padding: 12px; border-radius: 6px; text-align: left; margin: 14px 0; font-size: 13.5px; overflow-wrap: anywhere;">
+        <p><strong>Ngân hàng:</strong> MB Bank</p><p><strong>Số tài khoản:</strong> 1018</p><p><strong>Chủ tài khoản:</strong> CONG TY CO PHAN DOANH NGHIEP HA NOI XANH</p>
       </div>
       <button class="btn-pill btn-join" onclick="closeModal('donateModal')" style="width: 100%;">Đã hiểu / Đóng</button>
     </div>
@@ -1449,6 +1493,7 @@
     </div>
   </div>
 
+  <script src="../site-header.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     let registeredUsers = [];
@@ -1473,15 +1518,12 @@
 
     function togglePasswordVisibility(inputId, btn) {
       const input = document.getElementById(inputId);
-      const icon = btn.querySelector('i');
       if (input.type === 'password') {
         input.type = 'text';
-        icon.className = 'fa-regular fa-eye-slash';
-        btn.setAttribute('aria-label', 'Ẩn mật khẩu');
+        btn.innerText = '🙈';
       } else {
         input.type = 'password';
-        icon.className = 'fa-regular fa-eye';
-        btn.setAttribute('aria-label', 'Hiện mật khẩu');
+        btn.innerText = '👁️';
       }
     }
 
@@ -1553,7 +1595,7 @@
         loggedOutBox.style.display = 'none';
         loggedInBox.style.display = 'grid';
         document.getElementById('headerAccountName').innerText = currentUser.name;
-        document.getElementById('headerAccountAvatar').src = currentUser.avatarUrl || currentUser.avatar || 'logo.jpg';
+         document.getElementById('headerAccountAvatar').src = currentUser.avatarUrl || currentUser.avatar || 'logo.png';
         document.getElementById('headerAccountAvatar').hidden = false;
         document.getElementById('headerAccountCaret').hidden = false;
         document.getElementById('uName').innerText = currentUser.name;
@@ -1802,21 +1844,26 @@
     }
 
     function renderNewsPosts(posts) {
-      const column = document.querySelector('#page-tin-tuc .news-col-left');
-      const sidebar = document.querySelector('#page-tin-tuc .news-sidebar-box');
-      if (!column || !Array.isArray(posts)) return;
-      if (!posts.length) { column.innerHTML = '<div class="news-main-card"><div class="news-main-body"><h3>Chưa có bài viết nào được xuất bản.</h3></div></div>'; if (sidebar) sidebar.innerHTML = ''; return; }
-      const article = post => {
+      const featuredRoot = document.getElementById('newsFeatured');
+      const storyGrid = document.getElementById('newsStoryGrid');
+      if (!featuredRoot || !storyGrid || !Array.isArray(posts)) return;
+      if (!posts.length) {
+        featuredRoot.style.display = 'none';
+        storyGrid.innerHTML = '<div class="news-empty">Chưa có bài viết nào được xuất bản.</div>';
+        return;
+      }
+      featuredRoot.style.display = '';
+      const fallbackImages = ['news-hanoi-xanh.png', 'news-air-pollution.jpg', 'news-pm25.webp', 'news-waste-hanoi.jpg', 'news-to-lich.jpg', 'news-to-lich-park.jpg', 'news-bad-air-2025.jpg'];
+      const getImage = (post, index) => escapeImpactHtml(post.image_url || fallbackImages[index % fallbackImages.length]);
+      const article = (post, index) => {
         const date = new Date(post.published_at || post.created_at).toLocaleDateString('vi-VN');
         const url = escapeImpactHtml(post.source_url || '#');
-        return `<article class="news-sub-card" onclick="window.open('${url}','_blank')" style="cursor:pointer"><img src="${escapeImpactHtml(post.image_url || 'news-hanoi-xanh.png')}" alt="${escapeImpactHtml(post.title || '')}"><div class="news-sub-body"><span class="news-tag" style="padding:2px 6px;font-size:10px">${escapeImpactHtml(post.category || 'Tin tức')}</span><h4>${escapeImpactHtml(post.title || '')}</h4><p>${escapeImpactHtml(post.excerpt || post.content || '')}</p><div class="news-sub-meta">${date} • ${escapeImpactHtml(post.source_name || 'Hà Nội Xanh')}</div></div></article>`;
+        return `<a class="news-story-card" href="${url}" target="_blank" rel="noopener"><div class="news-story-media"><img src="${getImage(post, index + 1)}" alt="${escapeImpactHtml(post.title || '')}"></div><div class="news-story-body"><h3>${escapeImpactHtml(post.title || '')}</h3><p>${escapeImpactHtml(post.excerpt || post.content || '')}</p><div class="news-story-footer"><span>${date} · ${escapeImpactHtml(post.source_name || 'Hà Nội Xanh')}</span><span class="news-story-arrow">→</span></div></div></a>`;
       };
       const [featured, ...others] = posts;
-      const mainCards = others.slice(0, 3);
-      const sidebarCards = others.slice(3);
       const date = new Date(featured.published_at || featured.created_at).toLocaleDateString('vi-VN');
-      column.innerHTML = `<article class="news-main-card"><img src="${escapeImpactHtml(featured.image_url || 'news-hanoi-xanh.png')}" alt="${escapeImpactHtml(featured.title || '')}"><div class="news-main-body"><span class="news-tag">${escapeImpactHtml(featured.category || 'Tin tức')}</span><h3>${escapeImpactHtml(featured.title || '')}</h3><p>${escapeImpactHtml(featured.excerpt || featured.content || '')}</p><div class="news-meta-row"><span>${date} &nbsp; ${escapeImpactHtml(featured.source_name || 'Hà Nội Xanh')}</span><a href="${escapeImpactHtml(featured.source_url || '#')}" target="_blank" rel="noopener" class="news-link-read">Đọc tiếp →</a></div></div></article><div class="news-grid-3">${mainCards.map(article).join('')}</div>`;
-      if (sidebar) sidebar.innerHTML = `<div class="news-sidebar-title"><span><i class="fa-solid fa-seedling ui-icon" aria-hidden="true"></i> Xu hướng nổi bật</span></div>${sidebarCards.map(post => { const itemDate = new Date(post.published_at || post.created_at).toLocaleDateString('vi-VN'); return `<a href="${escapeImpactHtml(post.source_url || '#')}" target="_blank" rel="noopener" class="news-side-item"><img src="${escapeImpactHtml(post.image_url || 'news-hanoi-xanh.png')}" alt="${escapeImpactHtml(post.title || '')}"><div class="news-side-info"><h5>${escapeImpactHtml(post.title || '')}</h5><span>${itemDate} • ${escapeImpactHtml(post.source_name || 'Hà Nội Xanh')}</span></div></a>`; }).join('')}`;
+      featuredRoot.innerHTML = `<div class="news-featured-media"><img src="${getImage(featured, 0)}" alt="${escapeImpactHtml(featured.title || '')}"></div><div class="news-featured-body"><div class="news-kicker">Câu chuyện mới nhất</div><h2>${escapeImpactHtml(featured.title || '')}</h2><p>${escapeImpactHtml(featured.excerpt || featured.content || '')}</p><div class="news-meta-row"><span>${date} · ${escapeImpactHtml(featured.source_name || 'Hà Nội Xanh')}</span><a href="${escapeImpactHtml(featured.source_url || '#')}" target="_blank" rel="noopener" class="news-link-read">Đọc bài viết →</a></div></div>`;
+      storyGrid.innerHTML = others.length ? others.map(article).join('') : '<div class="news-empty">Các câu chuyện mới đang được cập nhật.</div>';
     }
 
     function renderImpactMetrics(rows) {
@@ -1902,7 +1949,11 @@
       if (event.data?.type === 'hnx:posts-data') { renderNewsPosts(event.data.posts || []); return; }
       if (event.data?.type === 'hnx:homepage-metrics') { renderImpactMetrics(event.data.metrics); return; }
       if (event.data?.type === 'hnx:scroll-section') {
-        const target = event.data.section === 'before-after' ? document.getElementById('impact-before-after') : null;
+        const target = event.data.section === 'before-after'
+          ? document.getElementById('impact-before-after')
+          : event.data.section === 'bao-o-nhiem'
+            ? document.getElementById('pollutionSection')
+            : null;
         if (target) window.requestAnimationFrame(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }));
         return;
       }
@@ -1981,7 +2032,7 @@
       zoomControl: false
     });
     L.control.zoom({ position: 'bottomright' }).addTo(bMap);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(bMap);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(bMap);
 
     const addressInput = document.getElementById('reportLocation');
     const reportDescInput = document.getElementById('reportDesc');
