@@ -135,7 +135,7 @@
 .admin-shell { min-height: 100vh; display: flex; background: #f5f8f6; color: #15251b; }
 .admin-sidebar { position: sticky; top: 0; width: 250px; height: 100vh; box-sizing: border-box; flex: 0 0 250px; display: flex; flex-direction: column; overflow-y: auto; padding: 26px 16px; background: #0f382c; color: white; }
 .admin-brand { display: flex; align-items: center; gap: 10px; padding: 0 10px 28px; }
-.admin-brand > img { width: 38px; height: 38px; border-radius: 12px; object-fit: cover; background: #d1fae5; }
+.admin-brand > span { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: #d1fae5; font-size: 20px; }
 .admin-brand strong, .admin-brand small { display: block; }
 .admin-brand strong { font-size: 13px; letter-spacing: .04em; }
 .admin-brand small { margin-top: 3px; color: #a7f3d0; font-size: 9px; letter-spacing: .12em; }
@@ -156,8 +156,7 @@
 .admin-stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 15px; }
 .admin-stat, .admin-panel { border: 1px solid #e2ebe5; border-radius: 14px; background: white; box-shadow: 0 6px 22px rgba(15,56,44,.04); }
 .admin-stat { padding: 20px; display: grid; gap: 5px; }
-.admin-stat > span { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 11px; background: #ecf8f0; color: #15803d; }
-.admin-stat > span svg { width: 20px; height: 20px; }
+.admin-stat > span { font-size: 21px; }
 .admin-stat strong { font-size: 29px; color: #15803d; }
 .admin-stat small { color: #64748b; font-weight: 700; }
 .admin-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 20px; }

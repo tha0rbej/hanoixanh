@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hà Nội Xanh - Hệ thống đầy đủ các tab & Đăng ký Zalo</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -72,7 +71,7 @@
 
     .search-box { position: relative; }
     .search-box input { border-radius: 22px; border: 1px solid var(--border-color); padding: 9px 14px 9px 34px; font-size: 13.5px; outline: none; width: 145px; background: #fff; height: 42px; }
-    .search-box::before { content: "\f002"; position: absolute; left: 11px; top: 11px; font-family: "Font Awesome 6 Free"; font-size: 12px; font-weight: 900; opacity: 0.6; }
+    .search-box::before { content: "🔍"; position: absolute; left: 11px; top: 11px; font-size: 12px; opacity: 0.6; }
 
     .btn-login-custom {
       display: inline-flex; align-items: center; justify-content: center;
@@ -159,8 +158,8 @@
     .report-intro { font-size: 13.5px; color: var(--text-sub); margin-bottom: 14px; line-height: 1.5; }
     .form-group { margin-bottom: 14px; }
     .form-group label { display: block; font-size: 13.5px; font-weight: 700; margin-bottom: 5px; }
-    .form-group input, .form-group textarea, .form-group select { width: 100%; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 0.75rem 1rem; font-size: 14.5px; outline: none; background: #f9fafb; transition: all 300ms; }
-    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: transparent; background: #fff; outline: none; box-shadow: 0 0 0 2px #16a34a; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; border: 1px solid var(--border-color); border-radius: 4px; padding: 10px 12px; font-size: 14.5px; outline: none; background: #fff; }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--primary); }
 
     .btn-pick-location { width: 100%; margin-top: 6px; border: 1px solid var(--primary); background: #fff; color: var(--primary); padding: 10px; border-radius: 4px; font-size: 13.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .btn-pick-location:hover { background: var(--primary-light); }
@@ -270,53 +269,47 @@
 
     /* VIEW 4: THAM GIA */
     #page-tham-gia { display: none; margin-top: 28px; }
-    .thamgia-hero { margin-bottom: 28px; padding: 44px 48px; border-radius: 1.5rem; background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 52%, #f7fee7 100%); }
-    .thamgia-hero h1 { font-size: clamp(2.25rem, 5vw, 4rem); font-weight: 900; color: #14532d; line-height: 1.05; margin-bottom: 14px; }
+    .thamgia-hero { margin-bottom: 28px; }
+    .thamgia-hero h1 { font-size: 28px; font-weight: 900; color: var(--text-main); margin-bottom: 8px; }
     .thamgia-hero p { font-size: 15px; color: var(--text-sub); }
 
     .thamgia-cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 35px; }
-    .thamgia-action-card { background: #fff; border: 0; border-radius: 1rem; padding: 24px 18px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; transition: all 300ms; }
-    .thamgia-action-card:hover { transform: translateY(-4px); background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.12); }
+    .thamgia-action-card { background: rgba(22, 138, 69, 0.06); border: 1.5px solid #d4ecd9; border-radius: 10px; padding: 24px 18px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.02); display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; transition: 0.2s; }
+    .thamgia-action-card:hover { border-color: var(--primary); transform: translateY(-3px); background: rgba(22, 138, 69, 0.12); }
     
     /* Ô THẺ QUYÊN GÓP NỔI BẬT VỚI TÔNG MÀU ĐỎ */
     .thamgia-action-card.donate-highlight {
-      background: rgba(240, 253, 244, 0.5);
-      border: 0;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      background: linear-gradient(135.4deg, #FEF2F2 0%, #FEE2E2 100%);
+      border: 2px solid #EF4444;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
       position: relative;
     }
     .thamgia-action-card.donate-highlight:hover {
-      border-color: transparent;
+      border-color: #DC2626;
       transform: translateY(-4px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
     }
     .thamgia-action-card.donate-highlight h3 {
-      color: #166534;
+      color: #991B1B;
       font-size: 17px;
     }
 
-    .thamgia-action-icon { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 9999px; font-size: 21px; margin-bottom: 4px; color: #166534; background: #dcfce7; }
-    .action-volunteer .thamgia-action-icon { color: #b45309; background: #fef3c7; }
-    .action-share .thamgia-action-icon { color: #2563eb; background: #dbeafe; }
-    .action-follow .thamgia-action-icon { color: #7c3aed; background: #ede9fe; }
-    .action-donate .thamgia-action-icon { color: #166534; background: #dcfce7; }
+    .thamgia-action-icon { font-size: 36px; margin-bottom: 4px; }
     .thamgia-action-card h3 { font-size: 16px; font-weight: 800; color: var(--text-main); }
-    .thamgia-action-card p { font-size: 13.5px; color: var(--text-sub); line-height: 1.45; max-width: 220px; }
-    .thamgia-action-card h3 { font-size: 16px; font-weight: 800; color: #14532d; }
+    .thamgia-action-card p { font-size: 13.5px; color: var(--text-sub); line-height: 1.45; }
 
-    .thamgia-form-section { background: #fff; border: 0; border-radius: 1.5rem; padding: 2rem; margin: 0 auto 30px; max-width: 56rem; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
-    .thamgia-badge-label { background: #dcfce7; color: #166534; padding: 0.375rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; display: inline-block; margin-bottom: 12px; }
+    .thamgia-form-section { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 26px; margin-bottom: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+    .thamgia-badge-label { background: var(--primary-light); color: var(--primary); padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 800; display: inline-block; margin-bottom: 12px; }
     .thamgia-form-title { font-size: 20px; font-weight: 900; color: var(--text-main); margin-bottom: 6px; }
-    @media (min-width: 768px) { .thamgia-form-section { padding: 3rem; } }
     .thamgia-form-desc { font-size: 14px; color: var(--text-sub); margin-bottom: 16px; }
     .thamgia-benefits-list { list-style: none; margin-bottom: 22px; font-size: 14px; color: var(--text-sub); display: flex; flex-direction: column; gap: 6px; }
     .thamgia-benefits-list li { display: flex; align-items: center; gap: 8px; }
-    .thamgia-benefits-list li::before { content: "\f00c"; color: var(--primary); font-family: "Font Awesome 6 Free"; font-weight: 900; }
+    .thamgia-benefits-list li::before { content: "✓"; color: var(--primary); font-weight: bold; }
 
-    .thamgia-form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 20px; }
+    .thamgia-form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px; }
     .thamgia-checkbox-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-sub); margin: 14px 0; cursor: pointer; }
-    .btn-thamgia-submit { background: #16a34a; color: #fff; border: none; width: 100%; padding: 13px; border-radius: 0.75rem; font-size: 14.5px; font-weight: 600; text-transform: uppercase; cursor: pointer; transition: all 300ms; }
-    .btn-thamgia-submit:hover { background: #15803d; transform: translateY(-2px); box-shadow: 0 10px 15px rgba(0,0,0,0.12); }
+    .btn-thamgia-submit { background: var(--primary); color: #fff; border: none; width: 100%; padding: 13px; border-radius: 6px; font-size: 14.5px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+    .btn-thamgia-submit:hover { background: #10b981; }
 
     /* VIEW 5: VỀ HÀ NỘI XANH */
     #page-ve-chung-toi { display: none; margin-top: 28px; }
@@ -549,280 +542,6 @@
       .thamgia-form-card { padding: 18px 14px; }
       .footer-grid { gap: 28px; }
     }
-    /* THAM GIA — bố cục mới theo mockup */
-    #page-tham-gia[style*="display: block"] {
-      display: grid;
-      grid-template-columns: minmax(0, 1.08fr) minmax(420px, 0.92fr);
-      gap: 28px;
-      align-items: start;
-      margin-top: 0;
-      padding: 28px 0 64px;
-      background: linear-gradient(180deg, #f7fff8 0%, #ffffff 42%, #f4fbf6 100%);
-    }
-
-    #page-tham-gia .thamgia-hero,
-    #page-tham-gia > div[style],
-    #page-tham-gia > p { grid-column: 1 / -1; }
-
-    #page-tham-gia .thamgia-hero {
-      position: relative;
-      overflow: hidden;
-      min-height: 220px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 48px 52px;
-      border-radius: 32px;
-      background:
-        radial-gradient(circle at 78% 30%, rgba(134, 239, 172, .42), transparent 22%),
-        radial-gradient(circle at 92% 90%, rgba(187, 247, 208, .6), transparent 28%),
-        linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 54%, #f7fee7 100%);
-      box-shadow: 0 12px 30px rgba(22, 101, 52, .08);
-    }
-
-    #page-tham-gia .thamgia-hero::after {
-      content: "\01F343";
-      position: absolute;
-      right: 8%;
-      bottom: 12px;
-      color: #15803d;
-      font-size: 110px;
-      opacity: .16;
-      transform: rotate(-18deg);
-    }
-
-    #page-tham-gia .thamgia-hero-art {
-      position: absolute;
-      right: 7%;
-      bottom: 8px;
-      width: min(42%, 360px);
-      opacity: .7;
-      pointer-events: none;
-    }
-
-    #page-tham-gia .thamgia-hero-art svg { display: block; width: 100%; height: auto; }
-
-    #page-tham-gia[style*="display: block"]::before {
-      content: "";
-      position: absolute;
-      inset: 120px 0 0;
-      pointer-events: none;
-      opacity: .55;
-      background:
-        radial-gradient(circle at 7% 38%, rgba(187, 247, 208, .75) 0 80px, transparent 81px),
-        radial-gradient(circle at 96% 78%, rgba(187, 247, 208, .55) 0 130px, transparent 131px),
-        linear-gradient(175deg, transparent 0 76%, rgba(220, 252, 231, .55) 76% 82%, transparent 82%);
-      z-index: 0;
-    }
-
-    #page-tham-gia > * { position: relative; z-index: 1; }
-
-    #page-tham-gia .thamgia-hero h1,
-    #page-tham-gia .thamgia-hero p { position: relative; z-index: 1; max-width: 660px; }
-    #page-tham-gia .thamgia-hero h1 { font-size: clamp(2.5rem, 5vw, 4.4rem); color: #14532d; line-height: 1.04; letter-spacing: -.04em; }
-    #page-tham-gia .thamgia-hero p { font-size: 17px; color: #365b4a; line-height: 1.6; }
-
-    #page-tham-gia > div[style] { margin: 0 !important; color: #166534 !important; font-size: 24px !important; font-weight: 900 !important; }
-    #page-tham-gia > p { margin: -18px 0 0 !important; font-size: 16px !important; color: #527064 !important; }
-
-    #page-tham-gia .thamgia-cards-grid { grid-column: 1; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 0; }
-    #page-tham-gia .thamgia-action-card { min-height: 150px; justify-content: center; padding: 14px 12px; border-radius: 24px; }
-    #page-tham-gia .thamgia-action-card h3 { font-size: 15px; margin-top: 2px; }
-    #page-tham-gia .thamgia-action-card p { font-size: 12px; }
-    #page-tham-gia .action-volunteer { background: #fffbeb; }
-    #page-tham-gia .action-share { background: #eff6ff; }
-    #page-tham-gia .action-follow { background: #f5f3ff; }
-
-    #page-tham-gia #volunteerFormSection,
-    #page-tham-gia > .thamgia-form-section:not(#volunteerFormSection) {
-      margin: 0;
-      width: 100%;
-      max-width: none;
-      border: 0;
-      border-radius: 32px;
-      background: rgba(255,255,255,.94);
-      box-shadow: 0 16px 38px rgba(22, 101, 52, .11);
-    }
-
-    #page-tham-gia #volunteerFormSection { grid-column: 2; grid-row: 4 / span 2; }
-    #page-tham-gia > .thamgia-form-section:not(#volunteerFormSection) {
-      grid-column: 1 / -1;
-      display: grid;
-      grid-template-columns: minmax(240px, .72fr) minmax(0, 1.28fr);
-      column-gap: 44px;
-    }
-    #page-tham-gia > .thamgia-form-section:not(#volunteerFormSection) > .thamgia-badge-label,
-    #page-tham-gia > .thamgia-form-section:not(#volunteerFormSection) > .thamgia-form-title,
-    #page-tham-gia > .thamgia-form-section:not(#volunteerFormSection) > .thamgia-form-desc { grid-column: 1 / -1; }
-    #page-tham-gia > .thamgia-form-section:not(#volunteerFormSection) > .thamgia-benefits-list { grid-column: 1; grid-row: 4 / span 2; align-self: center; }
-    #page-tham-gia > .thamgia-form-section:not(#volunteerFormSection) > form { grid-column: 2; grid-row: 4 / span 2; }
-
-    #page-tham-gia .thamgia-form-title { color: #14532d; font-size: 28px; }
-    #page-tham-gia .thamgia-form-desc { font-size: 16px; color: #527064; }
-    #page-tham-gia .thamgia-form-grid-2 { gap: 20px; margin-bottom: 20px; }
-    #page-tham-gia .form-group label { color: #14532d; font-size: 14px; font-weight: 800; }
-    #page-tham-gia .thamgia-checkbox-label { line-height: 1.5; }
-
-    @media (max-width: 900px) {
-      #page-tham-gia[style*="display: block"] { display: block; padding: 20px 0 48px; }
-      #page-tham-gia .thamgia-cards-grid,
-      #page-tham-gia #volunteerFormSection,
-      #page-tham-gia > .thamgia-form-section:not(#volunteerFormSection) { display: block; margin-bottom: 24px; }
-      #page-tham-gia .thamgia-action-card { margin-bottom: 16px; }
-      #page-tham-gia > .thamgia-form-section:not(#volunteerFormSection) > form { margin-top: 24px; }
-    }
-
-    /* FINAL THAM GIA LAYOUT OVERRIDES */
-    #page-tham-gia > .mx-auto.grid {
-      max-width: 1240px !important;
-      gap: 48px !important;
-      padding: 16px 0 28px !important;
-      align-items: start !important;
-    }
-
-    #page-tham-gia > .mx-auto.grid > .lg\:col-span-7,
-    #page-tham-gia > .mx-auto.grid > .lg\:col-span-5 {
-      min-width: 0 !important;
-    }
-
-    #page-tham-gia .thamgia-hero {
-      min-height: 196px !important;
-      margin-bottom: 18px !important;
-      padding: 26px 34px !important;
-    }
-
-    #page-tham-gia .thamgia-hero h1 {
-      max-width: 430px !important;
-      font-size: 42px !important;
-      line-height: 1.02 !important;
-    }
-
-    #page-tham-gia .thamgia-hero p {
-      max-width: 460px !important;
-      margin-top: 10px !important;
-      font-size: 14px !important;
-      line-height: 1.45 !important;
-    }
-
-    #page-tham-gia .thamgia-cards-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-      gap: 12px !important;
-    }
-
-    #page-tham-gia .thamgia-action-card {
-      min-height: 148px !important;
-      padding: 14px 9px !important;
-      border-radius: 18px !important;
-    }
-
-    #page-tham-gia .thamgia-action-icon {
-      width: 42px !important;
-      height: 42px !important;
-      font-size: 18px !important;
-    }
-
-    #page-tham-gia .thamgia-action-card h3 {
-      font-size: 13px !important;
-      line-height: 1.2 !important;
-    }
-
-    #page-tham-gia .thamgia-action-card p {
-      margin-top: 6px !important;
-      font-size: 10px !important;
-      line-height: 1.3 !important;
-    }
-
-    #page-tham-gia .thamgia-action-card > span:last-child {
-      width: 24px !important;
-      height: 24px !important;
-      margin-top: 8px !important;
-      font-size: 10px !important;
-    }
-
-    #page-tham-gia .lg\:col-span-5 > .rounded-2xl {
-      max-height: 560px !important;
-      border-radius: 24px !important;
-    }
-
-    #page-tham-gia .lg\:col-span-5 > .rounded-2xl > div:first-child {
-      padding: 20px 24px !important;
-    }
-
-    #page-tham-gia .lg\:col-span-5 form {
-      gap: 14px !important;
-      padding: 22px 24px !important;
-    }
-
-    #page-tham-gia .lg\:col-span-5 input:not([type="checkbox"]) {
-      padding-top: 9px !important;
-      padding-bottom: 9px !important;
-    }
-
-    #page-tham-gia .lg\:col-span-7 > section:last-child {
-      margin-top: 14px !important;
-      padding: 14px 18px !important;
-    }
-
-    #page-tham-gia .lg\:col-span-7 > section:last-child h2 {
-      font-size: 22px !important;
-      line-height: 1.25 !important;
-    }
-
-    #page-tham-gia .lg\:col-span-7 > section:last-child p,
-    #page-tham-gia .lg\:col-span-7 > section:last-child li {
-      font-size: 14px !important;
-      line-height: 1.5 !important;
-    }
-
-    #page-tham-gia .thamgia-partner-section {
-      grid-column: 1 / -1;
-      width: 100vw;
-      margin-left: calc(50% - 50vw);
-      margin-top: 32px;
-      overflow: hidden;
-      background: linear-gradient(180deg, #f8fff7 0%, #f2fbf2 100%);
-    }
-
-    #page-tham-gia .partner-hero-art svg {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    #page-tham-gia .partner-benefit-card {
-      box-shadow: 0 14px 38px rgba(22, 101, 52, .10);
-    }
-
-    #page-tham-gia .partner-form-card {
-      box-shadow: 0 18px 48px rgba(22, 101, 52, .12);
-    }
-
-    #page-tham-gia .partner-field input,
-    #page-tham-gia .partner-field select {
-      width: 100%;
-      border: 1px solid #dbe5ee;
-      border-radius: 12px;
-      background: #fbfdff;
-      padding: 12px 16px;
-      color: #164e3b;
-      outline: none;
-      transition: all .2s ease;
-    }
-
-    #page-tham-gia .partner-field input:focus,
-    #page-tham-gia .partner-field select:focus {
-      border-color: transparent;
-      background: #fff;
-      box-shadow: 0 0 0 2px #16a34a;
-    }
-
-    @media (max-width: 900px) {
-      #page-tham-gia > .mx-auto.grid { gap: 24px !important; padding: 12px 16px 24px !important; }
-      #page-tham-gia .thamgia-hero h1 { font-size: 36px !important; }
-      #page-tham-gia .thamgia-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
-      #page-tham-gia .thamgia-partner-section { margin-top: 20px; }
-    }
-
   </style>
   <link rel="stylesheet" href="../site-header.css">
 </head>
@@ -1280,401 +999,131 @@
     </div>
 
     <!-- ==================== VIEW 4: THAM GIA ==================== -->
-<div id="page-tham-gia" class="bg-green-50 px-4 py-12 font-normal" style="font-family: 'Be Vietnam Pro', sans-serif;">
-  <div class="mx-auto grid max-w-7xl grid-cols-1 gap-12 lg:grid-cols-12">
-
-    <!-- CỘT TRÁI -->
-    <div class="lg:col-span-7">
-      <section class="thamgia-hero mb-5 rounded-3xl bg-gradient-to-br from-green-50 via-white to-lime-50 p-6 shadow-sm md:p-8">
-        <div class="thamgia-hero-art" aria-hidden="true">
-          <svg viewBox="0 0 420 260" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="318" cy="48" r="24" fill="#FCD34D" opacity=".8" />
-            <path d="M205 222C215 172 244 130 283 111C319 94 354 102 382 127C343 131 318 151 295 180C268 214 239 229 205 222Z" fill="#BBF7D0" />
-            <path d="M207 222C184 179 180 134 198 99C215 66 247 48 280 50C266 86 269 117 281 148C294 181 270 215 207 222Z" fill="#86EFAC" />
-            <path d="M230 210C236 165 256 119 288 80" stroke="#15803D" stroke-width="7" stroke-linecap="round" />
-            <path d="M244 166C220 150 210 129 214 108C237 111 254 126 260 145" fill="#4ADE80" />
-            <path d="M267 126C277 96 297 80 320 79C321 102 307 121 281 135" fill="#22C55E" />
-            <path d="M214 220C157 231 110 224 64 207" stroke="#86EFAC" stroke-width="14" stroke-linecap="round" opacity=".65" />
-            <path d="M272 220C326 230 367 219 405 195" stroke="#BBF7D0" stroke-width="14" stroke-linecap="round" opacity=".65" />
-          </svg>
-        </div>
-        <span class="mb-4 inline-flex w-fit items-center gap-2 rounded-full bg-green-100 px-4 py-1.5 text-sm font-semibold text-green-800">
-          <i class="fa-solid fa-leaf"></i>
-          Cùng nhau hành động
-        </span>
-
-        <h1 class="max-w-xl text-4xl font-extrabold leading-tight text-green-900 md:text-5xl">
-          Tham gia cùng Hà Nội Xanh
-        </h1>
-
-        <p class="mt-3 max-w-2xl text-base leading-relaxed text-gray-600">
-          Mỗi hành động nhỏ đều tạo nên khác biệt lớn. Chọn cách tham gia phù hợp với bạn –
-          không nhất thiết phải quyên góp hay làm tình nguyện viên.
-        </p>
+    <div id="page-tham-gia">
+      <section class="thamgia-hero">
+        <h1>Tham gia cùng Hà Nội Xanh</h1>
+        <p>Mỗi hành động nhỏ đều tạo nên khác biệt lớn. Chọn cách tham gia phù hợp với bạn - không nhất thiết phải quyên góp hay làm tình nguyện viên.</p>
       </section>
 
-      <section>
-        <div class="mb-5">
-          <h2 class="text-2xl font-extrabold text-green-900 md:text-3xl">
-            Bạn có thể tham gia bằng cách nào?
-          </h2>
-          <p class="mt-2 text-gray-600">
-            Có nhiều cách để bạn góp phần cho Hà Nội Xanh, dù bạn có ít hay nhiều thời gian.
-          </p>
+      <div style="font-size: 16px; font-weight: 800; color: var(--text-main); margin-bottom: 14px;">Bằng cách nào?</div>
+      <p style="font-size: 14px; color: var(--text-sub); margin-bottom: 20px;">Có nhiều cách để bạn giúp đỡ Hà Nội Xanh, dù bạn có ít hay nhiều thời gian</p>
+
+      <div class="thamgia-cards-grid">
+        <!-- Ô Quyên góp nổi bật với tông màu đỏ -->
+        <div class="thamgia-action-card donate-highlight" onclick="openDonateModal()">
+          <div class="thamgia-action-icon">❤️</div>
+          <h3>Quyên góp</h3>
+          <p>Đóng góp tài chính cho các chiến dịch làm sạch đang diễn ra</p>
         </div>
-
-        <div class="grid grid-cols-4 gap-3">
-          <button
-            type="button"
-            onclick="openDonateModal()"
-            class="group rounded-2xl bg-green-100 p-3 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
-          >
-            <span class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-200 text-2xl text-green-700">
-              <i class="fa-solid fa-hand-holding-heart"></i>
-            </span>
-            <h3 class="font-extrabold text-green-900">Quyên góp</h3>
-            <p class="mt-2 text-sm leading-relaxed text-gray-600">
-              Đóng góp tài chính cho các chiến dịch làm sạch.
-            </p>
-            <span class="mx-auto mt-2 flex h-7 w-7 items-center justify-center rounded-full bg-green-600 text-white">
-              <i class="fa-solid fa-arrow-right"></i>
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onclick="scrollToVolunteerForm()"
-            class="group rounded-2xl bg-orange-50 p-3 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
-          >
-            <span class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-orange-100 text-2xl text-orange-600">
-              <i class="fa-solid fa-seedling"></i>
-            </span>
-            <h3 class="font-extrabold text-green-900">Tình nguyện viên</h3>
-            <p class="mt-2 text-sm leading-relaxed text-gray-600">
-              Trực tiếp tham gia các buổi ra quân cùng cộng đồng.
-            </p>
-            <span class="mx-auto mt-2 flex h-7 w-7 items-center justify-center rounded-full bg-orange-500 text-white">
-              <i class="fa-solid fa-arrow-right"></i>
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onclick="shareCampaignOnFacebook()"
-            class="group rounded-2xl bg-blue-50 p-3 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
-          >
-            <span class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-2xl text-blue-600">
-              <i class="fa-solid fa-bullhorn"></i>
-            </span>
-            <h3 class="font-extrabold text-green-900">Chia sẻ</h3>
-            <p class="mt-2 text-sm leading-relaxed text-gray-600">
-              Lan tỏa thông tin tới bạn bè và người thân.
-            </p>
-            <span class="mx-auto mt-2 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-white">
-              <i class="fa-solid fa-arrow-right"></i>
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onclick="openFollowModal()"
-            class="group rounded-2xl bg-purple-50 p-3 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
-          >
-            <span class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-purple-100 text-2xl text-purple-600">
-              <i class="fa-solid fa-heart"></i>
-            </span>
-            <h3 class="font-extrabold text-green-900">Ấn quan tâm</h3>
-            <p class="mt-2 text-sm leading-relaxed text-gray-600">
-              Theo dõi và ủng hộ các hoạt động cộng đồng.
-            </p>
-            <span class="mx-auto mt-2 flex h-7 w-7 items-center justify-center rounded-full bg-purple-600 text-white">
-              <i class="fa-solid fa-arrow-right"></i>
-            </span>
-          </button>
+        <div class="thamgia-action-card" onclick="scrollToVolunteerForm()">
+          <div class="thamgia-action-icon">🤝</div>
+          <h3>Làm tình nguyện viên</h3>
+          <p>Trực tiếp tham gia các buổi ra quân dọn rác cùng cộng đồng</p>
         </div>
-      </section>
+        <div class="thamgia-action-card" onclick="shareCampaignOnFacebook()">
+          <div class="thamgia-action-icon">🔄</div>
+          <h3>Chia sẻ chiến dịch</h3>
+          <p>Lan tỏa thông tin tới bạn bè, người thân trên mạng xã hội</p>
+        </div>
+        <div class="thamgia-action-card" onclick="openFollowModal()">
+          <div class="thamgia-action-icon">💌</div>
+          <h3>Ấn quan tâm</h3>
+          <p>Theo dõi và bày tỏ sự ủng hộ với các điểm ô nhiễm, chiến dịch</p>
+        </div>
+      </div>
 
-      <section class="mt-3 rounded-3xl bg-green-100 p-4 shadow-sm">
-        <div class="flex items-start gap-5">
-          <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-200 text-2xl text-green-700">
-            <i class="fa-solid fa-leaf"></i>
-          </span>
+      <!-- FORM DÀNH CHO CÁ NHÂN -->
+      <div class="thamgia-form-section" id="volunteerFormSection">
+        <span class="thamgia-badge-label">Dành cho cá nhân</span>
+        <h2 class="thamgia-form-title">Trở thành tình nguyện viên</h2>
+        <p class="thamgia-form-desc">Đăng ký để tham gia các buổi ra quân, nhận thông báo chiến dịch mới gần khu vực bạn sinh sống.</p>
 
-          <div class="min-w-0 flex-1">
-            <div class="flex flex-wrap items-center gap-3">
-              <h2 class="text-2xl font-extrabold text-green-900">
-                Trở thành tình nguyện viên
-              </h2>
-              <span class="inline-flex w-fit rounded-full bg-green-200 px-3 py-1 text-sm font-semibold text-green-800">Được nhiều người lựa chọn</span>
+        <ul class="thamgia-benefits-list">
+          <li>Nhận lịch ra quân phù hợp với khu vực của bạn</li>
+          <li>Tích lũy giờ tham gia vào hồ sơ cá nhân</li>
+          <li>Kết nối với cộng đồng tình nguyện Hà Nội Xanh</li>
+        </ul>
+
+        <form onsubmit="handleThamGiaCaNhan(event)">
+          <div class="thamgia-form-grid-2">
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Họ và tên</label>
+              <input type="text" placeholder="Nguyễn Văn A" required>
             </div>
-            <p class="mt-2 text-gray-600">
-              Đăng ký để tham gia các buổi ra quân, nhận thông báo chiến dịch mới gần khu vực bạn sinh sống.
-            </p>
-
-            <ul class="mt-3 space-y-1 text-sm text-gray-700">
-              <li><i class="fa-solid fa-check mr-2 text-green-600"></i>Nhận lịch ra quân phù hợp với khu vực của bạn</li>
-              <li><i class="fa-solid fa-check mr-2 text-green-600"></i>Tích lũy giờ tham gia vào hồ sơ cá nhân</li>
-              <li><i class="fa-solid fa-check mr-2 text-green-600"></i>Kết nối với cộng đồng tình nguyện Hà Nội Xanh</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <!-- CỘT PHẢI -->
-    <div class="lg:col-span-5">
-      <div class="overflow-hidden rounded-2xl bg-white shadow-lg">
-        <div class="bg-[#15803d] px-6 py-5 text-white">
-          <div class="flex items-center gap-4">
-            <span class="flex h-16 w-16 items-center justify-center rounded-full bg-white text-3xl text-[#15803d]">
-              <i class="fa-solid fa-user"></i>
-            </span>
-
-            <div>
-              <h2 class="text-3xl font-extrabold">Đăng ký tham gia</h2>
-              <p class="mt-1 text-green-100">
-                Cùng chung tay vì một Hà Nội xanh hơn!
-              </p>
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Số điện thoại</label>
+              <input type="text" placeholder="09xx xxx xxx" required>
             </div>
           </div>
-        </div>
-
-        <form onsubmit="handleThamGiaCaNhan(event)" class="space-y-4 p-6 md:p-8">
-          <div class="grid gap-4 sm:grid-cols-2">
-            <label class="block text-sm font-bold text-green-900">
-              <span class="mb-2 flex items-center gap-2">
-                <i class="fa-solid fa-user text-green-700"></i>
-                Họ và tên *
-              </span>
-              <input
-                type="text"
-                placeholder="Nguyễn Văn A"
-                required
-                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition-all placeholder:text-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-600"
-              />
-            </label>
-
-            <label class="block text-sm font-bold text-green-900">
-              <span class="mb-2 flex items-center gap-2">
-                <i class="fa-solid fa-phone text-green-700"></i>
-                Số điện thoại *
-              </span>
-              <input
-                type="text"
-                placeholder="09xx xxx xxx"
-                required
-                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition-all placeholder:text-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-600"
-              />
-            </label>
-
-            <label class="block text-sm font-bold text-green-900">
-              <span class="mb-2 flex items-center gap-2">
-                <i class="fa-solid fa-envelope text-green-700"></i>
-                Email *
-              </span>
-              <input
-                type="email"
-                placeholder="email@example.com"
-                required
-                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition-all placeholder:text-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-600"
-              />
-            </label>
-
-            <label class="block text-sm font-bold text-green-900">
-              <span class="mb-2 flex items-center gap-2">
-                <i class="fa-solid fa-location-dot text-green-700"></i>
-                Địa chỉ *
-              </span>
-              <input
-                type="text"
-                placeholder="Quận, Hà Nội"
-                required
-                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition-all placeholder:text-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-green-600"
-              />
-            </label>
+          <div class="thamgia-form-grid-2" style="margin-top: 14px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Email</label>
+              <input type="email" placeholder="email@example.com" required>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Địa chỉ</label>
+              <input type="text" placeholder="Quận, Hà Nội" required>
+            </div>
           </div>
-
-          <label class="flex items-start gap-3 text-sm leading-relaxed text-gray-600">
-            <input type="checkbox" required class="mt-1 h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600" />
-            <span>
-              Tôi đồng ý với
-              <a href="#" onclick="openPolicyModal('terms'); return false;" class="font-semibold text-green-700 underline">
-                Điều khoản sử dụng
-              </a>
-              và
-              <a href="#" onclick="openPolicyModal('privacy'); return false;" class="font-semibold text-green-700 underline">
-                Chính sách bảo mật
-              </a>
-              của Hà Nội Xanh.
-            </span>
+          <label class="thamgia-checkbox-label">
+            <input type="checkbox" required> Tôi đồng ý với Điều khoản sử dụng và Chính sách bảo mật của Hà Nội Xanh
           </label>
+          <button type="submit" class="btn-thamgia-submit">Đăng ký tình nguyện viên</button>
+        </form>
+      </div>
 
-          <button
-            type="submit"
-            class="flex w-full items-center justify-center gap-3 rounded-xl bg-green-600 px-5 py-4 font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-green-700 hover:shadow-lg"
-          >
-            <i class="fa-solid fa-user-plus"></i>
-            Đăng ký tình nguyện viên
-            <i class="fa-solid fa-arrow-right"></i>
-          </button>
+      <!-- FORM DÀNH CHO TỔ CHỨC / DOANH NGHIỆP -->
+      <div class="thamgia-form-section">
+        <span class="thamgia-badge-label">Dành cho tổ chức, CLB, doanh nghiệp</span>
+        <h2 class="thamgia-form-title">Trở thành đối tác</h2>
+        <p class="thamgia-form-desc">Hợp tác cùng Hà Nội Xanh để tổ chức chiến dịch, tài trợ nguồn lực hoặc đồng hành truyền thông dài hạn.</p>
 
-          <p class="text-center text-sm font-medium text-green-700">
-            <i class="fa-solid fa-leaf mr-2"></i>
-            Cảm ơn bạn đã chung tay vì Hà Nội xanh!
-          </p>
+        <ul class="thamgia-benefits-list">
+          <li>Đồng tổ chức chiến dịch làm sạch quy mô lớn</li>
+          <li>Xuất hiện là đối tác đồng hành trên website</li>
+          <li>Báo cáo tác động dành riêng cho đối tác</li>
+        </ul>
+
+        <form onsubmit="handleThamGiaDoanhNghiep(event)">
+          <div class="thamgia-form-grid-2">
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Tên tổ chức / doanh nghiệp</label>
+              <input type="text" placeholder="Công ty / Câu lạc bộ ABC" required>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Loại hình</label>
+              <select required style="width:100%; border:1px solid var(--border-color); border-radius:4px; padding:10px 12px; font-size:14.5px; outline:none; background:#fff;">
+                <option value="">Doanh nghiệp / Câu lạc bộ / Tổ chức</option>
+                <option value="Doanh nghiệp">Doanh nghiệp</option>
+                <option value="Câu lạc bộ">Câu lạc bộ</option>
+                <option value="Tổ chức xã hội">Tổ chức xã hội</option>
+              </select>
+            </div>
+          </div>
+          <div class="thamgia-form-grid-2" style="margin-top: 14px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Người đại diện</label>
+              <input type="text" placeholder="Nguyễn Văn B" required>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Số điện thoại</label>
+              <input type="text" placeholder="09xx xxx xxx" required>
+            </div>
+          </div>
+          <div class="thamgia-form-grid-2" style="margin-top: 14px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Email</label>
+              <input type="email" placeholder="contact@company.vn" required>
+            </div>
+            <div class="form-group" style="margin-bottom:0; display:flex; align-items:flex-end;"></div>
+          </div>
+          <label class="thamgia-checkbox-label">
+            <input type="checkbox" required> Tôi đồng ý với Điều khoản hợp tác và Chính sách bảo mật của Hà Nội Xanh
+          </label>
+          <button type="submit" class="btn-thamgia-submit" style="background: var(--primary-dark);">Gửi đăng ký hợp tác</button>
         </form>
       </div>
     </div>
-
-  </div>
-
-  <!-- MÀN HÌNH 2: DÀNH CHO TỔ CHỨC / CLB / DOANH NGHIỆP -->
-  <section class="thamgia-partner-section relative pb-20" aria-labelledby="partner-section-title">
-    <div class="relative min-h-[245px] overflow-hidden bg-gradient-to-r from-[#f5fced] via-[#fbfff5] to-[#f4fbea]">
-      <div class="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-green-100/80 to-transparent"></div>
-      <div class="mx-auto grid min-h-[245px] max-w-[1450px] grid-cols-1 items-center gap-8 px-8 py-8 lg:grid-cols-12 lg:px-12">
-        <div class="relative z-10 lg:col-span-4">
-          <span class="inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-2 text-sm font-bold text-green-800">
-            <i class="fa-solid fa-people-group"></i>
-            Dành cho tổ chức, CLB, doanh nghiệp
-          </span>
-          <h2 id="partner-section-title" class="mt-4 text-4xl font-extrabold leading-[1.05] text-emerald-800 lg:text-5xl">
-            Tham gia cùng<br />Hà Nội Xanh
-          </h2>
-          <p class="mt-3 text-lg font-medium text-emerald-800">Cùng chung tay vì một Hà Nội xanh hơn!</p>
-        </div>
-
-        <div class="partner-hero-art relative z-10 hidden h-[215px] lg:col-span-5 lg:block" aria-hidden="true">
-          <svg viewBox="0 0 620 260" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="485" cy="45" r="25" fill="#FDE68A" />
-            <path d="M70 232C124 170 179 144 245 150C297 87 380 78 431 146C484 138 527 165 566 232H70Z" fill="#D9F99D" />
-            <path d="M157 232C207 174 258 151 314 163C344 117 400 99 442 137C474 166 488 198 500 232H157Z" fill="#BBF7D0" />
-            <path d="M286 226V102H352V226" fill="#15803D" />
-            <path d="M304 102V78H334V102M296 119H342M295 154H343M293 191H345" stroke="#166534" stroke-width="8" stroke-linecap="round" />
-            <path d="M319 78V48M309 58H329" stroke="#166534" stroke-width="7" stroke-linecap="round" />
-            <path d="M244 226V154H281V226M358 226V143H399V226" fill="#22C55E" />
-            <path d="M255 170H270M255 192H270M369 160H388M369 184H388" stroke="#DCFCE7" stroke-width="7" stroke-linecap="round" />
-            <path d="M77 226C103 199 129 180 162 169M490 218C525 178 551 151 588 130" stroke="#4ADE80" stroke-width="12" stroke-linecap="round" />
-            <path d="M98 202C68 186 56 164 61 141C91 145 109 162 115 188M535 177C546 146 568 127 596 126C595 157 576 177 548 188" fill="#86EFAC" />
-            <path d="M113 87C127 61 147 50 171 53C169 78 154 95 128 102M450 92C461 65 481 51 507 52C505 78 489 97 463 104" fill="#4ADE80" />
-            <path d="M16 232H605" stroke="#86EFAC" stroke-width="10" stroke-linecap="round" opacity=".55" />
-          </svg>
-        </div>
-
-        <div class="relative z-10 hidden text-2xl font-semibold leading-relaxed text-emerald-800 lg:col-span-3 lg:block">
-          <p>Doanh nghiệp,</p>
-          <p>CLB, tổ chức</p>
-          <p>cùng kiến tạo</p>
-          <p>thay đổi xanh! <i class="fa-regular fa-heart text-green-600"></i></p>
-        </div>
-      </div>
-    </div>
-
-    <div class="relative z-10 mx-auto grid max-w-[1450px] grid-cols-1 gap-6 px-6 py-5 lg:grid-cols-12 lg:px-12">
-      <aside class="partner-benefit-card rounded-3xl bg-white/90 p-7 lg:col-span-3">
-        <h3 class="text-2xl font-extrabold leading-tight text-emerald-800">Vì sao nên tham gia<br />cùng Hà Nội Xanh?</h3>
-
-        <div class="mt-7 space-y-6">
-          <div class="flex gap-4">
-            <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-lime-100 text-2xl text-green-700"><i class="fa-solid fa-leaf"></i></span>
-            <div><h4 class="font-extrabold text-emerald-800">Cùng tạo tác động thật</h4><p class="mt-1 text-sm leading-relaxed text-slate-600">Góp phần lan tỏa lối sống xanh, bảo vệ môi trường Hà Nội.</p></div>
-          </div>
-          <div class="flex gap-4">
-            <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-lime-100 text-2xl text-green-700"><i class="fa-solid fa-people-group"></i></span>
-            <div><h4 class="font-extrabold text-emerald-800">Kết nối cộng đồng</h4><p class="mt-1 text-sm leading-relaxed text-slate-600">Mở rộng mạng lưới, hợp tác với nhiều tổ chức uy tín.</p></div>
-          </div>
-          <div class="flex gap-4">
-            <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-sky-100 text-2xl text-cyan-700"><i class="fa-solid fa-bullhorn"></i></span>
-            <div><h4 class="font-extrabold text-emerald-800">Truyền thông &amp; lan tỏa</h4><p class="mt-1 text-sm leading-relaxed text-slate-600">Được đồng hành trong các chiến dịch, sự kiện và hoạt động truyền thông.</p></div>
-          </div>
-          <div class="flex gap-4">
-            <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-orange-100 text-2xl text-red-500"><i class="fa-solid fa-heart"></i></span>
-            <div><h4 class="font-extrabold text-emerald-800">Khẳng định trách nhiệm xã hội</h4><p class="mt-1 text-sm leading-relaxed text-slate-600">Nâng cao hình ảnh và giá trị thương hiệu của bạn/đơn vị.</p></div>
-          </div>
-        </div>
-
-        <p class="mt-8 text-center text-xl font-semibold italic leading-relaxed text-emerald-700">Cùng nhau<br />vì một Hà Nội xanh! <i class="fa-regular fa-heart"></i></p>
-      </aside>
-
-      <div class="partner-form-card rounded-3xl bg-white p-7 lg:col-span-9 lg:p-9">
-        <div class="flex items-center gap-5">
-          <span class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-green-100 text-3xl text-emerald-700"><i class="fa-solid fa-building"></i></span>
-          <div>
-            <h3 class="text-3xl font-extrabold text-emerald-800">Đăng ký tham gia</h3>
-            <p class="mt-1 text-base text-slate-600">Vui lòng điền đầy đủ thông tin để chúng tôi có thể kết nối và đồng hành cùng bạn!</p>
-          </div>
-        </div>
-
-        <form onsubmit="handleThamGiaDoanhNghiep(event)" class="mt-7 grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2">
-          <label class="partner-field block text-sm font-bold text-emerald-900">
-            <span class="mb-2 flex items-center gap-2"><i class="fa-solid fa-building text-emerald-700"></i>Tên tổ chức / doanh nghiệp / CLB <b class="text-red-500">*</b></span>
-            <input type="text" placeholder="Ví dụ: Công ty TNHH Xanh Việt" required />
-          </label>
-
-          <label class="partner-field block text-sm font-bold text-emerald-900">
-            <span class="mb-2 flex items-center gap-2"><i class="fa-solid fa-people-group text-emerald-700"></i>Loại hình <b class="text-red-500">*</b></span>
-            <select required>
-              <option value="">Chọn loại hình</option>
-              <option value="Doanh nghiệp">Doanh nghiệp</option>
-              <option value="Câu lạc bộ">Câu lạc bộ</option>
-              <option value="Tổ chức xã hội">Tổ chức xã hội</option>
-              <option value="Trường học">Trường học</option>
-            </select>
-          </label>
-
-          <label class="partner-field block text-sm font-bold text-emerald-900">
-            <span class="mb-2 flex items-center gap-2"><i class="fa-solid fa-user text-emerald-700"></i>Người đại diện <b class="text-red-500">*</b></span>
-            <input type="text" placeholder="Nguyễn Văn A" required />
-          </label>
-
-          <label class="partner-field block text-sm font-bold text-emerald-900">
-            <span class="mb-2 flex items-center gap-2"><i class="fa-solid fa-phone text-emerald-700"></i>Số điện thoại <b class="text-red-500">*</b></span>
-            <input type="tel" placeholder="09xx xxx xxx" required />
-          </label>
-
-          <label class="partner-field block text-sm font-bold text-emerald-900">
-            <span class="mb-2 flex items-center gap-2"><i class="fa-solid fa-envelope text-emerald-700"></i>Email <b class="text-red-500">*</b></span>
-            <input type="email" placeholder="contact@company.vn" required />
-          </label>
-
-          <label class="partner-field block text-sm font-bold text-emerald-900">
-            <span class="mb-2 flex items-center gap-2"><i class="fa-solid fa-location-dot text-emerald-700"></i>Địa chỉ <b class="text-red-500">*</b></span>
-            <input type="text" placeholder="Quận, Huyện, Tỉnh/Thành phố" required />
-          </label>
-
-          <label class="partner-field block text-sm font-bold text-emerald-900 md:col-span-2">
-            <span class="mb-2 flex items-center gap-2"><i class="fa-solid fa-clipboard-list text-emerald-700"></i>Lĩnh vực hoạt động / Ngành nghề <b class="text-red-500">*</b></span>
-            <select required>
-              <option value="">Chọn lĩnh vực hoạt động</option>
-              <option>Môi trường</option>
-              <option>Giáo dục</option>
-              <option>Truyền thông</option>
-              <option>Công nghệ</option>
-              <option>Sản xuất - Thương mại</option>
-              <option>Khác</option>
-            </select>
-          </label>
-
-          <label class="flex items-start gap-3 text-sm leading-relaxed text-slate-600 md:col-span-2">
-            <input type="checkbox" required class="mt-1 h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600" />
-            <span>Tôi đồng ý với <a href="#" onclick="openPolicyModal('terms'); return false;" class="font-semibold text-green-700 underline">Điều khoản sử dụng</a> và <a href="#" onclick="openPolicyModal('privacy'); return false;" class="font-semibold text-green-700 underline">Chính sách bảo mật</a> của Hà Nội Xanh.</span>
-          </label>
-
-          <button type="submit" class="flex w-full items-center justify-center gap-3 rounded-xl bg-emerald-600 px-6 py-4 text-base font-bold uppercase text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-lg md:col-span-2">
-            <i class="fa-solid fa-user-group"></i>
-            Gửi đăng ký hợp tác
-            <i class="fa-solid fa-arrow-right"></i>
-          </button>
-        </form>
-      </div>
-    </div>
-
-    <svg class="pointer-events-none absolute inset-x-0 bottom-0 h-24 w-full" viewBox="0 0 1600 120" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M0 67C240 5 394 117 646 62C913 4 1086 98 1600 27V120H0V67Z" fill="#DCFCE7" opacity=".8" />
-      <path d="M0 94C285 35 462 130 747 80C1035 29 1260 105 1600 65V120H0V94Z" fill="#BBF7D0" opacity=".65" />
-    </svg>
-  </section>
-</div>
 
     <!-- ==================== VIEW 5: VỀ HÀ NỘI XANH ==================== -->
     <div id="page-ve-chung-toi">
@@ -1870,9 +1319,9 @@
         <div class="footer-col">
           <h4>Liên hệ</h4>
           <ul class="contact-list">
-            <li><i class="fa-solid fa-phone"></i><a href="tel:+84987231832">+84 98 723 18 32</a></li>
-            <li><i class="fa-regular fa-envelope"></i><a href="mailto:hanoixanhh@gmail.com">hanoixanhh@gmail.com</a></li>
-            <li><i class="fa-solid fa-location-dot"></i><span>117 Xuân Thủy, Phường Dịch Vọng Hậu, Cầu Giấy, Hà Nội</span></li>
+            <li><span>📞</span><a href="tel:+84987231832">+84 98 723 18 32</a></li>
+            <li><span>✉️</span><a href="mailto:hanoixanhh@gmail.com">hanoixanhh@gmail.com</a></li>
+            <li><span>📍</span><span>117 Xuân Thủy, Phường Dịch Vọng Hậu, Cầu Giấy, Hà Nội</span></li>
           </ul>
         </div>
       </div>
@@ -1893,7 +1342,7 @@
       <div id="authLoginView">
         <div class="auth-title">
           <span>Đăng nhập</span>
-          <button aria-label="Đóng" style="border:none; background:none; font-size:20px; cursor:pointer; color:#64748b;" onclick="closeModal('authModal')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+          <button style="border:none; background:none; font-size:20px; cursor:pointer; color:#64748b;" onclick="closeModal('authModal')">✕</button>
         </div>
         <form onsubmit="handleLoginAction(event)">
           <div class="auth-group">
@@ -1904,7 +1353,7 @@
             <label>Mật khẩu</label>
             <div class="auth-input-wrap">
               <input type="password" id="loginPass" placeholder="Vui lòng nhập mật khẩu." required>
-              <button type="button" class="toggle-pass-btn" aria-label="Hiện mật khẩu" onclick="togglePasswordVisibility('loginPass', this)"><i class="fa-regular fa-eye"></i></button>
+              <button type="button" class="toggle-pass-btn" onclick="togglePasswordVisibility('loginPass', this)">👁️</button>
             </div>
           </div>
           <div class="auth-link-row">
@@ -1920,7 +1369,7 @@
       <div id="authRegisterView" style="display: none;">
         <div class="auth-title">
           <span>Tạo tài khoản</span>
-          <button aria-label="Đóng" style="border:none; background:none; font-size:20px; cursor:pointer; color:#64748b;" onclick="closeModal('authModal')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+          <button style="border:none; background:none; font-size:20px; cursor:pointer; color:#64748b;" onclick="closeModal('authModal')">✕</button>
         </div>
         <form onsubmit="handleRegisterAction(event)">
           <div class="auth-group">
@@ -1935,14 +1384,14 @@
             <label>Mật khẩu*</label>
             <div class="auth-input-wrap">
               <input type="password" id="regPass" placeholder="Vui lòng nhập mật khẩu" required>
-              <button type="button" class="toggle-pass-btn" aria-label="Hiện mật khẩu" onclick="togglePasswordVisibility('regPass', this)"><i class="fa-regular fa-eye"></i></button>
+              <button type="button" class="toggle-pass-btn" onclick="togglePasswordVisibility('regPass', this)">👁️</button>
             </div>
           </div>
           <div class="auth-group">
             <label>Xác nhận mật khẩu*</label>
             <div class="auth-input-wrap">
               <input type="password" id="regPassConfirm" placeholder="Nhập lại mật khẩu" required>
-              <button type="button" class="toggle-pass-btn" aria-label="Hiện mật khẩu" onclick="togglePasswordVisibility('regPassConfirm', this)"><i class="fa-regular fa-eye"></i></button>
+              <button type="button" class="toggle-pass-btn" onclick="togglePasswordVisibility('regPassConfirm', this)">👁️</button>
             </div>
           </div>
           <button type="submit" class="btn-auth-submit" style="margin-top: 8px;">TẠO TÀI KHOẢN</button>
@@ -1955,7 +1404,7 @@
       <div id="authForgotView" style="display: none;">
         <div class="auth-title">
           <span>Quên mật khẩu</span>
-          <button aria-label="Đóng" style="border:none; background:none; font-size:20px; cursor:pointer; color:#64748b;" onclick="closeModal('authModal')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+          <button style="border:none; background:none; font-size:20px; cursor:pointer; color:#64748b;" onclick="closeModal('authModal')">✕</button>
         </div>
         <p style="font-size: 13.5px; color: #475569; margin-bottom: 16px; line-height: 1.5;">Nhập địa chỉ email của bạn để nhận hướng dẫn đặt lại mật khẩu.</p>
         <form onsubmit="handleForgotAction(event)">
@@ -1976,7 +1425,7 @@
     <div class="modal-content auth-modal-content">
       <div class="auth-title">
         <span>Chỉnh sửa hồ sơ</span>
-        <button aria-label="Đóng" style="border:none; background:none; font-size:20px; cursor:pointer; color:#64748b;" onclick="closeModal('editProfileModal')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        <button style="border:none; background:none; font-size:20px; cursor:pointer; color:#64748b;" onclick="closeModal('editProfileModal')">✕</button>
       </div>
       <form onsubmit="handleSaveProfile(event)">
         <div class="auth-group">
@@ -2088,7 +1537,7 @@
     <div class="modal-content picker-content">
       <div class="picker-header">
         <h4>Chọn vị trí điểm ô nhiễm trên bản đồ</h4>
-        <button class="picker-close" aria-label="Đóng" onclick="closeModal('pickerModal')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        <button class="picker-close" onclick="closeModal('pickerModal')">✕</button>
       </div>
       <div class="picker-body">
         <div id="pickerMap"></div>
@@ -2158,12 +1607,10 @@
       const input = document.getElementById(inputId);
       if (input.type === 'password') {
         input.type = 'text';
-        btn.innerHTML = '<i class="fa-regular fa-eye-slash"></i>';
-        btn.setAttribute('aria-label', 'Ẩn mật khẩu');
+        btn.innerText = '🙈';
       } else {
         input.type = 'password';
-        btn.innerHTML = '<i class="fa-regular fa-eye"></i>';
-        btn.setAttribute('aria-label', 'Hiện mật khẩu');
+        btn.innerText = '👁️';
       }
     }
 
@@ -2513,7 +1960,7 @@
       const groups = { upcoming: document.getElementById('pane-upcoming'), completed: document.getElementById('pane-completed') };
       if (!groups.upcoming || !groups.completed) return;
       groups.upcoming.innerHTML = ''; groups.completed.innerHTML = '';
-      event.data.campaigns.forEach(function(c) { const ended = c.status === 'completed'; const pane = ended ? groups.completed : groups.upcoming; const card = document.createElement('div'); card.className = 'camp-card'; card.innerHTML = '<div class="card-thumb"><span class="badge-card">' + (ended ? 'Đã diễn ra' : 'Sắp diễn ra') + '</span>' + (c.image_url ? '<img src="' + c.image_url + '" alt="">' : '') + '</div><div class="card-info"><h4></h4><div class="card-meta-line"><i class="fa-solid fa-location-dot"></i> ' + (c.location || '') + '</div><div class="card-meta-line"><i class="fa-regular fa-calendar"></i> ' + new Date(c.start_at).toLocaleString('vi-VN') + '</div><div class="card-desc"></div><div class="card-bottom"><span class="card-members"><i class="fa-solid fa-user-group"></i> ' + (c.capacity || '') + ' người</span><button class="btn-view">Xem chi tiết <i class="fa-solid fa-arrow-right"></i></button></div></div>'; card.querySelector('h4').textContent = c.title || ''; card.querySelector('.card-desc').textContent = c.description || ''; campaignDetails[c.id] = { isCompleted: ended, title: c.title || '', meta: (c.location || '') + ' • ' + new Date(c.start_at).toLocaleString('vi-VN'), status: c.pollution_status || c.description || 'Chưa cập nhật.', action: c.action_plan || 'Chưa cập nhật.', support: c.support_equipment || 'Chưa cập nhật.' }; card.querySelector('.btn-view').onclick = function() { openDetailModal(c.id); }; pane.appendChild(card); });
+      event.data.campaigns.forEach(function(c) { const ended = c.status === 'completed'; const pane = ended ? groups.completed : groups.upcoming; const card = document.createElement('div'); card.className = 'camp-card'; card.innerHTML = '<div class="card-thumb"><span class="badge-card">' + (ended ? 'Đã diễn ra' : 'Sắp diễn ra') + '</span>' + (c.image_url ? '<img src="' + c.image_url + '" alt="">' : '') + '</div><div class="card-info"><h4></h4><div class="card-meta-line">📍 ' + (c.location || '') + '</div><div class="card-meta-line">📅 ' + new Date(c.start_at).toLocaleString('vi-VN') + '</div><div class="card-desc"></div><div class="card-bottom"><span class="card-members">👥 ' + (c.capacity || '') + ' người tham gia</span><button class="btn-view">Xem chi tiết →</button></div></div>'; card.querySelector('h4').textContent = c.title || ''; card.querySelector('.card-desc').textContent = c.description || ''; campaignDetails[c.id] = { isCompleted: ended, title: c.title || '', meta: '📍 ' + (c.location || '') + ' | 📅 ' + new Date(c.start_at).toLocaleString('vi-VN'), status: c.pollution_status || c.description || 'Chưa cập nhật.', action: c.action_plan || 'Chưa cập nhật.', support: c.support_equipment || 'Chưa cập nhật.' }; card.querySelector('.btn-view').onclick = function() { openDetailModal(c.id); }; pane.appendChild(card); });
     });
 
     const knownCampaignLocations = [
