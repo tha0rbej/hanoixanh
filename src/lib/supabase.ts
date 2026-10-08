@@ -32,6 +32,16 @@ export type HnxSession = {
   user: { id: string; email?: string }
 }
 
+export type SignUpInput = {
+  email: string
+  password: string
+  fullName: string
+  phone?: string
+  address?: string
+  preferredRole?: string
+  accountType?: "individual" | "organization"
+}
+
 type SupabaseError = { message?: string; error_description?: string }
 
 const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.replace(/\/$/, "")
@@ -156,12 +166,22 @@ export async function signIn(email: string, password: string): Promise<{ session
   return { session, profile }
 }
 
-export async function signUp(input: { email: string; password: string; fullName: string; phone?: string }): Promise<{ session: HnxSession | null; profile?: HnxProfile }> {
+export async function signUp(input: SignUpInput): Promise<{ session: HnxSession | null; profile?: HnxProfile }> {
   requireConfig()
   const response = await fetch(`${supabaseUrl}/auth/v1/signup`, {
     method: "POST",
     headers: authHeaders(),
-    body: JSON.stringify({ email: input.email, password: input.password, data: { full_name: input.fullName, phone: input.phone || null } }),
+    body: JSON.stringify({
+      email: input.email,
+      password: input.password,
+      data: {
+        full_name: input.fullName,
+        phone: input.phone || null,
+        address: input.address || null,
+        preferred_role: input.preferredRole || null,
+        account_type: input.accountType || "individual",
+      },
+    }),
   })
   const result = normalizeSession(await parseResponse<HnxSession>(response))
   if (!result.access_token) return { session: null }

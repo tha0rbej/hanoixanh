@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hà Nội Xanh - Hệ thống đầy đủ các tab & Đăng ký Zalo</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     :root {
@@ -25,7 +28,7 @@
       --radius: 8px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
     html { scroll-behavior: smooth; }
     body { background-color: var(--bg-page); color: var(--text-main); font-size: 16px; line-height: 1.65; }
     .container { width: 1320px; max-width: 98%; margin: 0 auto; }
@@ -553,10 +556,11 @@
       <li><a onclick="navigateParent('/chien-dich')" id="nav-chien-dich">Chiến dịch</a></li>
       <li><a onclick="navigateParent('/tac-dong')" id="nav-tac-dong">Tác động cộng đồng</a></li>
       <li><a onclick="navigateParent('/tin-tuc')" id="nav-tin-tuc">Tin tức &amp; câu chuyện</a></li>
+      <li class="mobile-donate-link"><a href="#" onclick="event.preventDefault(); openDonateModal()">Quyên tặng</a></li>
     </ul></nav>
+    <button class="site-menu-toggle" type="button" aria-label="Mở menu" aria-expanded="false"><span></span><span></span><span></span></button>
     <div class="header-actions">
-      <a onclick="navigateParent('/tham-gia')" class="btn-join" id="nav-btn-thamgia">THAM GIA</a>
-      <a href="#" class="donate-btn" onclick="event.preventDefault(); openDonateModal()"><i class="fa-regular fa-heart"></i> QUYÊN TẶNG</a>
+      <a href="#" class="donate-btn" onclick="event.preventDefault(); openDonateModal()"><i class="fa-regular fa-heart"></i> Quyên tặng</a>
        <div class="account-menu" id="accountMenu"><a onclick="handleHeaderAuthClick()" class="btn-login account-trigger" id="headerLoginBtn"><img id="headerAccountAvatar" class="account-avatar" src="logo.png" alt="Avatar" hidden><span id="headerAccountName">ĐĂNG NHẬP</span><i id="headerAccountCaret" class="fa-solid fa-chevron-down" hidden></i></a><div class="account-dropdown"><button class="profile-action" type="button" onclick="navigateParent('/ho-so'); document.getElementById('accountMenu').classList.remove('open')">Hồ sơ cá nhân</button><button type="button" onclick="if (confirm('Bạn có chắc chắn muốn đăng xuất không?')) { handleLogout(); document.getElementById('accountMenu').classList.remove('open'); }">Đăng xuất</button></div></div>
     </div>
   </header>
@@ -1557,6 +1561,7 @@
     </div>
   </div>
 
+  <script src="../site-header.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     let registeredUsers = [];
