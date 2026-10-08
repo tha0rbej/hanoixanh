@@ -11,6 +11,7 @@ import {
   supabaseConfigured,
   type HnxProfile,
   type HnxSession,
+  type SignUpInput,
 } from "../lib/supabase"
 
 type AuthContextValue = {
@@ -19,7 +20,7 @@ type AuthContextValue = {
   loading: boolean
   configured: boolean
   signIn: (email: string, password: string) => Promise<void>
-  signUp: (input: { email: string; password: string; fullName: string; phone?: string }) => Promise<boolean>
+  signUp: (input: SignUpInput) => Promise<boolean>
   resetPassword: (email: string) => Promise<void>
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>
   signOut: () => Promise<void>

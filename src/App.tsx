@@ -12,7 +12,7 @@ import { ConnectedAdminDashboard } from "./app/ConnectedAdminDashboard"
 import { AuthModal } from "./app/AuthModal"
 import { AuthProvider, useAuth } from "./app/AuthContext"
 import { ResetPasswordPage } from "./app/ResetPasswordPage"
-import { tableInsert, tableInsertMinimal, tableSelect, updateProfile, uploadPublicFile } from "./lib/supabase"
+import { consumeOAuthSession, tableInsert, tableInsertMinimal, tableSelect, updateProfile, uploadPublicFile } from "./lib/supabase"
 
 type SourcePage = "home" | "about" | "remaining" | "profile"
 
@@ -285,12 +285,25 @@ function AppRoutes() {
   const navigate = useNavigate()
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""))
+    const isRecovery = hash.get("type") === "recovery"
+    const isOAuthCallback = Boolean(params.get("code")) || (Boolean(hash.get("access_token")) && !isRecovery)
+    if (isOAuthCallback) {
+      void consumeOAuthSession()
+        .then(session => {
+          if (session) window.location.replace(window.location.pathname)
+        })
+        .catch(error => {
+          console.error("Không thể hoàn tất đăng nhập Google", error)
+          window.history.replaceState({}, "", `${window.location.pathname}?auth=login`)
+          setAuthTab("login")
+        })
+      return
+    }
     if (params.get("auth") === "login") {
       setAuthTab("login")
       window.history.replaceState({}, "", window.location.pathname)
     }
-    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""))
-    const isRecovery = hash.get("type") === "recovery" || Boolean(hash.get("access_token"))
     if (isRecovery && window.location.pathname !== "/dat-lai-mat-khau") {
       navigate(`/dat-lai-mat-khau${window.location.hash}`, { replace: true })
     }

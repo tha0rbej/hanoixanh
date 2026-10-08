@@ -1,0 +1,854 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+:root {
+  --site-header-height: 80px;
+  --site-header-green: #087b43;
+  --site-header-green-dark: #056535;
+  --site-header-border: #e5e7eb;
+}
+
+/* Header 2026: dùng chung ngôn ngữ thị giác của trang chủ. */
+.site-header,
+#top.home-toolbar.site-header,
+#main-app > .site-header {
+  --site-header-height: 84px;
+  height: 84px !important;
+  min-height: 84px !important;
+  padding: 0 clamp(24px, 4vw, 64px) !important;
+  gap: 28px !important;
+  flex-wrap: nowrap !important;
+  border-bottom: 1px solid rgba(16, 62, 46, .08) !important;
+  background: rgba(255, 255, 255, .98) !important;
+  box-shadow: 0 1px 0 rgba(16, 62, 46, .08) !important;
+  font-family: "Inter", sans-serif !important;
+}
+
+.site-header .logo-area,
+.site-header .logo {
+  gap: 10px !important;
+  cursor: pointer !important;
+}
+
+.site-header .logo-area img,
+.site-header .logo img {
+  width: 40px !important;
+  height: 40px !important;
+  flex-basis: 40px !important;
+  padding: 6px !important;
+  border: 0 !important;
+  background: #16734a !important;
+}
+
+.site-header .site-brand-copy strong {
+  color: #103e2e !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.03em !important;
+  text-transform: none !important;
+}
+
+.site-header .site-brand-copy small { display: none !important; }
+
+.site-header nav a,
+.site-header .nav-links a {
+  color: #19352c !important;
+  font-family: "Inter", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+}
+
+.site-header nav a:hover,
+.site-header nav a.active,
+.site-header .nav-links a:hover,
+.site-header .nav-links a.active { color: #16734a !important; }
+
+.site-header nav a.active::after,
+.site-header .nav-links a.active::after {
+  height: 2px !important;
+  bottom: 1px !important;
+  background: #16734a !important;
+}
+
+.site-header .header-actions { gap: 12px !important; }
+.site-header .btn-join,
+.site-header .btn-join-pill { display: none !important; }
+
+.site-header .donate-btn {
+  min-width: 118px !important;
+  height: 44px !important;
+  padding: 0 18px !important;
+  border: 0 !important;
+  border-radius: 6px !important;
+  background: #16734a !important;
+  color: #fff !important;
+  font-family: "Inter", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+.site-header .donate-btn:hover {
+  background: #103e2e !important;
+  transform: translateY(-2px) !important;
+}
+
+.site-header .account-menu,
+.site-header .user-dropdown-container {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+.site-header .account-menu::before,
+.site-header .user-dropdown-container::before,
+.site-header > .header-actions > .account-trigger::after { display: none !important; }
+
+.site-header .account-trigger,
+.site-header .user-menu {
+  width: auto !important;
+  min-width: 112px !important;
+  max-width: 190px !important;
+  height: 44px !important;
+  padding: 0 15px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  overflow: visible !important;
+  border: 1px solid #cbdad1 !important;
+  border-radius: 6px !important;
+  background: #fff !important;
+  color: #19352c !important;
+  font-family: "Inter", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+}
+
+.site-header .account-trigger:hover,
+.site-header .user-menu:hover {
+  border-color: #16734a !important;
+  color: #16734a !important;
+  background: #f7faf8 !important;
+}
+
+.site-header .account-trigger::before,
+.site-header .user-menu::before {
+  width: 18px !important;
+  height: 18px !important;
+  flex: 0 0 18px !important;
+  background-color: currentColor !important;
+}
+
+.site-header .account-trigger span,
+.site-header .account-trigger i,
+.site-header .user-menu span,
+.site-header .user-menu i { display: inline !important; }
+
+.site-header .account-trigger img,
+.site-header .user-menu img {
+  width: 30px !important;
+  height: 30px !important;
+  flex: 0 0 30px !important;
+  border: 2px solid #dce5dc !important;
+}
+
+.site-menu-toggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.site-menu-toggle span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  margin: 6px 0;
+  border-radius: 99px;
+  background: #103e2e;
+  transition: transform .2s, opacity .2s;
+}
+
+.mobile-donate-link { display: none !important; }
+
+@media (max-width: 1080px) {
+  :root { --site-header-height: 84px; }
+  .site-header,
+  #top.home-toolbar.site-header,
+  #main-app > .site-header {
+    height: 84px !important;
+    min-height: 84px !important;
+    padding: 0 24px !important;
+    flex-wrap: nowrap !important;
+    align-content: normal !important;
+  }
+  .site-header .site-menu-toggle { display: block; margin-left: auto; flex: 0 0 auto; }
+  .site-header nav,
+  .site-header .nav-links {
+    position: fixed !important;
+    inset: 84px 0 auto !important;
+    z-index: 4999 !important;
+    order: initial !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 18px 28px 24px !important;
+    display: block !important;
+    overflow: visible !important;
+    background: #fff !important;
+    box-shadow: 0 14px 30px rgba(16, 62, 46, .12) !important;
+    transform: translateY(-145%);
+    transition: transform .25s ease;
+  }
+  .site-header.menu-open nav,
+  .site-header.menu-open .nav-links { transform: translateY(0); }
+  .site-header nav ul,
+  .site-header .nav-links {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 2px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .site-header nav a,
+  .site-header .nav-links a { width: 100% !important; padding: 12px 4px !important; }
+  .site-header nav a.active::after,
+  .site-header .nav-links a.active::after { display: none !important; }
+  .site-header .mobile-donate-link { display: block !important; }
+  .site-header .mobile-donate-link a { color: #16734a !important; font-weight: 700 !important; }
+  .site-header.menu-open .site-menu-toggle span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+  .site-header.menu-open .site-menu-toggle span:nth-child(2) { opacity: 0; }
+  .site-header.menu-open .site-menu-toggle span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+}
+
+@media (max-width: 640px) {
+  :root { --site-header-height: 72px; }
+  .site-header,
+  #top.home-toolbar.site-header,
+  #main-app > .site-header {
+    height: 72px !important;
+    min-height: 72px !important;
+    padding: 0 16px !important;
+    gap: 8px !important;
+  }
+  .site-header nav,
+  .site-header .nav-links { inset: 72px 0 auto !important; }
+  .site-header .logo-area img,
+  .site-header .logo img {
+    width: 36px !important;
+    height: 36px !important;
+    flex-basis: 36px !important;
+    padding: 5px !important;
+  }
+  .site-header .site-brand-copy strong { font-size: 16px !important; }
+  .site-header .donate-btn { display: none !important; }
+  .site-header .account-trigger,
+  .site-header .user-menu {
+    min-width: 92px !important;
+    max-width: 128px !important;
+    height: 40px !important;
+    padding: 0 10px !important;
+    font-size: 12px !important;
+  }
+  .site-header .account-trigger span,
+  .site-header .user-menu span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+body {
+  padding-top: var(--site-header-height) !important;
+}
+
+.site-header,
+#top.home-toolbar.site-header,
+#main-app > .site-header {
+  position: fixed !important;
+  inset: 0 0 auto 0 !important;
+  z-index: 5000 !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: var(--site-header-height) !important;
+  min-height: var(--site-header-height) !important;
+  padding: 0 clamp(18px, 3vw, 48px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: nowrap !important;
+  gap: clamp(16px, 2vw, 32px) !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--site-header-border) !important;
+  background: #fff !important;
+  box-shadow: 0 2px 10px rgba(15, 56, 44, 0.06) !important;
+  color: #111827 !important;
+}
+
+.site-header .logo-area,
+.site-header .logo {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+  color: #111827 !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+.site-header .logo-area img,
+.site-header .logo img {
+  width: 52px !important;
+  height: 52px !important;
+  flex: 0 0 52px !important;
+  padding: 2px !important;
+  border: 2px solid #d7e4dc !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  object-fit: cover !important;
+}
+
+.site-header .site-brand-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  line-height: 1 !important;
+}
+
+.site-header .site-brand-copy strong {
+  color: #111827 !important;
+  font-size: 20px !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.04em !important;
+}
+
+.site-header .site-brand-copy small {
+  color: var(--site-header-green) !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+
+.site-header nav {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+.site-header nav ul,
+.site-header .nav-links {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: clamp(15px, 1.65vw, 30px) !important;
+  width: auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+  overflow: visible !important;
+}
+
+.site-header nav li {
+  flex: 0 0 auto !important;
+}
+
+.site-header nav a,
+.site-header .nav-links a {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 10px 0 !important;
+  border: 0 !important;
+  color: #4b5563 !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.01em !important;
+  text-decoration: none !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  transition: color 0.2s ease !important;
+}
+
+.site-header nav a:hover,
+.site-header nav a.active,
+.site-header .nav-links a:hover,
+.site-header .nav-links a.active {
+  color: #111827 !important;
+}
+
+.site-header nav a.active::after,
+.site-header .nav-links a.active::after {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  right: 0 !important;
+  bottom: 2px !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 3px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: var(--site-header-green) !important;
+  transform: none !important;
+}
+
+.site-header .header-actions {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin: 0 !important;
+}
+
+.site-header .btn-join,
+.site-header .btn-join-pill,
+.site-header .donate-btn {
+  box-sizing: border-box !important;
+  min-width: 130px !important;
+  height: 46px !important;
+  padding: 0 22px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.01em !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  transform: none !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.site-header .btn-join,
+.site-header .btn-join-pill {
+  border: 2px solid var(--site-header-green) !important;
+  background: #fff !important;
+  color: var(--site-header-green) !important;
+}
+
+.site-header .btn-join:hover,
+.site-header .btn-join-pill:hover {
+  background: #eef8f2 !important;
+  box-shadow: 0 5px 14px rgba(8, 123, 67, 0.12) !important;
+}
+
+.site-header .donate-btn {
+  min-width: 164px !important;
+  border: 2px solid var(--site-header-green) !important;
+  background: var(--site-header-green) !important;
+  color: #fff !important;
+}
+
+.site-header .donate-btn:hover {
+  border-color: var(--site-header-green-dark) !important;
+  background: var(--site-header-green-dark) !important;
+  box-shadow: 0 5px 14px rgba(8, 123, 67, 0.2) !important;
+}
+
+.site-header #adminDashboardLink {
+  box-sizing: border-box !important;
+  height: 42px !important;
+  padding: 0 16px !important;
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1.5px solid var(--site-header-green) !important;
+  border-radius: 999px !important;
+  background: #fff !important;
+  color: var(--site-header-green) !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.02em !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+}
+
+.site-header #adminDashboardLink:hover {
+  border-color: var(--site-header-green-dark) !important;
+  background: #eef8f2 !important;
+  color: var(--site-header-green-dark) !important;
+}
+
+.site-header .account-menu,
+.site-header .user-dropdown-container {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  margin-left: 6px !important;
+  padding-left: 18px !important;
+}
+
+.site-header .account-menu::before,
+.site-header .user-dropdown-container::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 3px auto 3px 0 !important;
+  width: 1px !important;
+  background: #e5e7eb !important;
+}
+
+.site-header .account-trigger,
+.site-header .user-menu {
+  box-sizing: border-box !important;
+  width: 46px !important;
+  min-width: 46px !important;
+  max-width: 46px !important;
+  height: 46px !important;
+  padding: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: hidden !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 50% !important;
+  background: #f3f4f6 !important;
+  color: #9ca3af !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  transform: none !important;
+}
+
+.site-header .account-trigger::before,
+.site-header .user-menu::before {
+  content: "" !important;
+  width: 29px !important;
+  height: 29px !important;
+  background-color: #9ca3af !important;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='currentColor' d='M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.42 0-8 2.24-8 5v2h16v-2c0-2.76-3.58-5-8-5Z'/%3E%3C/svg%3E") center / contain no-repeat !important;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='currentColor' d='M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.42 0-8 2.24-8 5v2h16v-2c0-2.76-3.58-5-8-5Z'/%3E%3C/svg%3E") center / contain no-repeat !important;
+}
+
+.site-header .account-trigger:has(img:not([hidden]))::before,
+.site-header .user-menu:has(img:not([hidden]))::before {
+  display: none !important;
+}
+
+.site-header .account-trigger img,
+.site-header .user-menu img {
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+}
+
+.site-header .account-trigger span,
+.site-header .account-trigger i,
+.site-header .user-menu span,
+.site-header .user-menu i {
+  display: none !important;
+}
+
+.site-header > .header-actions > .account-trigger {
+  position: relative !important;
+  margin-left: 6px !important;
+}
+
+.site-header > .header-actions > .account-trigger::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 3px !important;
+  bottom: 3px !important;
+  left: -19px !important;
+  width: 1px !important;
+  background: #e5e7eb !important;
+}
+
+.site-header .account-dropdown,
+.site-header .dropdown-menu {
+  top: calc(100% + 10px) !important;
+  right: 0 !important;
+}
+
+/* Keep the donation dialog fully visible below the fixed site header. */
+#donateModal {
+  top: var(--site-header-height) !important;
+  bottom: 0 !important;
+  height: calc(100dvh - var(--site-header-height)) !important;
+  box-sizing: border-box !important;
+  padding: 12px !important;
+  align-items: center !important;
+  overflow: hidden !important;
+}
+
+#donateModal .modal-content {
+  box-sizing: border-box !important;
+  width: min(390px, calc(100vw - 24px)) !important;
+  max-width: calc(100vw - 24px) !important;
+  max-height: calc(100dvh - var(--site-header-height) - 24px) !important;
+  padding: 18px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  border-radius: 12px !important;
+}
+
+#donateModal .modal-header-title {
+  margin: 0 0 6px !important;
+  font-size: 20px !important;
+  line-height: 1.25 !important;
+}
+
+#donateModal .modal-content > p {
+  margin: 6px 0 !important;
+  font-size: 12.5px !important;
+  line-height: 1.45 !important;
+}
+
+#donateModal .modal-content > img {
+  width: min(170px, 55vw) !important;
+  height: auto !important;
+  margin: 6px auto !important;
+}
+
+#donateModal .modal-content > div {
+  margin: 8px 0 !important;
+  padding: 9px 10px !important;
+  font-size: 12.5px !important;
+  line-height: 1.45 !important;
+  overflow-wrap: anywhere !important;
+}
+
+#donateModal .modal-content > div p {
+  margin: 2px 0 !important;
+}
+
+#donateModal .modal-content > button {
+  min-height: 42px !important;
+  margin-top: 8px !important;
+}
+
+@media (max-width: 1280px) {
+  .site-header,
+  #top.home-toolbar.site-header,
+  #main-app > .site-header {
+    padding-inline: 20px !important;
+    gap: 16px !important;
+  }
+
+  .site-header .site-brand-copy small {
+    display: none !important;
+  }
+
+  .site-header .site-brand-copy strong {
+    font-size: 17px !important;
+  }
+
+  .site-header nav ul,
+  .site-header .nav-links {
+    gap: 14px !important;
+  }
+
+  .site-header nav a,
+  .site-header .nav-links a {
+    font-size: 12px !important;
+  }
+
+  .site-header .btn-join,
+  .site-header .btn-join-pill,
+  .site-header .donate-btn {
+    min-width: auto !important;
+    padding-inline: 16px !important;
+  }
+
+  .site-header #adminDashboardLink {
+    padding-inline: 12px !important;
+    font-size: 11px !important;
+  }
+}
+
+@media (max-width: 1040px) {
+  :root {
+    --site-header-height: 126px;
+  }
+
+  .site-header,
+  #top.home-toolbar.site-header,
+  #main-app > .site-header {
+    height: var(--site-header-height) !important;
+    min-height: var(--site-header-height) !important;
+    padding: 10px 18px 8px !important;
+    flex-wrap: wrap !important;
+    align-content: center !important;
+    row-gap: 7px !important;
+  }
+
+  .site-header nav {
+    order: 3 !important;
+    flex: 0 0 calc(100% + 36px) !important;
+    width: calc(100% + 36px) !important;
+    margin: 0 -18px !important;
+    padding: 0 18px !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+  }
+
+  .site-header nav::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .site-header nav ul,
+  .site-header .nav-links {
+    justify-content: flex-start !important;
+    width: max-content !important;
+    min-width: max-content !important;
+  }
+
+  .site-header .site-brand-copy small {
+    display: block !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-header,
+  #top.home-toolbar.site-header,
+  #main-app > .site-header {
+    padding-inline: 14px !important;
+  }
+
+  .site-header .logo-area img,
+  .site-header .logo img {
+    width: 44px !important;
+    height: 44px !important;
+    flex-basis: 44px !important;
+  }
+
+  .site-header .site-brand-copy strong {
+    font-size: 15px !important;
+  }
+
+  .site-header .site-brand-copy small {
+    font-size: 10px !important;
+  }
+
+  .site-header .btn-join,
+  .site-header .btn-join-pill,
+  .site-header .donate-btn {
+    display: none !important;
+  }
+
+  .site-header #adminDashboardLink {
+    height: 40px !important;
+    padding-inline: 11px !important;
+    font-size: 10px !important;
+  }
+
+  .site-header .account-menu,
+  .site-header .user-dropdown-container {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  .site-header .account-menu::before,
+  .site-header .user-dropdown-container::before,
+  .site-header > .header-actions > .account-trigger::after {
+    display: none !important;
+  }
+
+  #donateModal {
+    padding: 8px !important;
+  }
+
+  #donateModal .modal-content {
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - var(--site-header-height) - 16px) !important;
+    padding: 14px !important;
+  }
+
+  #donateModal .modal-content > img {
+    width: min(150px, 48vw) !important;
+  }
+}
+
+/* Final cascade: giữ header giống hệt Trang chủ trên mọi tài liệu nguồn. */
+:root { --site-header-height: 84px; }
+.site-header, #top.home-toolbar.site-header, #main-app > .site-header {
+  height: 84px !important; min-height: 84px !important; padding: 0 clamp(24px, 4vw, 64px) !important;
+  flex-wrap: nowrap !important; align-content: normal !important; gap: 28px !important;
+  border-bottom: 1px solid rgba(16,62,46,.08) !important; background: rgba(255,255,255,.98) !important;
+  box-shadow: 0 1px 0 rgba(16,62,46,.08) !important; font-family: "Inter", sans-serif !important;
+}
+.site-header .logo-area img, .site-header .logo img {
+  width: 40px !important; height: 40px !important; flex-basis: 40px !important; padding: 6px !important;
+  border: 0 !important; background: #16734a !important;
+}
+.site-header .site-brand-copy strong { color:#103e2e !important; font-size:20px !important; font-weight:700 !important; letter-spacing:-.03em !important; text-transform:none !important; }
+.site-header .site-brand-copy small { display:none !important; }
+.site-header nav { order:initial !important; flex:1 1 auto !important; width:auto !important; margin:0 !important; padding:0 !important; overflow:visible !important; }
+.site-header nav ul, .site-header .nav-links { justify-content:center !important; gap:clamp(15px,1.65vw,30px) !important; width:auto !important; min-width:0 !important; }
+.site-header nav a, .site-header .nav-links a { width:auto !important; color:#19352c !important; font-family:"Inter",sans-serif !important; font-size:13px !important; font-weight:500 !important; text-transform:none !important; }
+.site-header nav a:hover, .site-header nav a.active, .site-header .nav-links a:hover, .site-header .nav-links a.active { color:#16734a !important; }
+.site-header nav a.active::after, .site-header .nav-links a.active::after { display:block !important; height:2px !important; bottom:1px !important; background:#16734a !important; }
+.site-header .header-actions {
+  min-height:44px !important; margin:0 !important; gap:12px !important;
+  display:flex !important; align-items:center !important; justify-content:flex-end !important;
+}
+.site-header .btn-join, .site-header .btn-join-pill { display:none !important; }
+.site-header .donate-btn { min-width:118px !important; height:44px !important; padding:0 18px !important; border:0 !important; border-radius:6px !important; background:#16734a !important; color:#fff !important; font-family:"Inter",sans-serif !important; font-size:13px !important; font-weight:600 !important; }
+.site-header .donate-btn:hover { background:#103e2e !important; transform:translateY(-2px) !important; }
+.site-header .account-menu, .site-header .user-dropdown-container {
+  width:auto !important; height:44px !important; margin:0 !important; padding:0 !important;
+  display:flex !important; align-items:center !important; align-self:center !important;
+}
+.site-header .account-menu::before, .site-header .user-dropdown-container::before, .site-header > .header-actions > .account-trigger::after { display:none !important; }
+.site-header .account-trigger, .site-header .user-menu {
+  width:auto !important; min-width:112px !important; max-width:190px !important; height:44px !important; padding:0 15px !important;
+  display:flex !important; align-items:center !important; justify-content:center !important; gap:8px !important; overflow:visible !important;
+  border:1px solid #cbdad1 !important; border-radius:6px !important; background:#fff !important; color:#19352c !important;
+  font-family:"Inter",sans-serif !important; font-size:13px !important; font-weight:500 !important; white-space:nowrap !important;
+  margin:0 !important; line-height:1 !important; align-self:center !important; vertical-align:middle !important;
+}
+.site-header .account-trigger:hover, .site-header .user-menu:hover { border-color:#16734a !important; color:#16734a !important; background:#f7faf8 !important; }
+.site-header .account-trigger::before, .site-header .user-menu::before { width:18px !important; height:18px !important; flex:0 0 18px !important; background-color:currentColor !important; }
+.site-header .account-trigger span, .site-header .account-trigger i, .site-header .user-menu span, .site-header .user-menu i { display:inline !important; }
+.site-header .account-trigger img, .site-header .user-menu img { width:30px !important; height:30px !important; flex:0 0 30px !important; border:2px solid #dce5dc !important; }
+.site-menu-toggle { display:none; width:42px; height:42px; padding:8px; border:0; background:transparent; cursor:pointer; }
+.site-menu-toggle span { display:block; width:100%; height:2px; margin:6px 0; border-radius:99px; background:#103e2e; transition:transform .2s,opacity .2s; }
+.mobile-donate-link { display:none !important; }
+
+@media (max-width:1080px) {
+  :root { --site-header-height:84px; }
+  .site-header, #top.home-toolbar.site-header, #main-app > .site-header { height:84px !important; min-height:84px !important; padding:0 24px !important; flex-wrap:nowrap !important; }
+  .site-header .site-menu-toggle { display:block; margin-left:auto; flex:0 0 auto; }
+  .site-header nav, .site-header .nav-links {
+    position:fixed !important; inset:84px 0 auto !important; z-index:4999 !important; width:100% !important; height:auto !important;
+    margin:0 !important; padding:18px 28px 24px !important; display:block !important; overflow:visible !important;
+    background:#fff !important; box-shadow:0 14px 30px rgba(16,62,46,.12) !important; transform:translateY(-145%); transition:transform .25s ease;
+  }
+  .site-header.menu-open nav, .site-header.menu-open .nav-links { transform:translateY(0); }
+  .site-header nav ul, .site-header .nav-links { flex-direction:column !important; align-items:stretch !important; justify-content:flex-start !important; gap:2px !important; width:100% !important; min-width:0 !important; }
+  .site-header nav a, .site-header .nav-links a { width:100% !important; padding:12px 4px !important; }
+  .site-header nav a.active::after, .site-header .nav-links a.active::after { display:none !important; }
+  .site-header .mobile-donate-link { display:block !important; }
+  .site-header .mobile-donate-link a { color:#16734a !important; font-weight:700 !important; }
+  .site-header.menu-open .site-menu-toggle span:nth-child(1) { transform:translateY(8px) rotate(45deg); }
+  .site-header.menu-open .site-menu-toggle span:nth-child(2) { opacity:0; }
+  .site-header.menu-open .site-menu-toggle span:nth-child(3) { transform:translateY(-8px) rotate(-45deg); }
+}
+
+@media (max-width:640px) {
+  :root { --site-header-height:72px; }
+  .site-header, #top.home-toolbar.site-header, #main-app > .site-header { height:72px !important; min-height:72px !important; padding:0 16px !important; gap:8px !important; }
+  .site-header nav, .site-header .nav-links { inset:72px 0 auto !important; }
+  .site-header .logo-area img, .site-header .logo img { width:36px !important; height:36px !important; flex-basis:36px !important; padding:5px !important; }
+  .site-header .site-brand-copy strong { font-size:16px !important; }
+  .site-header .donate-btn { display:none !important; }
+  .site-header .account-trigger, .site-header .user-menu { min-width:92px !important; max-width:128px !important; height:40px !important; padding:0 10px !important; font-size:12px !important; }
+  .site-header .account-trigger span, .site-header .user-menu span { overflow:hidden; text-overflow:ellipsis; }
+}

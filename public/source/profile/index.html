@@ -7,6 +7,9 @@
 
     <!-- Font Awesome cho icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Thư viện Cropper.js (Dùng để cắt ảnh) -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
@@ -27,7 +30,7 @@
             --bg-body: #f4f7f6; /* Màu nền xám nhạt của toàn trang */
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background-color: var(--bg-body); color: var(--text-dark); line-height: 1.6; }
         a { text-decoration: none; color: inherit; }
         ul { list-style: none; }
@@ -272,6 +275,7 @@
             footer { padding-left: 18px; padding-right: 18px; }
         }
     </style>
+    <link rel="stylesheet" href="../site-header.css">
 </head>
 <body>
 
@@ -292,10 +296,10 @@
     <!-- MÀN HÌNH CHÍNH APP -->
     <div id="main-app">
         <!-- HEADER -->
-        <header>
+        <header class="site-header">
             <a href="#" class="logo" onclick="event.preventDefault(); navigateParent('/')">
-                <img src="../home/logo.jpg" alt="Logo Hà Nội Xanh">
-                <span>HÀ NỘI<br>XANH</span>
+                <img src="../home/logo.png" alt="Logo Hà Nội Xanh">
+                <span class="site-brand-copy"><strong>HÀ NỘI XANH</strong><small>Vì một Hà Nội xanh</small></span>
             </a>
             <nav class="nav-links">
                 <a onclick="navigateParent('/')">Trang chủ</a>
@@ -303,13 +307,14 @@
                 <a onclick="navigateParent('/chien-dich')">Chiến dịch</a>
                 <a onclick="navigateParent('/tac-dong')">Tác động cộng đồng</a>
                 <a onclick="navigateParent('/tin-tuc')">Tin tức &amp; câu chuyện</a>
+                <a class="mobile-donate-link" onclick="navigateParent('/tac-dong')">Quyên tặng</a>
             </nav>
+            <button class="site-menu-toggle" type="button" aria-label="Mở menu" aria-expanded="false"><span></span><span></span><span></span></button>
             <div class="header-actions">
-                <a class="btn-join" onclick="navigateParent('/tham-gia')">THAM GIA</a>
-                <a class="donate-btn" onclick="navigateParent('/tac-dong')"><i class="fa-regular fa-heart"></i> QUYÊN TẶNG</a>
+                <a class="donate-btn" onclick="navigateParent('/tac-dong')"><i class="fa-regular fa-heart"></i> Quyên tặng</a>
                 <div class="user-dropdown-container">
                     <div class="user-menu" onclick="toggleDropdown()">
-                        <img id="header-avatar" src="../home/logo.jpg" alt="Avatar">
+                        <img id="header-avatar" src="../home/logo.png" alt="Avatar">
                         <span id="header-user-name">Thành viên</span> <i class="fa-solid fa-chevron-down" style="font-size: 10px;"></i>
                     </div>
                     <div id="dropdown-menu" class="dropdown-menu">
@@ -340,7 +345,7 @@
             
             <!-- Cột Trái: Menu Chuyển Tab -->
             <aside class="sidebar-left card">
-                <img id="main-profile-avatar" class="avatar-lg" src="../home/logo.jpg" alt="Avatar">
+                <img id="main-profile-avatar" class="avatar-lg" src="../home/logo.png" alt="Avatar">
                 <input type="file" id="file-upload" accept="image/*">
                 <button class="btn-change-photo" onclick="document.getElementById('file-upload').click();"><i class="fa-solid fa-camera"></i> Đổi ảnh</button>
                 <h3 id="profile-user-name">Thành viên</h3>
@@ -497,7 +502,7 @@
                 <p>Cùng chia sẻ ý kiến và lan tỏa những hành động tốt đẹp vì môi trường Thủ đô.</p>
             </div>
             <div class="footer-col">
-                <div class="footer-logo-area"><img src="../home/logo.jpg" alt="Logo Hà Nội Xanh">HÀ NỘI <span>XANH</span></div>
+                <div class="footer-logo-area"><img src="../home/logo.png" alt="Logo Hà Nội Xanh">HÀ NỘI <span>XANH</span></div>
                 <p>Cùng nhau hành động nhỏ, tạo nên thay đổi lớn cho môi trường Thủ đô.</p>
             </div>
             <div class="footer-col">
@@ -738,5 +743,6 @@
         });
         window.parent.postMessage({ type: 'hnx:profile-ready' }, window.location.origin);
     </script>
+    <script src="../site-header.js"></script>
 </body>
 </html>
