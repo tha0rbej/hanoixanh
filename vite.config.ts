@@ -32,7 +32,7 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       host: '0.0.0.0',
-      allowedHosts: ['.ngrok-free.dev', '.ngrok-free.app'],
+      allowedHosts: ['.ngrok-free.dev', '.ngrok-free.app', '.loca.lt'],
       port: parseInt(process.env.PORT || '8443'),
       strictPort: true,
       watch: { ignored: ['**/.figma/**'] },

@@ -42,6 +42,7 @@ export function AuthModal({ initialTab, onClose, onAdmin }: { initialTab: AuthTa
   const [error, setError] = useState("")
   const [notice, setNotice] = useState("")
   const [values, setValues] = useState(emptyValues)
+  const [passwordVisible, setPasswordVisible] = useState({ password: false, confirm: false })
 
   const update = (key: keyof typeof values) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues(current => ({ ...current, [key]: event.target.value }))
@@ -52,6 +53,11 @@ export function AuthModal({ initialTab, onClose, onAdmin }: { initialTab: AuthTa
     setError("")
     setNotice("")
     setCompletion(null)
+    setPasswordVisible({ password: false, confirm: false })
+  }
+
+  const togglePassword = (field: "password" | "confirm") => {
+    setPasswordVisible(current => ({ ...current, [field]: !current[field] }))
   }
 
   if (!configured) {
@@ -203,8 +209,8 @@ export function AuthModal({ initialTab, onClose, onAdmin }: { initialTab: AuthTa
                     )}
                     {registrationType === "individual" && (
                       <>
-                        <label><span className="auth-field-label">Mật khẩu <span className="auth-required">*</span></span><div className="auth-input-wrap"><i className="fa-solid fa-lock" aria-hidden="true" /><input type="password" value={values.password} onChange={update("password")} minLength={8} placeholder="Tối thiểu 8 ký tự" required /></div></label>
-                        <label><span className="auth-field-label">Nhập lại mật khẩu <span className="auth-required">*</span></span><div className="auth-input-wrap"><i className="fa-solid fa-lock" aria-hidden="true" /><input type="password" value={values.confirm} onChange={update("confirm")} minLength={8} placeholder="Nhập lại mật khẩu" required /></div></label>
+                        <label><span className="auth-field-label">Mật khẩu <span className="auth-required">*</span></span><div className="auth-input-wrap"><i className="fa-solid fa-lock" aria-hidden="true" /><input type={passwordVisible.password ? "text" : "password"} value={values.password} onChange={update("password")} minLength={8} placeholder="Tối thiểu 8 ký tự" required /><button type="button" className="auth-password-toggle" onClick={() => togglePassword("password")} aria-label={passwordVisible.password ? "Ẩn mật khẩu" : "Hiện mật khẩu"}><i className={`fa-solid ${passwordVisible.password ? "fa-eye-slash" : "fa-eye"}`} aria-hidden="true" /></button></div></label>
+                        <label><span className="auth-field-label">Nhập lại mật khẩu <span className="auth-required">*</span></span><div className="auth-input-wrap"><i className="fa-solid fa-lock" aria-hidden="true" /><input type={passwordVisible.confirm ? "text" : "password"} value={values.confirm} onChange={update("confirm")} minLength={8} placeholder="Nhập lại mật khẩu" required /><button type="button" className="auth-password-toggle" onClick={() => togglePassword("confirm")} aria-label={passwordVisible.confirm ? "Ẩn mật khẩu" : "Hiện mật khẩu"}><i className={`fa-solid ${passwordVisible.confirm ? "fa-eye-slash" : "fa-eye"}`} aria-hidden="true" /></button></div></label>
                       </>
                     )}
                   </div>
@@ -217,7 +223,7 @@ export function AuthModal({ initialTab, onClose, onAdmin }: { initialTab: AuthTa
           ) : (
             <>
               <label>Email<input type="email" value={values.email} onChange={update("email")} required /></label>
-              {tab !== "reset" && <label>Mật khẩu<input type="password" value={values.password} onChange={update("password")} minLength={8} required /></label>}
+              {tab !== "reset" && <label>Mật khẩu<div className="auth-input-wrap"><i className="fa-solid fa-lock" aria-hidden="true" /><input type={passwordVisible.password ? "text" : "password"} value={values.password} onChange={update("password")} minLength={8} required /><button type="button" className="auth-password-toggle" onClick={() => togglePassword("password")} aria-label={passwordVisible.password ? "Ẩn mật khẩu" : "Hiện mật khẩu"}><i className={`fa-solid ${passwordVisible.password ? "fa-eye-slash" : "fa-eye"}`} aria-hidden="true" /></button></div></label>}
               <button className="auth-primary" disabled={busy}>{busy ? "Đang xử lý…" : tab === "login" ? "ĐĂNG NHẬP" : "GỬI LINK ĐẶT LẠI"}</button>
             </>
           )}

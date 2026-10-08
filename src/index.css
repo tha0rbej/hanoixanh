@@ -107,6 +107,9 @@
 .auth-form-section h3 > i { width: 18px; color: #006d38; text-align: center; }
 .auth-input-wrap { position: relative; }
 .auth-input-wrap > i { position: absolute; z-index: 1; left: 16px; top: 50%; width: 17px; transform: translateY(-50%); color: #a3acb9; font-size: 16px; text-align: center; pointer-events: none; }
+.auth-password-toggle { position: absolute; z-index: 2; right: 10px; top: 50%; display: grid; width: 32px; height: 32px; place-items: center; transform: translateY(-50%); border: 0; border-radius: 8px; background: transparent; color: #94a3b8; cursor: pointer; }
+.auth-password-toggle:hover, .auth-password-toggle:focus-visible { color: #16734a; background: #edf7f0; outline: none; }
+.auth-input-wrap input { padding-right: 48px !important; }
 .auth-card .auth-input-wrap input { padding-left: 41px; }
 .auth-input-wrap:focus-within > i { color: #16734a; }
 .auth-required { color: #ef4444; }
