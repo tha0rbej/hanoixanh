@@ -761,6 +761,15 @@
       #page-chien-dich .report-form-card .upload-box { min-height: 76px; }
       #page-chien-dich .report-form-card .btn-pick-location, #page-chien-dich .report-form-card .btn-submit-report { min-height: 40px; }
     }
+
+    /* Keep campaign detail popups fully visible with actions inside the viewport. */
+    .detail-modal-content { height: min(680px, calc(100dvh - 32px)); max-height: calc(100dvh - 32px); }
+    .detail-modal-content .detail-modal-carousel { height: clamp(145px, 22vh, 205px); }
+    .detail-modal-content .detail-modal-block p { -webkit-line-clamp: 2; }
+    @media (max-width: 640px) {
+      .detail-modal-content { height: calc(100dvh - 20px); max-height: calc(100dvh - 20px); }
+      .detail-modal-content .detail-modal-carousel { height: 170px; }
+    }
   </style>
   <link rel="stylesheet" href="../site-header.css">
 </head>
