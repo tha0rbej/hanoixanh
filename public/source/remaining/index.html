@@ -739,6 +739,28 @@
       #page-chien-dich .map-col { min-height: 540px; }
       #page-chien-dich .map-container, #page-chien-dich #boundaryMap { min-height: 440px; }
     }
+
+    /* Keep the campaign view compact and contained on desktop screens. */
+    @media (min-width: 1051px) {
+      #page-chien-dich { overflow-x: hidden; }
+      #page-chien-dich .intro-section { min-height: 270px; margin-bottom: 20px; padding: 38px 34px 32px; }
+      #page-chien-dich .explore-section { margin: 20px 0 22px; }
+      #page-chien-dich .campaign-explorer .col-box { height: 520px; padding: 18px; }
+      #page-chien-dich .map-col { min-height: 520px; }
+      #page-chien-dich .campaign-list-panel .tab-pane.active { max-height: 430px; }
+      #page-chien-dich .map-container, #page-chien-dich #boundaryMap { height: 420px; min-height: 0; }
+      #page-chien-dich .report-section { margin-bottom: 18px; padding: 30px 34px; }
+      #page-chien-dich .report-layout { gap: 30px; }
+      #page-chien-dich .report-copy h2 { font-size: 34px; }
+      #page-chien-dich .report-copy .report-intro { margin: 10px 0 14px; font-size: 14px; line-height: 1.5; }
+      #page-chien-dich .report-visual, #page-chien-dich .report-visual img { min-height: 205px; height: 205px; }
+      #page-chien-dich .report-form-card { padding: 18px 22px; }
+      #page-chien-dich .report-form-card .form-group { margin-bottom: 10px; }
+      #page-chien-dich .report-form-card .form-group input { min-height: 40px; padding: 8px 12px; }
+      #page-chien-dich .report-form-card .form-group textarea { min-height: 76px; padding: 8px 12px; }
+      #page-chien-dich .report-form-card .upload-box { min-height: 76px; }
+      #page-chien-dich .report-form-card .btn-pick-location, #page-chien-dich .report-form-card .btn-submit-report { min-height: 40px; }
+    }
   </style>
   <link rel="stylesheet" href="../site-header.css">
 </head>
