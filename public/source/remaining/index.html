@@ -358,7 +358,8 @@
     .btn-feedback:hover { background: #10b981; }
 
     .footer-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-    .footer-brand svg { height: 38px; width: 38px; }
+    .footer-brand svg { display: none; }
+    .footer-brand::before { content: ""; width: 38px; height: 38px; flex: 0 0 38px; display: block; border-radius: 50%; background: #16734a url('logo.png') center / contain no-repeat; }
     .footer-brand span { font-size: 16.5px; font-weight: 800; color: #fff; }
     .footer-brand span strong { color: var(--primary); }
 
