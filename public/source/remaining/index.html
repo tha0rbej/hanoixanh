@@ -1434,7 +1434,7 @@
     </div>
   </div>
 
-  <div class="modal-backdrop" id="detailModal">
+  <div class="modal-backdrop" id="detailModal" onclick="if (event.target === this) closeModal('detailModal')">
     <div class="modal-content detail-modal-content">
       <h3 class="modal-header-title" id="mTitle">Chi tiết chiến dịch</h3>
       <div class="detail-modal-meta" aria-label="Thông tin thời gian và địa điểm">
