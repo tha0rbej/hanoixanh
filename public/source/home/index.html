@@ -686,7 +686,14 @@
     <nav id="homeSiteNav">
         <ul>
             <li><a href="../../" target="_parent" class="active" onclick="event.preventDefault(); window.parent.postMessage({type:'hnx:navigate', path:'/'}, '*')">Trang chủ</a></li>
-            <li><a href="../../ve-ha-noi-xanh" target="_parent">Về Hà Nội Xanh</a></li>
+            <li class="nav-dropdown">
+                <button class="nav-dropdown-trigger" type="button" aria-expanded="false" aria-haspopup="true">Về Hà Nội Xanh <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>
+                <div class="nav-dropdown-menu" role="menu">
+                    <a href="../../ve-ha-noi-xanh/cau-chuyen" target="_parent" role="menuitem">Câu chuyện &amp; CLB</a>
+                    <a href="../../ve-ha-noi-xanh/doanh-nghiep-xa-hoi" target="_parent" role="menuitem">Doanh nghiệp xã hội</a>
+                    <a href="../../ve-ha-noi-xanh/doi-ngu" target="_parent" role="menuitem">Đội ngũ</a>
+                </div>
+            </li>
             <li><a href="../../chien-dich" target="_parent">Chiến dịch</a></li>
             <li><a href="../../tac-dong" target="_parent">Tác động cộng đồng</a></li>
             <li><a href="../../tin-tuc" target="_parent">Tin tức & câu chuyện</a></li>
