@@ -34,6 +34,17 @@
   }
 }
 
+.site-frame {
+  position: fixed;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  border: 0;
+  background: #05190e;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
@@ -80,6 +91,9 @@
 .auth-switch { display: flex; justify-content: space-between; gap: 12px; margin-top: 18px; }
 .auth-switch button { border: 0; background: transparent; color: #15803d; font-weight: 700; cursor: pointer; }
 .auth-error, .admin-error { margin-top: 14px; border-radius: 9px; padding: 10px 12px; background: #fef2f2; color: #b91c1c; font-size: 13px; }
+.admin-warning, .admin-notice { display: grid; gap: 4px; margin: 14px 0; border-radius: 10px; padding: 12px 14px; font-size: 13px; line-height: 1.5; }
+.admin-warning { border: 1px solid #f5d38a; background: #fffbeb; color: #92400e; }
+.admin-notice { border: 1px solid #b7ddc2; background: #f0fdf4; color: #166534; }
 .auth-success { margin-top: 14px; border-radius: 9px; padding: 10px 12px; background: #ecfdf5; color: #047857; font-size: 13px; }
 
 .auth-card-register { width: min(100%, 980px); max-height: calc(100dvh - 40px); overflow-y: auto; padding: 30px 36px 26px; }
@@ -188,6 +202,23 @@
 .admin-panel .large-textarea { min-height: 170px; }
 .admin-panel form > .admin-primary { margin-top: 16px; }
 .admin-panel > hr { margin: 28px 0 18px; border: 0; border-top: 1px solid #e7efe9; }
+.admin-points-editor { display: grid; grid-template-columns: minmax(220px, 1fr) 180px auto; gap: 12px; align-items: center; margin: 20px 0 26px; padding: 16px; border: 1px solid #b7ddc2; border-radius: 12px; background: #f0fdf4; }
+.admin-points-editor strong, .admin-points-editor small { display: block; }
+.admin-points-editor small { margin-top: 4px; color: #64748b; font-size: 12px; }
+.admin-points-editor button, .admin-panel-heading button { border: 1px solid #15803d; border-radius: 8px; padding: 10px 13px; background: white; color: #166534; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
+.admin-points-editor button:hover, .admin-panel-heading button:hover { background: #166534; color: white; }
+.admin-reward-summary p { max-width: 780px; color: #52665b; line-height: 1.6; }
+.admin-reward-range { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; margin-top: 18px; color: #166534; font-size: 13px; font-weight: 900; }
+.admin-reward-range div { height: 8px; border-radius: 999px; background: linear-gradient(90deg, #86efac, #15803d); }
+.admin-panel-heading { display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; margin-bottom: 18px; }
+.admin-panel-heading h2 { margin-bottom: 5px; }
+.admin-panel-heading p { margin: 0; color: #64748b; font-size: 13px; }
+.admin-badge-editor-list { display: grid; gap: 14px; margin-bottom: 18px; }
+.admin-badge-editor { padding: 17px; border: 1px solid #e2ebe5; border-radius: 12px; background: #fbfdfb; }
+.admin-badge-editor-title { display: grid; grid-template-columns: 36px 1fr auto; gap: 10px; align-items: center; margin-bottom: 14px; }
+.admin-badge-editor-title > span { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 50%; background: #dcfce7; color: #15803d; }
+.admin-badge-editor-title .link-danger { padding: 7px; }
+.admin-reward-notice { margin: 12px 0 0; color: #166534; font-size: 13px; font-weight: 700; }
 
 /* The news manager is built inside the dashboard at runtime. Give its direct table
    the same visual structure as every table wrapped in .admin-table-wrap. */
@@ -243,6 +274,8 @@
   .admin-panel { padding: 15px 12px; border-radius: 11px; }
   .admin-row { align-items: flex-start; flex-direction: column; }
   .form-grid { grid-template-columns: 1fr; }
+  .admin-points-editor { grid-template-columns: 1fr; }
+  .admin-panel-heading { flex-direction: column; }
   .admin-panel input, .admin-panel textarea, .admin-panel select { font-size: 16px; }
   .admin-table-wrap, .admin-panel:has(> table) { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .admin-table-wrap table, .admin-panel > table { min-width: 720px; }

@@ -197,6 +197,21 @@
         .stat-card:hover { background: var(--light-green-badge); border-color: var(--light-green-badge); transform: translateY(-2px);}
         .stat-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; margin-right: 15px; background: var(--light-green-badge); color: var(--primary-green);}
 
+        .points-hero { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; padding: 24px; border-radius: 16px; color: white; background: linear-gradient(135deg, #035c2e, #0c8a4c); box-shadow: 0 14px 28px rgba(3, 92, 46, .18); }
+        .points-hero-icon { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 16px; color: #035c2e; background: #dcfce7; font-size: 25px; }
+        .points-hero small { display: block; color: #d1fae5; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+        .points-hero strong { display: block; margin-top: 3px; font-size: 32px; line-height: 1; }
+        .points-note { margin: 14px 0 24px; color: var(--text-gray); font-size: 13px; line-height: 1.55; }
+        .badge-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .badge-card { display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: center; padding: 15px; border: 1px solid var(--border-color); border-radius: 12px; background: #fafafa; }
+        .badge-card.earned { border-color: #a7d9bb; background: #effaf3; }
+        .badge-card.locked { opacity: .62; }
+        .badge-card-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; color: #64748b; background: #e5e7eb; font-size: 18px; }
+        .badge-card.earned .badge-card-icon { color: #fff; background: var(--primary-green); }
+        .badge-card h3 { margin: 0 0 4px; font-size: 14px; color: var(--text-dark); }
+        .badge-card p { margin: 0; color: var(--text-gray); font-size: 12px; line-height: 1.4; }
+        .badge-card-status { display: inline-block; margin-top: 7px; color: var(--primary-green); font-size: 11px; font-weight: 800; }
+
         /* =========================================
            4. MODAL CĂN CHỈNH ẢNH (CROPPER UI)
         ========================================= */
@@ -235,6 +250,7 @@
             .history-item { align-items: flex-start; flex-wrap: wrap; gap: 14px; }
             .history-date { flex-basis: 75px; padding-right: 14px; margin-right: 0; }
             .history-meta { flex-direction: column; gap: 7px; }
+            .badge-grid { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr; }
         }
 
@@ -354,6 +370,7 @@
                 <ul class="side-menu" style="text-align: left; margin-top: 15px;">
                     <li><a class="menu-link active" onclick="switchTab('tab-profile', this)"><i class="fa-regular fa-user"></i> Hồ sơ cá nhân</a></li>
                     <li><a class="menu-link" onclick="switchTab('tab-history', this)"><i class="fa-regular fa-clock"></i> Lịch sử tham gia</a></li>
+                    <li><a class="menu-link" onclick="switchTab('tab-rewards', this)"><i class="fa-solid fa-award"></i> Điểm & huy hiệu</a></li>
                     <li><a class="menu-link" onclick="switchTab('tab-password', this)"><i class="fa-solid fa-lock"></i> Đổi mật khẩu</a></li>
                 </ul>
             </aside>
@@ -407,7 +424,25 @@
                     </div>
                 </div>
 
-                <!-- TAB 3: ĐỔI MẬT KHẨU -->
+                <!-- TAB 3: ĐIỂM VÀ HUY HIỆU -->
+                <div id="tab-rewards" class="tab-content">
+                    <div class="section-header">
+                        <h2>Điểm & huy hiệu tình nguyện</h2>
+                        <p>Ghi nhận sự tham gia đều đặn và thời gian bạn đồng hành cùng Hà Nội Xanh</p>
+                    </div>
+                    <div class="points-hero">
+                        <div class="points-hero-icon"><i class="fa-solid fa-coins"></i></div>
+                        <div><small>Điểm hiện có</small><strong id="profile-points-main">0 điểm</strong></div>
+                    </div>
+                    <p class="points-note">Mỗi chiến dịch đã được admin xác nhận sẽ nhận từ 10.000 đến 15.000 điểm và được cộng dồn vào tổng điểm của tài khoản. Điểm và huy hiệu chỉ được cập nhật sau khi kết quả tham gia được xác nhận.</p>
+                    <div class="section-header" style="margin-top: 8px;">
+                        <h2 style="font-size: 17px;">Các mốc huy hiệu</h2>
+                        <p>Mốc được xét theo số chiến dịch, số giờ, số tháng hoạt động và thời gian gắn bó.</p>
+                    </div>
+                    <div class="badge-grid" id="profile-badge-grid"></div>
+                </div>
+
+                <!-- TAB 4: ĐỔI MẬT KHẨU -->
                 <div id="tab-password" class="tab-content">
                     <div class="section-header">
                         <h2>Đổi mật khẩu</h2>
@@ -473,7 +508,13 @@
                         <i class="fa-solid fa-chevron-right" style="color: #9ca3af; font-size: 12px;"></i>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card" onclick="switchTab('tab-rewards', document.querySelectorAll('.menu-link')[2])">
+                        <div class="stat-icon"><i class="fa-solid fa-coins"></i></div>
+                        <div style="flex:1;"><h4 id="profile-points" style="margin: 0; font-size: 18px;">0</h4><p style="margin: 0; font-size: 12px; color: var(--text-gray);">Điểm tích lũy</p></div>
+                        <i class="fa-solid fa-chevron-right" style="color: #9ca3af; font-size: 12px;"></i>
+                    </div>
+
+                    <div class="stat-card" onclick="switchTab('tab-rewards', document.querySelectorAll('.menu-link')[2])">
                         <div class="stat-icon"><i class="fa-solid fa-trophy"></i></div>
                         <div style="flex:1;"><h4 id="profile-badges" style="margin: 0; font-size: 18px;">0</h4><p style="margin: 0; font-size: 12px; color: var(--text-gray);">Huy hiệu</p></div>
                         <i class="fa-solid fa-chevron-right" style="color: #9ca3af; font-size: 12px;"></i>
@@ -485,7 +526,7 @@
                         <h2 style="font-size: 16px;"><i class="fa-solid fa-lock" style="color:var(--primary-green); margin-right:5px;"></i> Đổi mật khẩu</h2>
                         <p style="font-size: 12px;">Cập nhật mật khẩu để bảo vệ tài khoản của bạn tốt hơn.</p>
                     </div>
-                    <div class="stat-card" style="margin-bottom: 0; padding: 10px 15px;" onclick="switchTab('tab-password', document.querySelectorAll('.menu-link')[2])">
+                    <div class="stat-card" style="margin-bottom: 0; padding: 10px 15px;" onclick="switchTab('tab-password', document.querySelectorAll('.menu-link')[3])">
                         <div class="stat-icon" style="background: white; border: 1px solid var(--border-color); color: var(--text-dark); width: 30px; height: 30px; font-size: 12px;"><i class="fa-solid fa-lock"></i></div>
                         <div style="flex:1; font-weight: 600; font-size: 14px;">Đổi mật khẩu</div>
                         <i class="fa-solid fa-chevron-right" style="color: #9ca3af; font-size: 12px;"></i>
@@ -588,7 +629,8 @@
             if(element && element.classList.contains('menu-link')){ element.classList.add('active'); } 
             else if(tabId === 'tab-profile') { document.querySelectorAll('.menu-link')[0].classList.add('active'); } 
             else if(tabId === 'tab-history') { document.querySelectorAll('.menu-link')[1].classList.add('active'); } 
-            else if(tabId === 'tab-password') { document.querySelectorAll('.menu-link')[2].classList.add('active'); }
+            else if(tabId === 'tab-rewards') { document.querySelectorAll('.menu-link')[2].classList.add('active'); }
+            else if(tabId === 'tab-password') { document.querySelectorAll('.menu-link')[3].classList.add('active'); }
 
             if(tabId === 'tab-profile') {
                 document.getElementById('breadcrumb-text').innerHTML = '<i class="fa-solid fa-house"></i> > Tài khoản > <strong>Hồ sơ cá nhân</strong>';
@@ -598,6 +640,10 @@
                 document.getElementById('breadcrumb-text').innerHTML = '<i class="fa-solid fa-house"></i> > Tài khoản > <strong>Lịch sử tham gia</strong>';
                 document.getElementById('banner-title').innerText = 'Lịch sử tham gia';
                 document.getElementById('banner-desc').innerText = 'Hành trình cống hiến vì một Hà Nội xanh sạch đẹp qua các chiến dịch mà bạn đã đồng hành.';
+            } else if (tabId === 'tab-rewards') {
+                document.getElementById('breadcrumb-text').innerHTML = '<i class="fa-solid fa-house"></i> > Tài khoản > <strong>Điểm & huy hiệu</strong>';
+                document.getElementById('banner-title').innerText = 'Điểm & huy hiệu';
+                document.getElementById('banner-desc').innerText = 'Theo dõi điểm tích lũy và những cột mốc ghi nhận hành trình tình nguyện bền bỉ của bạn.';
             } else if (tabId === 'tab-password') {
                 document.getElementById('breadcrumb-text').innerHTML = '<i class="fa-solid fa-house"></i> > Tài khoản > <strong>Đổi mật khẩu</strong>';
                 document.getElementById('banner-title').innerText = 'Đổi mật khẩu';
@@ -690,6 +736,36 @@
                 list.appendChild(row);
             });
         }
+
+        function renderBadges(items) {
+            const grid = document.getElementById('profile-badge-grid');
+            grid.innerHTML = '';
+            if (!items || !items.length) {
+                grid.innerHTML = '<div class="empty-history">Các mốc huy hiệu đang được cập nhật.</div>';
+                return;
+            }
+            items.forEach(function(item) {
+                const card = document.createElement('article');
+                card.className = 'badge-card ' + (item.earned ? 'earned' : 'locked');
+                const icon = document.createElement('div');
+                icon.className = 'badge-card-icon';
+                const iconElement = document.createElement('i');
+                const safeIcon = /^fa-[a-z0-9-]+$/.test(item.icon || '') ? item.icon : 'fa-award';
+                iconElement.className = 'fa-solid ' + safeIcon;
+                icon.appendChild(iconElement);
+                const copy = document.createElement('div');
+                const title = document.createElement('h3');
+                title.textContent = item.name || 'Huy hiệu tình nguyện';
+                const description = document.createElement('p');
+                description.textContent = item.description || '';
+                const status = document.createElement('span');
+                status.className = 'badge-card-status';
+                status.textContent = item.earned ? 'ĐÃ ĐẠT' : 'CHƯA ĐẠT';
+                copy.append(title, description, status);
+                card.append(icon, copy);
+                grid.appendChild(card);
+            });
+        }
         // Sync the profile page with the React authentication layer.
         window.addEventListener('message', function(event) {
             if (event.origin !== window.location.origin || !event.data) return;
@@ -710,7 +786,11 @@
                 document.getElementById('profile-level').innerHTML = '<i class="fa-solid fa-leaf"></i> ' + (message.user.level || 'Thành viên mới');
                 document.getElementById('profile-campaign-count').textContent = String(message.user.camps || 0);
                 document.getElementById('profile-hours').textContent = String(message.user.hours || 0) + 'h';
+                const points = Number(message.user.points || 0).toLocaleString('vi-VN');
+                document.getElementById('profile-points').textContent = points;
+                document.getElementById('profile-points-main').textContent = points + ' điểm';
                 document.getElementById('profile-badges').textContent = String(message.user.badges || 0);
+                renderBadges(message.user.badgeDetails || []);
                 renderCampaignHistory(message.user.history || []);
                 if (message.user.avatarUrl) {
                     document.getElementById('main-profile-avatar').src = message.user.avatarUrl;

@@ -318,65 +318,138 @@
     .btn-thamgia-submit { background: #16a34a; color: #fff; border: none; width: 100%; padding: 13px; border-radius: 0.75rem; font-size: 14.5px; font-weight: 600; text-transform: uppercase; cursor: pointer; transition: all 300ms; }
     .btn-thamgia-submit:hover { background: #15803d; transform: translateY(-2px); box-shadow: 0 10px 15px rgba(0,0,0,0.12); }
 
-    /* VIEW 5: VỀ HÀ NỘI XANH */
-    #page-ve-chung-toi { display: none; margin-top: 28px; }
-    .vehx-hero { background-color: var(--primary-light); padding: 50px 0 35px; text-align: center; border-radius: 12px; margin-bottom: 35px; border: 1px solid var(--border-color); }
-    .vehx-hero h1 { color: var(--primary-dark); font-size: 2.2rem; margin-bottom: 14px; text-transform: uppercase; }
-    .vehx-hero blockquote { font-size: 1.15rem; color: var(--text-sub); max-width: 800px; margin: 0 auto 24px auto; font-style: italic; }
-    .vehx-py-section { padding: 40px 0; }
-    .vehx-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
-    .vehx-quote-block { background-color: var(--primary-light); padding: 22px; border-left: 4px solid var(--primary); margin: 20px 0; font-style: italic; color: var(--primary-dark); font-size: 1.05rem; border-radius: 0 8px 8px 0; }
-    .vehx-standard-list { list-style-type: disc; padding-left: 20px; margin-bottom: 16px; }
-    .vehx-standard-list li { margin-bottom: 8px; }
-    .vehx-numbered-list { list-style-type: decimal; padding-left: 20px; margin-bottom: 16px; }
-    .vehx-numbered-list li { margin-bottom: 10px; }
-    .vehx-achievement-content { background: #fff; padding: 24px; border-radius: 8px; border: 1px solid var(--border-color); }
-    .vehx-achievement-content h3 { color: var(--primary-dark); border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 16px; }
-    .vehx-achievement-images { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: center; justify-items: center; }
-    .vehx-achievement-image img { width: 100%; border-radius: 8px; object-fit: contain; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    /* VIEW 5: VỀ HÀ NỘI XANH — đồng bộ hệ thống giao diện 2026 */
+    #page-ve-chung-toi { display: none; margin-top: 0; padding: 30px 0 64px; color: #19352c; }
+    #page-ve-chung-toi > section { margin-right: auto; margin-left: auto; }
+    #page-ve-chung-toi .container { width: 100%; max-width: 1180px; }
+    #page-ve-chung-toi .section-title { margin-bottom: 18px; color: #103e2e; font-size: clamp(30px, 3.2vw, 43px); line-height: 1.12; letter-spacing: -.04em; text-transform: none; }
+    .vehx-eyebrow { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 14px; color: #087b43; font-size: 12px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+    .vehx-eyebrow::before { content: ""; width: 24px; height: 2px; border-radius: 99px; background: #17a15d; }
+    .vehx-section-head { max-width: 720px; margin: 0 auto 34px; text-align: center; }
+    .vehx-section-head p { color: #607168; font-size: 15px; line-height: 1.75; }
 
-    /* Dấu ấn truyền thông: đúng 2 cái, căn đều, không cần link */
-    .vehx-media-feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; margin-bottom: 40px; max-width: 900px; margin-left: auto; margin-right: auto; }
-    .vehx-media-feature img { width: 100%; height: 280px; object-fit: cover; border-radius: 8px; display: block; }
-    .vehx-media-feature h3 { color: var(--primary-dark); margin: 16px 0 8px; font-size: 19px; }
-    .vehx-media-feature p { color: var(--text-sub); }
+    .vehx-hero { position: relative; overflow: hidden; margin-bottom: 34px; border: 1px solid #dce9e1; border-radius: 24px; background: linear-gradient(135deg, #eff8f2 0%, #f9fcfa 55%, #e4f3e8 100%); box-shadow: 0 18px 48px rgba(16,62,46,.08); }
+    .vehx-hero::before { content: ""; position: absolute; width: 360px; height: 360px; right: -150px; top: -180px; border-radius: 50%; background: rgba(134,239,172,.3); }
+    .vehx-hero .container { position: relative; display: grid; grid-template-columns: minmax(0,.92fr) minmax(460px,1.08fr); gap: 50px; align-items: center; padding: 56px; }
+    .vehx-hero-copy { position: relative; z-index: 1; }
+    .vehx-hero h1 { max-width: 590px; margin: 0 0 18px; color: #103e2e; font-size: clamp(42px, 4.6vw, 64px); line-height: 1.02; letter-spacing: -.055em; text-transform: none; }
+    .vehx-hero blockquote { max-width: 590px; margin: 0; color: #536c61; font-size: 16px; font-style: normal; line-height: 1.75; }
+    .vehx-secondary-btn { display: inline-flex; min-height: 46px; align-items: center; justify-content: center; gap: 9px; padding: 0 20px; border: 1px solid #bad1c3; border-radius: 8px; background: rgba(255,255,255,.75); color: #155e3d; font-size: 13px; font-weight: 800; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
+    .vehx-secondary-btn:hover { transform: translateY(-2px); box-shadow: 0 9px 22px rgba(16,62,46,.13); }
+    .vehx-hero-media { position: relative; min-width: 0; }
+    .vehx-hero-media > img { display: block; width: 100%; height: 390px; margin: 0; border-radius: 18px; object-fit: cover; box-shadow: 0 18px 42px rgba(16,62,46,.18); }
+    .vehx-hero-badge { position: absolute; right: 18px; bottom: 18px; display: flex; align-items: center; gap: 11px; max-width: 240px; padding: 12px 15px; border: 1px solid rgba(255,255,255,.72); border-radius: 12px; background: rgba(255,255,255,.9); color: #103e2e; box-shadow: 0 12px 30px rgba(0,0,0,.13); backdrop-filter: blur(8px); }
+    .vehx-hero-badge i { display: grid; width: 36px; height: 36px; flex: 0 0 36px; place-items: center; border-radius: 50%; background: #dcfce7; color: #15803d; }
+    .vehx-hero-badge strong, .vehx-hero-badge small { display: block; }
+    .vehx-hero-badge strong { font-size: 14px; }
+    .vehx-hero-badge small { color: #6a7d73; font-size: 11px; }
 
-    /* CẬP NHẬT: CSS cho ảnh phần Hành trình & Hoạt động */
-    .vehx-journey-img {
-      width: 100%;
-      height: 280px;
-      object-fit: cover;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      margin-bottom: 10px;
+    .vehx-py-section { padding: 66px 0; }
+    .vehx-grid-2 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 52px; align-items: center; }
+    .vehx-founder-copy > p { margin-bottom: 13px; color: #586f64; font-size: 15px; line-height: 1.8; }
+    .vehx-quote-block { position: relative; margin: 24px 0 0; padding: 22px 24px 22px 52px; border: 1px solid #cfe4d6; border-radius: 14px; background: #f1f8f3; color: #155e3d; font-size: 15px; font-style: italic; line-height: 1.7; }
+    .vehx-quote-block::before { content: "“"; position: absolute; left: 18px; top: 6px; color: #56a977; font-family: Georgia,serif; font-size: 54px; line-height: 1; }
+    .vehx-founder-card { position: relative; max-width: 420px; margin-left: auto; padding: 22px; border: 1px solid #dce8e1; border-radius: 20px; background: #fff; box-shadow: 0 18px 42px rgba(16,62,46,.1); }
+    .vehx-founder-card img { display: block; width: 100%; height: 370px; border-radius: 14px; object-fit: cover; object-position: center 28%; }
+    .vehx-founder-card figcaption { padding: 17px 5px 2px; text-align: left; }
+    .vehx-founder-card figcaption strong { display: block; color: #103e2e; font-size: 17px; }
+    .vehx-founder-card figcaption span { display: block; margin-top: 4px; color: #718078; font-size: 12px; }
+
+    .vehx-purpose-section { max-width: 1180px; padding: 64px 46px !important; border: 1px solid #dce9e1; border-radius: 22px !important; background: linear-gradient(145deg,#f1f8f3,#fbfdfb) !important; }
+    .vehx-purpose-section .container { max-width: 1080px !important; padding: 0; }
+    .vehx-numbered-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; counter-reset: vehx-purpose; }
+    .vehx-numbered-list li { position: relative; min-height: 116px; margin: 0; padding: 20px 20px 20px 64px; border: 1px solid #e0ebe4; border-radius: 14px; background: rgba(255,255,255,.82); color: #52675d; font-size: 13px; line-height: 1.65; counter-increment: vehx-purpose; }
+    .vehx-numbered-list li::before { content: counter(vehx-purpose,decimal-leading-zero); position: absolute; left: 18px; top: 18px; display: grid; width: 32px; height: 32px; place-items: center; border-radius: 50%; background: #def3e5; color: #16734a; font-size: 11px; font-weight: 900; }
+    .vehx-numbered-list li:last-child { grid-column: 1 / -1; min-height: 0; }
+    .vehx-purpose-quote { max-width: 760px; margin: 24px auto 0; color: #16734a; font-size: 14px; font-style: italic; line-height: 1.7; text-align: center; }
+
+    .vehx-journey-section .vehx-grid-2:first-of-type { align-items: stretch; }
+    .vehx-info-card { height: 100%; padding: 28px; border: 1px solid #e1eae4; border-radius: 17px; background: #fff; box-shadow: 0 8px 25px rgba(16,62,46,.06); }
+    .vehx-info-card h3 { display: flex; align-items: center; gap: 10px; margin-bottom: 15px !important; color: #103e2e !important; font-size: 20px; }
+    .vehx-info-card h3 i { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 10px; background: #e4f4e9; color: #16734a; font-size: 16px; }
+    .vehx-info-card p, .vehx-standard-list { color: #5d7067; font-size: 14px; line-height: 1.72; }
+    .vehx-standard-list { margin: 0; padding: 0; list-style: none; }
+    .vehx-standard-list li { position: relative; margin-bottom: 12px; padding-left: 20px; }
+    .vehx-standard-list li::before { content: ""; position: absolute; left: 0; top: .72em; width: 7px; height: 7px; border-radius: 50%; background: #41a66c; }
+    .vehx-image-card { position: relative; overflow: hidden; min-height: 320px; border-radius: 18px; box-shadow: 0 14px 34px rgba(16,62,46,.11); }
+    .vehx-journey-img { display: block; width: 100%; height: 320px; margin: 0; object-fit: cover; transition: transform .4s ease; }
+    .vehx-image-card:hover .vehx-journey-img { transform: scale(1.025); }
+    .vehx-image-card .img-caption { position: absolute; right: 0; bottom: 0; left: 0; padding: 42px 20px 18px; background: linear-gradient(transparent,rgba(5,35,23,.86)); color: #fff; font-size: 14px; font-style: normal; font-weight: 700; text-align: left; }
+
+    .vehx-achievement-section { max-width: 1180px; padding: 54px 46px !important; border: 1px solid #e2eae5; border-radius: 22px !important; background: #f6f9f7 !important; }
+    .vehx-achievement-section .container { padding: 0; }
+    .vehx-achievement-content { padding: 30px; border: 1px solid #dce8e1; border-radius: 17px; background: #fff; box-shadow: 0 10px 28px rgba(16,62,46,.06); }
+    .vehx-achievement-content h3 { margin-bottom: 18px; padding: 0; border: 0; color: #103e2e; font-size: 25px; }
+    .vehx-achievement-images { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+    .vehx-achievement-image { overflow: hidden; height: 230px; border-radius: 14px; background: #eef3ef; }
+    .vehx-achievement-image img { display: block; width: 100%; height: 100%; border-radius: 0; object-fit: cover; box-shadow: none; }
+
+    .vehx-media-section { padding-bottom: 40px; }
+    .vehx-media-feature-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; max-width: 920px; margin: 0 auto 52px; }
+    .vehx-media-feature { overflow: hidden; border: 1px solid #dfe9e3; border-radius: 18px; background: #fff; box-shadow: 0 10px 28px rgba(16,62,46,.07); }
+    .vehx-media-feature img { display: block; width: 100%; height: 260px; border-radius: 0; object-fit: cover; box-shadow: none; }
+    .vehx-media-feature h3 { margin: 20px 22px 8px; color: #103e2e; font-size: 18px; }
+    .vehx-media-feature p { margin: 0 22px 24px; color: #65766e; font-size: 13px; line-height: 1.7; }
+    .vehx-press-block { padding-top: 40px !important; border-top: 1px solid #dfe8e2 !important; }
+    .vehx-partner-logo-grid { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 12px; margin-top: 24px; }
+    .vehx-partner-logo-box { display: flex; width: 100%; height: 94px; align-items: center; justify-content: center; padding: 13px; border: 1px solid #e1e9e4; border-radius: 12px; background: #fff; transition: transform .2s ease,box-shadow .2s ease,border-color .2s ease; }
+    .vehx-partner-logo-box:hover { transform: translateY(-3px); border-color: #b9d7c3; box-shadow: 0 9px 22px rgba(16,62,46,.09); }
+    .vehx-partner-logo-box a { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; }
+    .vehx-partner-logo-img { max-width: 120px; max-height: 60px; object-fit: contain; }
+    .vehx-final-cta { position: relative; overflow: hidden; max-width: 1180px; margin-top: 18px !important; padding: 46px 52px; border-radius: 20px; background: linear-gradient(125deg,#0d4e34,#168251); color: #fff; }
+    .vehx-final-cta::after { content: ""; position: absolute; right: -70px; bottom: -120px; width: 300px; height: 300px; border: 50px solid rgba(255,255,255,.07); border-radius: 50%; }
+    .vehx-final-cta > div { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 36px; }
+    .vehx-final-cta h2 { margin-bottom: 8px; font-size: clamp(28px,3vw,39px); line-height: 1.15; letter-spacing: -.035em; }
+    .vehx-final-cta p { max-width: 660px; color: rgba(255,255,255,.8); font-size: 14px; line-height: 1.7; }
+    .vehx-final-cta .vehx-secondary-btn { flex: 0 0 auto; border-color: rgba(255,255,255,.55); background: #fff; color: #0d5d3b; }
+
+    @media (max-width: 1100px) {
+      .vehx-hero .container { grid-template-columns: minmax(0,.95fr) minmax(390px,1.05fr); gap: 30px; padding: 42px; }
+      .vehx-founder-card { margin: 0 auto; }
     }
-    .img-caption {
-      text-align: center;
-      font-size: 14px;
-      color: var(--text-sub);
-      font-style: italic;
-      font-weight: 600;
+    @media (max-width: 900px) {
+      #page-ve-chung-toi { padding-top: 20px; }
+      .vehx-hero .container { grid-template-columns: 1fr; padding: 38px; }
+      .vehx-hero-media > img { height: 360px; }
+      .vehx-numbered-list { grid-template-columns: 1fr; }
+      .vehx-numbered-list li:last-child { grid-column: auto; }
+      .vehx-purpose-section, .vehx-achievement-section { padding: 42px 28px !important; }
+      .vehx-final-cta > div { align-items: flex-start; flex-direction: column; }
     }
-
-    .vehx-partner-logo-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; align-items: center; justify-items: center; margin-top: 24px; }
-    .vehx-partner-logo-box { width: 100%; height: 110px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; transition: 0.2s; }
-    .vehx-partner-logo-box:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
-    .vehx-partner-logo-img { max-width: 130px; height: 75px; object-fit: contain; }
+    @media (max-width: 640px) {
+      #page-ve-chung-toi { padding-bottom: 42px; }
+      .vehx-hero { border-radius: 17px; }
+      .vehx-hero .container { padding: 30px 20px 20px; }
+      .vehx-hero h1 { font-size: 39px; }
+      .vehx-hero blockquote { font-size: 14px; }
+      .vehx-secondary-btn { width: 100%; }
+      .vehx-hero-media > img { height: 280px; }
+      .vehx-hero-badge { right: 10px; bottom: 10px; left: 10px; max-width: none; }
+      .vehx-py-section { padding: 46px 0; }
+      .vehx-purpose-section, .vehx-achievement-section { padding: 38px 18px !important; }
+      .vehx-numbered-list li { padding: 18px 16px 18px 58px; }
+      .vehx-media-feature-grid, .vehx-achievement-images { grid-template-columns: 1fr; }
+      .vehx-achievement-image { height: 250px; }
+      .vehx-partner-logo-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .vehx-final-cta { padding: 38px 24px; }
+      .vehx-final-cta .vehx-secondary-btn { width: 100%; }
+    }
 
     /* FOOTER */
-    footer { background-color: var(--footer-bg); color: #e2e8f0; padding: 50px 0 24px; border-top: 2px solid var(--primary-dark); }
+    .footer { background: #05190e; color: #e2e8f0; padding: 50px 0 24px; border-top: 2px solid #0b5d2a; }
+    .footer-container { width: 1320px; max-width: 98%; margin: 0 auto; }
     .footer-grid { display: grid; grid-template-columns: 1.2fr 1fr 0.9fr 1fr; gap: 36px; padding-bottom: 36px; border-bottom: 1px solid var(--footer-border); }
     .footer-col h4 { font-size: 17px; font-weight: 700; margin-bottom: 16px; color: #ffffff; }
     .footer-col p { font-size: 14px; color: #94a3b8; line-height: 1.6; margin-bottom: 14px; }
 
     .feedback-input-group { display: flex; gap: 8px; background: rgba(255,255,255,0.08); padding: 6px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.15); }
-    .feedback-input-group input { background: transparent; border: none; outline: none; padding: 6px 14px; color: #fff; font-size: 14px; flex: 1; }
+    .feedback-input-group input { min-width: 0; background: transparent; border: none; outline: none; padding: 6px 14px; color: #fff; font-size: 14px; flex: 1; }
     .feedback-input-group input::placeholder { color: #64748b; }
     .btn-feedback { background: var(--primary); color: #fff; border: none; padding: 7px 18px; border-radius: 20px; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: 0.2s; }
     .btn-feedback:hover { background: #10b981; }
 
     .footer-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-    .footer-brand svg { height: 38px; width: 38px; }
+    .footer-brand img { height: 38px; width: 38px; object-fit: contain; border-radius: 50%; }
     .footer-brand span { font-size: 16.5px; font-weight: 800; color: #fff; }
     .footer-brand span strong { color: var(--primary); }
 
@@ -490,6 +563,9 @@
       .main-grid > :last-child { grid-column: auto; }
       .profile-logged-in { grid-template-columns: 1fr; }
       .picker-footer { align-items: stretch; flex-direction: column; }
+      .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
+      .footer-legal { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 18px; }
+      .footer-legal a { margin-left: 0; }
     }
     @media (max-width: 480px) {
       html, body { width: 100%; overflow-x: hidden; }
@@ -1681,38 +1757,46 @@
       <!-- HERO -->
       <section class="vehx-hero">
         <div class="container">
-          <h1>Chung Tay Vì Một Việt Nam Xanh - Sạch - Đẹp</h1>
-          <blockquote>"Mang tinh thần xung kích của tuổi trẻ, Hà Nội Xanh không ngừng học hỏi, đổi mới, sáng tạo và nuôi dưỡng khát vọng vươn mình để hành động vì môi trường và cộng đồng."</blockquote>
-          <img src="bìa.jpg" alt="Tập thể Hà Nội Xanh" class="img-fluid img-shadow" style="max-width: 900px; margin: 20px auto 0 auto; border-radius: 8px;">
+          <div class="vehx-hero-copy">
+            <span class="vehx-eyebrow">Câu chuyện Hà Nội Xanh</span>
+            <h1>Chung tay cho một Hà Nội xanh hơn</h1>
+            <blockquote>Mang tinh thần xung kích của tuổi trẻ, chúng tôi học hỏi, đổi mới và hành động bền bỉ vì môi trường cùng cộng đồng.</blockquote>
+          </div>
+          <div class="vehx-hero-media">
+            <img src="bìa.jpg" alt="Tập thể tình nguyện viên Hà Nội Xanh">
+            <div class="vehx-hero-badge"><i class="fa-solid fa-people-group"></i><div><strong>Hành động từ năm 2022</strong><small>Kết nối người trẻ vì môi trường</small></div></div>
+          </div>
         </div>
       </section>
 
       <!-- KHỞI NGUỒN & SÁNG LẬP -->
-      <section class="vehx-py-section">
+      <section class="vehx-py-section vehx-founder-section">
         <div class="container vehx-grid-2">
-          <div>
-            <h2 class="section-title">Khởi Nguồn & Người Sáng Lập</h2>
+          <div class="vehx-founder-copy">
+            <span class="vehx-eyebrow">Khởi nguồn từ một trăn trở</span>
+            <h2 class="section-title">Ba người trẻ và một mong muốn làm sạch Thủ đô</h2>
             <p>Tổ chức được thành lập vào tháng 12/2022, xuất phát điểm chỉ có 3 thành viên.</p>
             <p>Có thời gian sinh sống và làm việc tại Hà Nội khá lâu. Mỗi lần đi qua các kênh mương, dọc các bờ sông thấy rác thải ngổn ngang trên mặt nước và nhiều chỗ ô nhiễm nên anh Nguyễn Tiến Huy cùng 2 người bạn nhen nhóm ý tưởng thành lập dự án mong muốn góp một phần công sức để bảo vệ môi trường của Thủ đô.</p>
             <div class="vehx-quote-block">
               "Chúng ta đã được sinh ra trên một mảnh đất màu mỡ. Hãy chung tay bảo vệ môi trường để sau này con cái chúng ta sinh ra không phải sống trên rác thải."
             </div>
           </div>
-          <div style="text-align: center;">
-            <img src="hnx.jpg" alt="Founder Nguyễn Tiến Huy" style="max-width: 280px; margin: 0 auto; border-radius: 50%; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-            <div style="text-align: center; font-size: 0.85rem; color: var(--text-sub); margin-top: 10px; font-style: italic;">
-              <strong>Nguyễn Tiến Huy - Founder Sáng Lập "Hà Nội Xanh"</strong><br>
-              Ngày sinh: 11/10/1995 | Quê quán: Hải Phòng
-            </div>
-          </div>
+          <figure class="vehx-founder-card">
+            <img src="hnx.jpg" alt="Nguyễn Tiến Huy, người sáng lập Hà Nội Xanh">
+            <figcaption><strong>Nguyễn Tiến Huy</strong><span>Người sáng lập Hà Nội Xanh · Hải Phòng</span></figcaption>
+          </figure>
         </div>
       </section>
 
       <!-- TÔN CHỈ -->
-      <section class="vehx-py-section" style="background: #f3f9f5; border-radius: 12px; padding: 40px 20px; margin: 30px 0;">
+      <section class="vehx-py-section vehx-purpose-section">
         <div class="container">
-          <h2 class="section-title" style="text-align: center;">Tôn Chỉ & Mục Tiêu Hoạt Động</h2>
-          <div style="max-width: 900px; margin: 0 auto;">
+          <div class="vehx-section-head">
+            <span class="vehx-eyebrow">Điều chúng tôi theo đuổi</span>
+            <h2 class="section-title">Tôn chỉ và mục tiêu hoạt động</h2>
+            <p>Những nguyên tắc định hướng cho mỗi chiến dịch, mỗi kết nối và mỗi thay đổi mà Hà Nội Xanh tạo ra.</p>
+          </div>
+          <div>
             <ol class="vehx-numbered-list">
               <li>Chung tay bảo vệ môi trường sống, góp phần giảm thiểu ô nhiễm và cải thiện cảnh quan đô thị theo hướng xanh – sạch bền vững.</li>
               <li>Nâng cao nhận thức và trách nhiệm của cộng đồng, đặc biệt là thế hệ trẻ, trong việc gìn giữ, bảo vệ môi trường và tài nguyên thiên nhiên.</li>
@@ -1722,7 +1806,7 @@
               <li>Hướng tới ứng dụng khoa học - công nghệ trong công tác bảo vệ môi trường, truyền thông và quản lý tổ chức, nhằm nâng cao hiệu quả hoạt động, tính bền vững và khả năng nhân rộng các mô hình hành động xanh.</li>
               <li>Nuôi dưỡng khát vọng vươn mình trở thành một tổ chức xã hội hoạt động chuyên nghiệp, có uy tín và sức ảnh hưởng tích cực trong lĩnh vực bảo vệ môi trường, đóng góp thiết thực cho cộng đồng và sự phát triển bền vững của xã hội.</li>
             </ol>
-            <div style="text-align: center; font-style: italic; color: var(--primary-dark); margin-top: 20px;">
+            <div class="vehx-purpose-quote">
               "Dám đối diện hiện thực, đổi mới tư duy và hành động đến cùng – đó là cách tuổi trẻ Hà Nội Xanh nuôi dưỡng khát vọng và chung tay kiến tạo một Việt Nam xanh, bền vững."
             </div>
           </div>
@@ -1730,17 +1814,21 @@
       </section>
 
       <!-- HÀNH TRÌNH VÀ CHIẾN DỊCH -->
-      <section class="vehx-py-section">
+      <section class="vehx-py-section vehx-journey-section">
         <div class="container">
-          <h2 class="section-title">Hành Trình Phát Triển & Hoạt Động</h2>
+          <div class="vehx-section-head">
+            <span class="vehx-eyebrow">Từ ý tưởng đến hành động</span>
+            <h2 class="section-title">Hành trình phát triển và hoạt động</h2>
+            <p>Ba năm kết nối cộng đồng bằng những chiến dịch thực tế tại sông, hồ, kênh mương và khu dân cư.</p>
+          </div>
           <div class="vehx-grid-2" style="margin-bottom: 30px;">
-            <div>
-              <h3 style="color: var(--primary-dark); margin-bottom: 12px;">Quy Mô Tổ Chức</h3>
+            <div class="vehx-info-card">
+              <h3><i class="fa-solid fa-people-group"></i> Quy mô tổ chức</h3>
               <p>Đến nay, Câu lạc bộ đã thu hút hơn <strong>1000 tình nguyện viên tham gia chính thức, với 20.000 lượt tham gia</strong> trong các hoạt động, đồng thời lan tỏa mạnh mẽ và kết nối tới nhiều tổ chức, trường đại học, các câu lạc bộ tình nguyện trẻ, đoàn thanh niên và các tổ chức địa phương.</p>
               <p>Tính đến nay, Câu lạc bộ đã thực hiện hơn <strong>200 chiến dịch bảo vệ môi trường</strong>, thu gom hàng nghìn tấn rác thải các loại, góp phần làm sạch trên 50 km sông, mương, kênh thoát nước trong suốt 3 năm hoạt động liên tục. Đặc biệt, CLB đã triển khai lắp đặt các hệ thống phao chắn rác tại một số khu vực sông trọng điểm (sông Nhuệ, sông Vũ Thư).</p>
             </div>
-            <div>
-              <h3 style="color: var(--primary-dark); margin-bottom: 12px;">Chiến Dịch Tiêu Biểu</h3>
+            <div class="vehx-info-card">
+              <h3><i class="fa-solid fa-flag-checkered"></i> Chiến dịch tiêu biểu</h3>
               <ul class="vehx-standard-list">
                 <li><strong>Dọn rác Sông Hồng (2024):</strong> Thu hút khoảng 1.000 lượt tình nguyện viên tham gia, thu gom hàng trăm tấn rác thải, khắc phục hậu quả bão.</li>
                 <li><strong>Dọn rác Dương Quang (2024):</strong> Với sự tham gia của 200 tình nguyện viên làm sạch khu vực dân cư và mương thoát nước.</li>
@@ -1752,11 +1840,11 @@
           </div>
           <!-- Đã cập nhật ảnh tại đây -->
           <div class="vehx-grid-2">
-            <div>
+            <div class="vehx-image-card">
               <img src="hanhdong.jpg" alt="Hành động dọn rác" class="vehx-journey-img">
               <div class="img-caption">Làm sạch dòng kênh mương</div>
             </div>
-            <div>
+            <div class="vehx-image-card">
               <img src="tuyentruyen.jpg" alt="Tuyên truyền" class="vehx-journey-img">
               <div class="img-caption">Lan tỏa thông điệp tới sinh viên</div>
             </div>
@@ -1765,10 +1853,11 @@
       </section>
 
       <!-- THÀNH TÍCH & GIẢI THƯỞNG -->
-      <section class="vehx-py-section" style="background: #f9fafb; padding: 40px 20px; border-radius: 12px; margin-bottom: 30px;">
+      <section class="vehx-py-section vehx-achievement-section">
         <div class="container vehx-grid-2">
           <div class="vehx-achievement-content">
-            <h3>Thành Tích & Ghi Nhận</h3>
+            <span class="vehx-eyebrow">Dấu mốc đáng nhớ</span>
+            <h3>Thành tích và ghi nhận</h3>
             <ul class="vehx-standard-list">
               <li><strong>Giải thưởng Tình nguyện Quốc gia năm 2023:</strong> Do Trung Ương Đoàn TNCS Hồ Chí Minh trao thưởng (Tháng 12/2023).</li>
               <li><strong>Gương điển hình tiên tiến Người tốt, Việc tốt năm 2023:</strong> Anh Nguyễn Tiến Huy đại diện CLB tham dự chương trình giao lưu do Ban Thi đua, Khen thưởng Trung Ương tổ chức.</li>
@@ -1782,9 +1871,13 @@
       </section>
 
       <!-- DẤU ẤN TRUYỀN THÔNG (ĐÚNG 2 ẢNH THUẦN TÚY, CÂN ĐỐI) -->
-      <section class="vehx-py-section">
+      <section class="vehx-py-section vehx-media-section">
         <div class="container">
-          <h2 class="section-title" style="text-align: center;">Dấu Ấn Truyền Thông</h2>
+          <div class="vehx-section-head">
+            <span class="vehx-eyebrow">Câu chuyện được lan tỏa</span>
+            <h2 class="section-title">Dấu ấn truyền thông</h2>
+            <p>Những câu chuyện thật từ hiện trường giúp hành động xanh đến gần hơn với cộng đồng.</p>
+          </div>
           <div class="vehx-media-feature-grid">
             
             <!-- Cất Cánh VTV1 -->
@@ -1804,7 +1897,7 @@
           </div>
 
           <!-- ĐỦ 10 ĐƠN VỊ BÁO CHÍ ĐỒNG HÀNH -->
-          <div style="border-top: 1px solid var(--border-color); padding-top: 30px; text-align: center;">
+          <div class="vehx-press-block" style="text-align: center;">
             <h3 style="color: var(--primary-dark); font-size: 20px; margin-bottom: 8px;">Các Đơn Vị Báo Chí Đồng Hành</h3>
             <p style="color: var(--text-sub); margin-bottom: 20px;">Câu chuyện đẹp của Hà Nội Xanh được lan tỏa mạnh mẽ qua các cơ quan báo đài.</p>
             <div class="vehx-partner-logo-grid">
@@ -1822,13 +1915,20 @@
           </div>
         </div>
       </section>
+
+      <section class="vehx-final-cta">
+        <div>
+          <div><h2>Mỗi người đều có thể tạo nên một thay đổi xanh</h2><p>Chọn một chiến dịch phù hợp, tham gia cùng cộng đồng và ghi dấu hành trình tình nguyện của bạn ngay hôm nay.</p></div>
+          <a class="vehx-secondary-btn" onclick="navigateParent('/tham-gia')">Tham gia Hà Nội Xanh <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </section>
     </div>
 
   </div>
 
   <!-- FOOTER -->
-  <footer id="footer">
-    <div class="container">
+  <footer class="footer" id="footer">
+    <div class="footer-container">
       <div class="footer-grid">
         <div class="footer-col">
           <h4>Lời nhắn gửi đến Hà Nội Xanh</h4>
@@ -1844,41 +1944,41 @@
 
         <div class="footer-col">
           <div class="footer-brand">
-             <img src="logo.png" alt="Hà Nội Xanh Logo" style="height: 38px; width: 38px; object-fit: contain; border-radius: 50%;">
+            <img src="logo.png" alt="Hà Nội Xanh Logo">
             <span>HÀ NỘI <strong>XANH</strong></span>
           </div>
           <p>Cùng nhau hành động nhỏ, tạo nên thay đổi lớn cho môi trường Thủ đô.</p>
           <div class="social-links">
-            <a href="https://www.facebook.com/share/1DF83NSNX1/" target="_blank" class="social-btn social-fb" title="Facebook"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
-            <a href="https://www.tiktok.com/@hanoi_xanh" target="_blank" class="social-btn social-tt" title="TikTok"><svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></a>
-            <a href="https://www.youtube.com/@HaNoiXanh2022" target="_blank" class="social-btn social-yt" title="YouTube"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+            <a href="https://www.facebook.com/share/1E6aH1UrUN/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="social-btn social-fb" aria-label="Facebook Hà Nội Xanh"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+            <a href="https://www.tiktok.com/@hanoi_xanh?_r=1&_t=ZS-99fpzQzUwz4" target="_blank" rel="noopener noreferrer" class="social-btn social-tt" aria-label="TikTok Hà Nội Xanh"><svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></a>
+            <a href="https://www.youtube.com/@hanoixanh2022?si=U6zihqHg6KA7Em7Q" target="_blank" rel="noopener noreferrer" class="social-btn social-yt" aria-label="YouTube Hà Nội Xanh"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
           </div>
         </div>
 
         <div class="footer-col">
           <h4>Liên kết nhanh</h4>
           <ul class="quick-links">
-            <li><a onclick="navigateParent('/')">› Trang chủ</a></li>
-            <li><a onclick="switchMainView('ve-chung-toi')">› Về Hà Nội Xanh</a></li>
-            <li><a onclick="navigateParent('/chien-dich')">› Chiến dịch</a></li>
-            <li><a onclick="navigateParent('/tac-dong')">› Tác động cộng đồng</a></li>
-            <li><a onclick="navigateParent('/tin-tuc')">› Tin tức & câu chuyện</a></li>
-            <li><a onclick="navigateParent('/tham-gia')">› Tham gia</a></li>
+            <li><a href="../../" target="_parent">› Trang chủ</a></li>
+            <li><a href="../../ve-ha-noi-xanh" target="_parent">› Về Hà Nội Xanh</a></li>
+            <li><a href="../../chien-dich" target="_parent">› Chiến dịch</a></li>
+            <li><a href="../../tac-dong" target="_parent">› Tác động cộng đồng</a></li>
+            <li><a href="../../tin-tuc" target="_parent">› Tin tức & câu chuyện</a></li>
+            <li><a href="../../tham-gia" target="_parent">› Tham gia</a></li>
           </ul>
         </div>
 
         <div class="footer-col">
           <h4>Liên hệ</h4>
           <ul class="contact-list">
-            <li><i class="fa-solid fa-phone"></i><a href="tel:+84987231832">+84 98 723 18 32</a></li>
-            <li><i class="fa-regular fa-envelope"></i><a href="mailto:hanoixanhh@gmail.com">hanoixanhh@gmail.com</a></li>
-            <li><i class="fa-solid fa-location-dot"></i><span>117 Xuân Thủy, Phường Dịch Vọng Hậu, Cầu Giấy, Hà Nội</span></li>
+            <li><span>📞</span><a href="tel:+84987231832">+84 98 723 18 32</a></li>
+            <li><span>✉️</span><a href="mailto:hanoixanhh@gmail.com">hanoixanhh@gmail.com</a></li>
+            <li><span>📍</span><span>117 Xuân Thủy, Phường Dịch Vọng Hậu, Cầu Giấy, Hà Nội</span></li>
           </ul>
         </div>
       </div>
 
       <div class="footer-bottom">
-        <div>© 2026 Hà Nội Xanh. All rights reserved.</div>
+        <div>&copy; 2026 Hà Nội Xanh. All rights reserved.</div>
         <div class="footer-legal">
           <a onclick="openPolicyModal('terms')">Điều khoản sử dụng</a>
           <a onclick="openPolicyModal('privacy')">Chính sách bảo mật</a>

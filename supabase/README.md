@@ -1,6 +1,6 @@
 # Cấu hình Supabase
 
-1. Tạo project Supabase, mở SQL Editor và chạy file `migrations/20260913000000_hnx_schema.sql`.
+1. Tạo project Supabase, mở SQL Editor và chạy các file trong `migrations/` theo thứ tự tên file. Các migration `20261017000000_rewards_and_badges.sql`, `20261017010000_points_leaderboard.sql` và `20261017020000_cumulative_campaign_points.sql` bổ sung điểm, mức thưởng, huy hiệu, bảng xếp hạng và cho phép mỗi tài khoản tích điểm qua nhiều chiến dịch.
 2. Trong Auth → Users, mời email admin đầu tiên. Sau khi người đó đăng nhập lần đầu, chạy:
 
 ```sql

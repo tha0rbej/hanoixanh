@@ -12,6 +12,7 @@ import { ConnectedAdminDashboard } from "./app/ConnectedAdminDashboard"
 import { AuthModal } from "./app/AuthModal"
 import { AuthProvider, useAuth } from "./app/AuthContext"
 import { ResetPasswordPage } from "./app/ResetPasswordPage"
+import { DEFAULT_REWARD_PROGRAM, earnedBadges, monthsSince, normalizeRewardProgram } from "./app/rewards"
 import { consumeOAuthSession, tableInsert, tableInsertMinimal, tableSelect, updateProfile, uploadPublicFile } from "./lib/supabase"
 
 type SourcePage = "home" | "about" | "remaining" | "profile"
@@ -31,11 +32,14 @@ type ParticipationSummaryRow = {
   status?: string
   attended_hours?: number | string
   trash_kg?: number | string
+  awarded_points?: number | string
+  attended_at?: string | null
   campaign_id?: string | null
   campaign_key?: string | null
   created_at?: string
 }
-type CampaignSummaryRow = { id: string; title?: string; location?: string; start_at?: string }
+type CampaignSummaryRow = { id: string; title?: string; location?: string; start_at?: string; reward_points?: number }
+type RewardMetricRow = { metric_key: string; metric_value: unknown }
 
 function volunteerLevel(campaigns: number, hours: number) {
   if (campaigns >= 15 && hours >= 100) return "Đại sứ Xanh"
@@ -73,11 +77,14 @@ function SourceFrame({
     }
     let campaigns = 0
     let hours = 0
-    let trashKg = 0
+    let badgeDetails = earnedBadges(DEFAULT_REWARD_PROGRAM, { campaigns: 0, hours: 0, activeMonths: 0, tenureMonths: monthsSince(profile.created_at) })
     let history: Array<{ title: string; location: string; date: string; status: string; hours: number }> = []
     try {
       const registrations = await tableSelect<ParticipationSummaryRow>("campaign_registrations", "*", session.access_token, `&user_id=eq.${encodeURIComponent(session.user.id)}`)
-      const campaignRows = await tableSelect<CampaignSummaryRow>("campaigns", "id,title,location,start_at", session.access_token)
+      const [campaignRows, rewardRows] = await Promise.all([
+        tableSelect<CampaignSummaryRow>("campaigns", "*", session.access_token),
+        tableSelect<RewardMetricRow>("homepage_metrics", "metric_key,metric_value", session.access_token, "&metric_key=eq.reward_program&limit=1"),
+      ])
       const campaignMap = new Map(campaignRows.map(item => [item.id, item]))
       const activeRegistrations = Array.from(new Map(
         registrations
@@ -88,7 +95,17 @@ function SourceFrame({
       const attended = activeRegistrations.filter(item => item.status === "attended")
       campaigns = activeRegistrations.length
       hours = attended.reduce((sum, item) => sum + Number(item.attended_hours || 0), 0)
-      trashKg = attended.reduce((sum, item) => sum + Number(item.trash_kg || 0), 0)
+      const activeMonths = new Set(attended.map(item => {
+        const campaign = campaignMap.get(item.campaign_id || item.campaign_key || "")
+        const date = item.attended_at || campaign?.start_at || item.created_at || ""
+        return date.slice(0, 7)
+      }).filter(Boolean)).size
+      badgeDetails = earnedBadges(normalizeRewardProgram(rewardRows[0]?.metric_value), {
+        campaigns: attended.length,
+        hours,
+        activeMonths,
+        tenureMonths: monthsSince(profile.created_at),
+      })
       history = activeRegistrations.map(item => {
         const campaign = campaignMap.get(item.campaign_id || item.campaign_key || "")
         return {
@@ -121,9 +138,10 @@ function SourceFrame({
         role: profile.role,
         camps: campaigns,
         hours,
-        badges: campaigns === 0 && hours === 0 ? 0 : Math.floor(campaigns / 3),
+        points: Number(profile.points_balance || 0),
+        badges: badgeDetails.filter(item => item.earned).length,
+        badgeDetails,
         history,
-        trash: `${trashKg.toLocaleString("vi-VN")} kg`,
         level: volunteerLevel(campaigns, hours),
       },
     }, window.location.origin)
@@ -245,6 +263,20 @@ function SourceFrame({
     if (token) void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/campaigns?select=*&order=start_at.desc`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(campaigns => frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaigns-data", campaigns }, window.location.origin))
     if (token) void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/homepage_metrics?select=metric_key,metric_value`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(metrics => frameRef.current?.contentWindow?.postMessage({ type: "hnx:homepage-metrics", metrics }, window.location.origin))
     if (token) void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/posts?select=*&status=eq.published&order=published_at.desc.nullslast,created_at.desc`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(posts => frameRef.current?.contentWindow?.postMessage({ type: "hnx:posts-data", posts: Array.isArray(posts) ? posts : [] }, window.location.origin))
+    if (token && page === "remaining") void (async () => {
+      const periods = ["month", "year", "all"] as const
+      const entries = await Promise.all(periods.map(async period => {
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/rpc/get_points_leaderboard`, {
+          method: "POST",
+          headers: { apikey: token, Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ period_key: period, row_limit: 10 }),
+        })
+        if (!response.ok) return [period, []] as const
+        const rows = await response.json()
+        return [period, Array.isArray(rows) ? rows : []] as const
+      }))
+      frameRef.current?.contentWindow?.postMessage({ type: "hnx:leaderboard-data", leaderboards: Object.fromEntries(entries) }, window.location.origin)
+    })().catch(() => frameRef.current?.contentWindow?.postMessage({ type: "hnx:leaderboard-data", leaderboards: { month: [], year: [], all: [] } }, window.location.origin))
     if (session) void tableSelect<{ campaign_key: string | null }>("campaign_registrations", "campaign_key", session.access_token, `&user_id=eq.${encodeURIComponent(session.user.id)}`).then(items => frameRef.current?.contentWindow?.postMessage({ type: "hnx:registered-campaigns", keys: items.map(x => x.campaign_key).filter(Boolean) }, window.location.origin))
     const section = location.hash.replace(/^#/, "")
     if (section) window.setTimeout(() => frameRef.current?.contentWindow?.postMessage({ type: "hnx:scroll-section", section }, window.location.origin), 50)
@@ -275,7 +307,7 @@ function SourceFrame({
       src={source}
       title={title}
       style={{ visibility: authLoading ? "hidden" : "visible" }}
-      className="fixed inset-0 h-dvh w-full border-0 bg-white"
+      className="site-frame"
     />
   )
 }

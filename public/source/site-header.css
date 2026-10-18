@@ -7,6 +7,17 @@
   --site-header-border: #e5e7eb;
 }
 
+/* Keep a fast momentum scroll from exposing a blank iframe canvas below the footer. */
+html {
+  min-height: 100%;
+  background: var(--footer-bg, #05190e);
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
 /* Header 2026: dùng chung ngôn ngữ thị giác của trang chủ. */
 .site-header,
 #top.home-toolbar.site-header,

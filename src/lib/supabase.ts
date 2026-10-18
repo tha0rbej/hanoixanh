@@ -20,6 +20,7 @@ export type HnxProfile = {
   occupation?: string | null
   interests?: string | null
   bio?: string | null
+  points_balance?: number
   role: UserRole
   created_at?: string
 }
