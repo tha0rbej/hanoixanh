@@ -319,7 +319,14 @@
             </a>
             <nav class="nav-links">
                 <a onclick="navigateParent('/')">Trang chủ</a>
-                <a onclick="navigateParent('/ve-ha-noi-xanh')">Về Hà Nội Xanh</a>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-trigger" type="button" aria-expanded="false" aria-haspopup="true">Về Hà Nội Xanh <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>
+                    <div class="nav-dropdown-menu" role="menu">
+                        <a onclick="navigateParent('/ve-ha-noi-xanh/cau-chuyen')" role="menuitem">Câu chuyện &amp; CLB</a>
+                        <a onclick="navigateParent('/ve-ha-noi-xanh/doanh-nghiep-xa-hoi')" role="menuitem">Doanh nghiệp xã hội</a>
+                        <a onclick="navigateParent('/ve-ha-noi-xanh/doi-ngu')" role="menuitem">Đội ngũ</a>
+                    </div>
+                </div>
                 <a onclick="navigateParent('/chien-dich')">Chiến dịch</a>
                 <a onclick="navigateParent('/tac-dong')">Tác động cộng đồng</a>
                 <a onclick="navigateParent('/tin-tuc')">Tin tức &amp; câu chuyện</a>

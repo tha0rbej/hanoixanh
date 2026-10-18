@@ -20,6 +20,9 @@ type SourcePage = "home" | "about" | "remaining" | "profile"
 const allowedPaths = new Set([
   "/",
   "/ve-ha-noi-xanh",
+  "/ve-ha-noi-xanh/cau-chuyen",
+  "/ve-ha-noi-xanh/doanh-nghiep-xa-hoi",
+  "/ve-ha-noi-xanh/doi-ngu",
   "/chien-dich",
   "/tac-dong",
   "/tin-tuc",
@@ -358,6 +361,18 @@ function AppRoutes() {
             title="Về Hà Nội Xanh" onAuth={openAuth}
           />
         }
+      />
+      <Route
+        path="ve-ha-noi-xanh/cau-chuyen"
+        element={<SourceFrame page="about" view="ve-chung-toi" title="Câu chuyện & CLB - Hà Nội Xanh" onAuth={openAuth} />}
+      />
+      <Route
+        path="ve-ha-noi-xanh/doanh-nghiep-xa-hoi"
+        element={<SourceFrame page="about" view="doanh-nghiep" title="Doanh nghiệp xã hội - Hà Nội Xanh" onAuth={openAuth} />}
+      />
+      <Route
+        path="ve-ha-noi-xanh/doi-ngu"
+        element={<SourceFrame page="about" view="doi-ngu" title="Đội ngũ - Hà Nội Xanh" onAuth={openAuth} />}
       />
       <Route
         path="tham-gia"
