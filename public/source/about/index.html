@@ -1257,6 +1257,1411 @@
       #reference-about-body .reference-card p,
       #reference-about-body .reference-banner p { font-size: 14px; }
     }
+
+    /* Mission / vision showcase: stronger contrast and a more memorable rhythm. */
+    #reference-about-body .mission-showcase {
+      position: relative;
+      overflow: hidden;
+      padding: 104px 0 112px;
+      background: #edf8f0;
+    }
+    #reference-about-body .mission-showcase::before,
+    #reference-about-body .mission-showcase::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    #reference-about-body .mission-showcase::before {
+      width: 420px;
+      height: 420px;
+      top: -210px;
+      right: -100px;
+      background: rgba(255,255,255,.04);
+      box-shadow: 0 0 0 42px rgba(255,255,255,.035), 0 0 0 84px rgba(255,255,255,.025);
+    }
+    #reference-about-body .mission-showcase::after {
+      width: 250px;
+      height: 250px;
+      bottom: -150px;
+      left: -90px;
+      border-color: rgba(22,115,74,.12);
+    }
+    #reference-about-body .mission-showcase > .container { position: relative; z-index: 1; }
+    #reference-about-body .mission-showcase .reference-split {
+      position: relative;
+      gap: 72px;
+      padding: 58px 64px 64px;
+      border-radius: 32px;
+      background: linear-gradient(125deg, #0b4d32 0%, #087348 100%);
+      box-shadow: 0 28px 60px rgba(11,77,50,.18);
+    }
+    #reference-about-body .mission-showcase .reference-copy { position: relative; }
+    #reference-about-body .mission-showcase .reference-copy + .reference-copy::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -36px;
+      width: 1px;
+      background: rgba(255,255,255,.2);
+    }
+    #reference-about-body .mission-showcase .vehx-eyebrow {
+      color: #b7e28a;
+      letter-spacing: .24em;
+    }
+    #reference-about-body .mission-showcase .section-title {
+      max-width: 560px;
+      margin-bottom: 24px;
+      color: #fff;
+      font-size: clamp(32px, 3.25vw, 50px);
+      line-height: 1.02;
+      text-wrap: balance;
+    }
+    #reference-about-body .mission-showcase .reference-copy p {
+      max-width: 620px;
+      color: rgba(255,255,255,.77);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+    #reference-about-body .mission-showcase .reference-value-list {
+      position: relative;
+      z-index: 2;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+      margin: -12px 0 0;
+      padding: 0 12px;
+    }
+    #reference-about-body .mission-showcase .reference-value-list > div {
+      position: relative;
+      min-height: 188px;
+      padding: 25px 22px 22px;
+      overflow: hidden;
+      border: 1px solid rgba(16,62,46,.08);
+      border-radius: 20px;
+      background: #fff;
+      box-shadow: 0 16px 28px rgba(16,62,46,.1);
+      transition: transform .22s ease, box-shadow .22s ease, background .22s ease;
+    }
+    #reference-about-body .mission-showcase .reference-value-list > div::before {
+      content: "";
+      display: block;
+      width: 36px;
+      height: 4px;
+      margin-bottom: 30px;
+      border-radius: 99px;
+      background: #b7e28a;
+    }
+    #reference-about-body .mission-showcase .reference-value-list > div::after {
+      content: "0" counter(mission-value);
+      position: absolute;
+      right: 18px;
+      top: 20px;
+      color: #d8e9dc;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+    #reference-about-body .mission-showcase .reference-value-list { counter-reset: mission-value; }
+    #reference-about-body .mission-showcase .reference-value-list > div { counter-increment: mission-value; }
+    #reference-about-body .mission-showcase .reference-value-list b {
+      margin-bottom: 12px;
+      color: #0b633d;
+      font-size: 16px;
+    }
+    #reference-about-body .mission-showcase .reference-value-list p {
+      color: #5a6d62;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    #reference-about-body .mission-showcase .reference-value-list > div:hover {
+      transform: translateY(-8px);
+      background: #f8fff4;
+      box-shadow: 0 22px 34px rgba(16,62,46,.16);
+    }
+    @media (max-width: 900px) {
+      #reference-about-body .mission-showcase .reference-split { gap: 42px; padding: 44px 38px 48px; }
+      #reference-about-body .mission-showcase .reference-copy + .reference-copy::before { display: none; }
+      #reference-about-body .mission-showcase .reference-value-list { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 18px; }
+    }
+    @media (max-width: 600px) {
+      #reference-about-body .mission-showcase { padding: 68px 0 74px; }
+      #reference-about-body .mission-showcase .reference-split { padding: 34px 24px 38px; border-radius: 24px; }
+      #reference-about-body .mission-showcase .reference-value-list { grid-template-columns: 1fr; padding: 0; }
+      #reference-about-body .mission-showcase .reference-value-list > div { min-height: 0; }
+    }
+
+    /* Shared editorial rhythm for all three About sub-pages. */
+    #page-ve-chung-toi .container,
+    #page-doanh-nghiep .container,
+    #page-doi-ngu .container {
+      width: min(100% - 48px, 1180px);
+      margin-right: auto;
+      margin-left: auto;
+    }
+    #page-ve-chung-toi .section-title,
+    #page-doanh-nghiep .section-title,
+    #page-doi-ngu .section-title,
+    #page-doanh-nghiep h2,
+    #page-doi-ngu h2 {
+      max-width: 760px;
+      margin-top: 0;
+      margin-bottom: 24px;
+      line-height: 1.08;
+      letter-spacing: -.035em;
+      text-wrap: balance;
+    }
+    #page-ve-chung-toi .reference-copy > p,
+    #page-ve-chung-toi .reference-lead,
+    #page-ve-chung-toi .reference-timeline p,
+    #page-doanh-nghiep .enterprise-copy > p,
+    #page-doanh-nghiep .enterprise-lead,
+    #page-doanh-nghiep .enterprise-section-head > p,
+    #page-doanh-nghiep .enterprise-contact > p,
+    #page-doi-ngu .team-lead,
+    #page-doi-ngu .team-card > p,
+    #page-doi-ngu .team-cta p {
+      text-align: justify;
+      text-justify: inter-word;
+      hyphens: auto;
+    }
+    #page-ve-chung-toi .reference-copy > p,
+    #page-doanh-nghiep .enterprise-copy > p,
+    #page-doanh-nghiep .enterprise-contact > p,
+    #page-doi-ngu .team-card > p {
+      max-width: 68ch;
+      margin-right: 0;
+      margin-left: 0;
+    }
+    #page-ve-chung-toi .reference-split,
+    #page-doanh-nghiep .enterprise-split {
+      align-items: stretch;
+    }
+    #page-ve-chung-toi .reference-copy,
+    #page-doanh-nghiep .enterprise-copy,
+    #page-doanh-nghiep .enterprise-contact {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    #page-ve-chung-toi .reference-copy > p:last-child,
+    #page-doanh-nghiep .enterprise-copy > p:last-child,
+    #page-doanh-nghiep .enterprise-contact > p:last-of-type {
+      margin-bottom: 0;
+    }
+    #page-ve-chung-toi .reference-detail-list,
+    #page-doanh-nghiep .enterprise-card-grid,
+    #page-doanh-nghiep .enterprise-step-grid,
+    #page-doi-ngu .team-grid {
+      align-items: stretch;
+    }
+    #page-doanh-nghiep .enterprise-card,
+    #page-doanh-nghiep .enterprise-step,
+    #page-doi-ngu .team-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      box-sizing: border-box;
+    }
+    #page-doanh-nghiep .enterprise-card p,
+    #page-doanh-nghiep .enterprise-step p,
+    #page-doi-ngu .team-card > p {
+      flex: 1;
+    }
+    #page-doanh-nghiep .enterprise-section-head,
+    #page-doi-ngu .team-section-head {
+      text-align: left;
+    }
+    #page-doanh-nghiep .enterprise-section-head > p,
+    #page-doi-ngu .team-section-head > p {
+      max-width: 68ch;
+      margin-right: 0;
+      margin-left: 0;
+    }
+    #page-doi-ngu .team-top {
+      min-height: 84px;
+    }
+    #page-doi-ngu .team-card h3 {
+      max-width: 26ch;
+      text-wrap: balance;
+    }
+    #page-doi-ngu .team-role {
+      max-width: 32ch;
+    }
+    #page-doi-ngu .team-cta {
+      align-items: flex-end;
+    }
+    @media (max-width: 900px) {
+      #page-ve-chung-toi .container,
+      #page-doanh-nghiep .container,
+      #page-doi-ngu .container { width: min(100% - 40px, 760px); }
+      #page-doi-ngu .team-top { min-height: 0; }
+    }
+    @media (max-width: 600px) {
+      #page-ve-chung-toi .container,
+      #page-doanh-nghiep .container,
+      #page-doi-ngu .container { width: min(100% - 32px, 560px); }
+      #page-ve-chung-toi .reference-copy > p,
+      #page-ve-chung-toi .reference-lead,
+      #page-doanh-nghiep .enterprise-copy > p,
+      #page-doanh-nghiep .enterprise-lead,
+      #page-doanh-nghiep .enterprise-contact > p,
+      #page-doi-ngu .team-lead,
+      #page-doi-ngu .team-card > p { text-align: left; }
+      #page-doi-ngu .team-cta { align-items: flex-start; }
+    }
+
+    /* Journey timeline: turn the flat text row into a clear visual progression. */
+    #reference-about-body .reference-timeline {
+      position: relative;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 42px;
+      padding: 0;
+      border: 0;
+      counter-reset: journey-step;
+    }
+    #reference-about-body .reference-timeline::before {
+      content: "";
+      position: absolute;
+      top: 29px;
+      right: 9%;
+      left: 9%;
+      height: 2px;
+      background: linear-gradient(90deg, #b7e28a, #14794b, #b7e28a);
+      opacity: .45;
+    }
+    #reference-about-body .reference-timeline > div {
+      position: relative;
+      z-index: 1;
+      min-height: 250px;
+      padding: 22px 20px 20px;
+      border: 1px solid #d8e7dc;
+      border-radius: 18px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 12px 28px rgba(16,62,46,.06);
+      counter-increment: journey-step;
+      transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+    }
+    #reference-about-body .reference-timeline > div::before {
+      content: "0" counter(journey-step);
+      display: grid;
+      width: 40px;
+      height: 40px;
+      margin-bottom: 28px;
+      place-items: center;
+      border: 5px solid #f8fbf9;
+      border-radius: 50%;
+      background: #0b633d;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      box-shadow: 0 0 0 1px #b7e28a;
+    }
+    #reference-about-body .reference-timeline > div:hover {
+      transform: translateY(-8px);
+      border-color: #9bc9a8;
+      box-shadow: 0 20px 34px rgba(16,62,46,.13);
+    }
+    #reference-about-body .reference-timeline strong {
+      display: block;
+      margin-bottom: 12px;
+      color: #0b633d;
+      font-size: 20px;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+    }
+    #reference-about-body .reference-timeline p {
+      margin: 0;
+      color: #53675d;
+      font-size: 13px;
+      line-height: 1.7;
+      text-align: left;
+      text-justify: auto;
+    }
+    #reference-about-body .reference-timeline a {
+      display: inline-flex;
+      margin-top: 18px;
+      padding: 7px 10px;
+      border: 1px solid #b7d6bc;
+      border-radius: 999px;
+      background: #f3faef;
+      color: #0b633d;
+      font-size: 11px;
+      text-decoration: none;
+    }
+    #reference-about-body .reference-timeline a:hover {
+      border-color: #0b633d;
+      background: #0b633d;
+      color: #fff;
+    }
+    @media (max-width: 900px) {
+      #reference-about-body .reference-timeline {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      #reference-about-body .reference-timeline::before { display: none; }
+    }
+    @media (max-width: 600px) {
+      #reference-about-body .reference-timeline {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-top: 28px;
+      }
+      #reference-about-body .reference-timeline > div {
+        min-height: 0;
+        padding: 20px;
+      }
+      #reference-about-body .reference-timeline > div::before {
+        float: left;
+        margin: 0 14px 18px 0;
+      }
+      #reference-about-body .reference-timeline strong { padding-top: 10px; }
+      #reference-about-body .reference-timeline p { clear: both; }
+    }
+
+    /* Image alignment across all About sub-pages. */
+    #reference-about-body .reference-intro-visual img,
+    #reference-about-body .reference-image-placeholder img,
+    #page-ve-chung-toi .vehx-hero-media > img,
+    #page-ve-chung-toi .vehx-founder-card > img,
+    #page-ve-chung-toi .vehx-journey-img,
+    #page-ve-chung-toi .vehx-achievement-image img,
+    #page-ve-chung-toi .vehx-media-feature img,
+    #page-doanh-nghiep .enterprise-image-placeholder img,
+    #page-doanh-nghiep .enterprise-card img,
+    #page-doi-ngu .team-avatar img {
+      display: block;
+      object-fit: cover;
+      object-position: 50% 50%;
+    }
+    #reference-about-body .reference-intro-visual img,
+    #reference-about-body .reference-image-placeholder img,
+    #page-ve-chung-toi .vehx-hero-media > img,
+    #page-ve-chung-toi .vehx-founder-card > img,
+    #page-ve-chung-toi .vehx-journey-img,
+    #page-ve-chung-toi .vehx-achievement-image img,
+    #page-ve-chung-toi .vehx-media-feature img,
+    #page-doanh-nghiep .enterprise-image-placeholder,
+    #page-doanh-nghiep .enterprise-card img {
+      overflow: hidden;
+      object-position: center center;
+    }
+    #page-doi-ngu .team-avatar {
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    #page-doi-ngu .team-avatar img {
+      width: 100%;
+      height: 100%;
+      object-position: center center;
+    }
+    /* Keep the two volunteers centered in the story image crop. */
+    #reference-about-body > .reference-section:nth-of-type(2) .reference-image-placeholder img {
+      object-position: 58% 50%;
+    }
+    /* Preserve the VTV1 logo and timestamp in the founder media crop. */
+    #reference-about-body > .reference-section:nth-of-type(5) .reference-image-placeholder img {
+      object-position: 35% 50%;
+    }
+    /* Center the founder's face inside the circular team avatar. */
+    #page-doi-ngu .team-grid:not(.advisors):not(.heads) .team-card:first-child .team-avatar img {
+      object-position: 35% 50%;
+    }
+    /* Keep the opening story heading balanced across two lines. */
+    #reference-about-body .reference-intro .section-title {
+      font-size: clamp(36px, 3.9vw, 48px);
+      letter-spacing: -.05em;
+    }
+    /* Club section: turn the department list into a stronger editorial block. */
+    #reference-about-body .reference-section:has(.reference-club-roles) {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f7fcf8 0%, #eaf6ee 100%);
+    }
+    #reference-about-body .reference-section:has(.reference-club-roles)::after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      bottom: -180px;
+      width: 380px;
+      height: 380px;
+      border: 1px solid rgba(22,115,74,.12);
+      border-radius: 50%;
+      box-shadow: 0 0 0 34px rgba(22,115,74,.035), 0 0 0 68px rgba(22,115,74,.025);
+      pointer-events: none;
+    }
+    #reference-about-body .reference-section:has(.reference-club-roles) > .container {
+      position: relative;
+      z-index: 1;
+    }
+    #reference-about-body .reference-section:has(.reference-club-roles) .reference-split {
+      align-items: center;
+      gap: 76px;
+    }
+    #reference-about-body .reference-section:has(.reference-club-roles) .reference-copy {
+      max-width: 650px;
+    }
+    #reference-about-body .reference-section:has(.reference-club-roles) .reference-copy .vehx-eyebrow {
+      color: #168251;
+    }
+    #reference-about-body .reference-section:has(.reference-club-roles) .reference-copy .section-title {
+      max-width: 620px;
+      font-size: clamp(32px, 3.1vw, 42px);
+      line-height: 1.02;
+    }
+    #reference-about-body .reference-section:has(.reference-club-roles) .reference-club-roles {
+      padding-top: 0;
+    }
+    #reference-about-body .reference-section:has(.reference-club-roles) .reference-club-roles > h3 {
+      margin: 0 0 18px;
+      color: #0b633d;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: .14em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    #reference-about-body .reference-section:has(.reference-club-roles) .reference-detail-list {
+      gap: 14px;
+      counter-reset: club-role;
+    }
+    #reference-about-body .reference-section:has(.reference-club-roles) .reference-detail-list > div {
+      position: relative;
+      min-height: 154px;
+      padding: 24px 22px 20px;
+      overflow: hidden;
+      border: 1px solid #d6e8db;
+      border-radius: 18px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 12px 24px rgba(16,62,46,.06);
+      counter-increment: club-role;
+      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    }
+    #reference-about-body .reference-section:has(.reference-club-roles) .reference-detail-list > div::before {
+      content: "0" counter(club-role);
+      display: block;
+      margin-bottom: 22px;
+      color: #b0d995;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .12em;
+    }
+    #reference-about-body .reference-section:has(.reference-club-roles) .reference-detail-list > div:hover {
+      transform: translateY(-6px);
+      border-color: #9bc9a8;
+      box-shadow: 0 20px 32px rgba(16,62,46,.12);
+    }
+    #reference-about-body .reference-section:has(.reference-club-roles) .reference-detail-list h3 {
+      margin: 0 0 8px;
+      color: #0b633d;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+    #reference-about-body .reference-section:has(.reference-club-roles) .reference-detail-list p {
+      color: #5a6d62;
+      font-size: 13px;
+      line-height: 1.65;
+      text-align: left;
+    }
+    /* The story page should end after the club content, without the extra CTA banner. */
+    #reference-about-body > .reference-section:last-child {
+      display: none !important;
+    }
+    #reference-about-body > .reference-section:nth-last-child(2) .reference-banner {
+      min-height: 0;
+      padding: 38px 48px;
+    }
+    /* Enterprise page: simplify the top and give the first story a stronger hero treatment. */
+    #page-doanh-nghiep .enterprise-crumb { display: none; }
+    #page-doanh-nghiep .enterprise-intro {
+      position: relative;
+      overflow: hidden;
+      padding: 88px 0 76px;
+      border: 0;
+      background: linear-gradient(135deg, #eef9f1 0%, #f9fcf8 72%);
+    }
+    #page-doanh-nghiep .enterprise-intro::after {
+      content: "";
+      position: absolute;
+      right: -100px;
+      top: -180px;
+      width: 420px;
+      height: 420px;
+      border: 1px solid rgba(22,115,74,.12);
+      border-radius: 50%;
+      box-shadow: 0 0 0 34px rgba(22,115,74,.035), 0 0 0 68px rgba(22,115,74,.025);
+      pointer-events: none;
+    }
+    #page-doanh-nghiep .enterprise-intro > .container { position: relative; z-index: 1; }
+    #page-doanh-nghiep .enterprise-intro .section-title {
+      max-width: 900px;
+      margin: 22px 0 26px;
+      color: #0b633d;
+      font-size: clamp(42px, 5vw, 68px);
+      line-height: .98;
+      letter-spacing: -.055em;
+    }
+    #page-doanh-nghiep .enterprise-intro .enterprise-lead {
+      max-width: 760px;
+      color: #4c6659;
+      font-size: 17px;
+      line-height: 1.75;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-image-placeholder) {
+      position: relative;
+      overflow: hidden;
+      padding: 96px 0 104px;
+      background: #fff;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-image-placeholder) .enterprise-split { align-items: center; gap: 84px; }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-image-placeholder) .enterprise-copy { max-width: 620px; }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-image-placeholder) .enterprise-copy .section-title {
+      max-width: 560px;
+      margin-bottom: 28px;
+      padding-left: 24px;
+      border-left: 4px solid #b7e28a;
+      color: #0b633d;
+      font-size: clamp(34px, 3.5vw, 50px);
+      line-height: 1.03;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-image-placeholder) .enterprise-copy p {
+      max-width: 62ch;
+      color: #53675d;
+      font-size: 15px;
+      line-height: 1.85;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-image-placeholder) .enterprise-image-placeholder {
+      position: relative;
+      min-height: 430px;
+      overflow: visible;
+      border: 0;
+      border-radius: 28px;
+      background: #dcefe0;
+      box-shadow: 18px 18px 0 #d5ebd8, 0 24px 48px rgba(16,62,46,.16);
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-image-placeholder) .enterprise-image-placeholder::after {
+      content: "Hành động từ hiện trường";
+      position: absolute;
+      right: 20px;
+      bottom: -18px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: #0b633d;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-image-placeholder) .enterprise-image-placeholder img { border-radius: inherit; box-shadow: none; }
+    #page-ve-chung-toi .vehx-eyebrow::before,
+    #page-doanh-nghiep .vehx-eyebrow::before,
+    #page-doi-ngu .vehx-eyebrow::before {
+      display: none !important;
+    }
+    #page-ve-chung-toi .vehx-eyebrow,
+    #page-doanh-nghiep .vehx-eyebrow,
+    #page-doi-ngu .vehx-eyebrow {
+      gap: 0;
+    }
+    /* Shared type scale: clear hierarchy with balanced, two-line display headings. */
+    #page-ve-chung-toi .reference-intro .section-title,
+    #page-doanh-nghiep .enterprise-intro .section-title,
+    #page-doi-ngu .team-intro .section-title {
+      max-width: 900px;
+      text-wrap: balance;
+    }
+    #page-ve-chung-toi .reference-section .section-title,
+    #page-doanh-nghiep .enterprise-section .section-title,
+    #page-doi-ngu .team-section .section-title {
+      max-width: 26ch;
+      margin-bottom: 22px;
+      font-size: clamp(28px, 3vw, 40px);
+      line-height: 1.08;
+      letter-spacing: -.04em;
+      text-wrap: balance;
+    }
+    #page-ve-chung-toi .reference-section:has(.reference-club-roles) .reference-copy .section-title {
+      max-width: 24ch;
+      font-size: clamp(30px, 2.8vw, 38px);
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-image-placeholder) .enterprise-copy .section-title {
+      max-width: 22ch;
+      font-size: clamp(30px, 3vw, 44px);
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-image-placeholder) .enterprise-copy .section-title {
+      max-width: 24ch;
+      font-size: clamp(30px, 2.7vw, 38px);
+      letter-spacing: -.05em;
+    }
+    #page-ve-chung-toi .reference-detail-list h3,
+    #page-doanh-nghiep .enterprise-card h3,
+    #page-doanh-nghiep .enterprise-step h3,
+    #page-doi-ngu .team-card h3 {
+      max-width: 24ch;
+      font-size: clamp(17px, 1.5vw, 21px);
+      line-height: 1.2;
+      text-wrap: balance;
+    }
+    /* Enterprise mission / vision: two calm, high-contrast panels. */
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-copy) {
+      position: relative;
+      overflow: hidden;
+      padding: 88px 0 96px;
+      border: 0;
+      background: linear-gradient(125deg, #0b4d32 0%, #087348 100%);
+    }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-copy)::after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      bottom: -210px;
+      width: 420px;
+      height: 420px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 50%;
+      box-shadow: 0 0 0 38px rgba(255,255,255,.035), 0 0 0 76px rgba(255,255,255,.022);
+      pointer-events: none;
+    }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-copy) > .container { position: relative; z-index: 1; }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-copy) .enterprise-split { gap: 24px; }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-copy) .enterprise-copy {
+      min-height: 286px;
+      padding: 34px 36px 32px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 24px;
+      background: rgba(255,255,255,.08);
+      box-shadow: 0 18px 40px rgba(0,0,0,.08);
+    }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-copy) .enterprise-copy .vehx-eyebrow { color: #b7e28a; }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-copy) .enterprise-copy .section-title {
+      max-width: 25ch;
+      margin-bottom: 20px;
+      color: #fff;
+      font-size: clamp(26px, 2.5vw, 36px);
+      line-height: 1.08;
+    }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-copy) .enterprise-copy p {
+      max-width: 62ch;
+      margin-bottom: 0;
+      color: rgba(255,255,255,.76);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    /* Fields / direction: make the six offerings feel like a structured system. */
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-fields-head) {
+      padding: 92px 0 100px;
+      background: #f7fbf8;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-fields-head) .enterprise-fields-head {
+      max-width: 760px;
+      margin: 0 0 42px;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-fields-head) .enterprise-fields-head .section-title {
+      max-width: 24ch;
+      color: #0b633d;
+      font-size: clamp(30px, 3.2vw, 44px);
+      line-height: 1.04;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-fields-head) .enterprise-card-grid { gap: 16px; }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-fields-head) .enterprise-card {
+      min-height: 260px;
+      padding: 24px 24px 26px;
+      border: 1px solid #d9e9dd;
+      border-top: 4px solid #b7e28a;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 12px 26px rgba(16,62,46,.05);
+      transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-fields-head) .enterprise-card:hover {
+      transform: translateY(-6px);
+      border-color: #9bc9a8;
+      box-shadow: 0 20px 32px rgba(16,62,46,.12);
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-fields-head) .enterprise-number {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      border-radius: 50%;
+      background: #eef8e7;
+      color: #0b633d;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-fields-head) .enterprise-card h3 {
+      margin: 28px 0 14px;
+      color: #0b633d;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-fields-head) .enterprise-card p {
+      color: #5a6d62;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    @media (max-width: 900px) {
+      #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-copy) { padding: 68px 0 76px; }
+      #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-copy) .enterprise-copy { min-height: 0; }
+      #page-doanh-nghiep .enterprise-section:has(.enterprise-fields-head) { padding: 70px 0 80px; }
+    }
+    @media (max-width: 600px) {
+      #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-copy) .enterprise-copy { padding: 28px 24px; border-radius: 20px; }
+      #page-doanh-nghiep .enterprise-section:has(.enterprise-fields-head) { padding: 60px 0 70px; }
+      #page-doanh-nghiep .enterprise-section:has(.enterprise-fields-head) .enterprise-card { min-height: 0; }
+    }
+    @media (max-width: 600px) {
+      #page-ve-chung-toi .reference-section .section-title,
+      #page-doanh-nghiep .enterprise-section .section-title,
+      #page-doi-ngu .team-section .section-title {
+        max-width: 22ch;
+        font-size: 30px;
+      }
+      #page-ve-chung-toi .reference-section:has(.reference-club-roles) .reference-copy .section-title,
+      #page-doanh-nghiep .enterprise-section:has(.enterprise-image-placeholder) .enterprise-copy .section-title {
+        max-width: 20ch;
+        font-size: 32px;
+      }
+    }
+    @media (max-width: 900px) {
+      #page-doanh-nghiep .enterprise-intro { padding: 70px 0 60px; }
+      #page-doanh-nghiep .enterprise-section:has(.enterprise-image-placeholder) .enterprise-split { gap: 48px; }
+    }
+    @media (max-width: 600px) {
+      #page-doanh-nghiep .enterprise-intro { padding: 56px 0 48px; }
+      #page-doanh-nghiep .enterprise-intro .section-title { font-size: 42px; }
+      #page-doanh-nghiep .enterprise-section:has(.enterprise-image-placeholder) { padding: 64px 0 76px; }
+      #page-doanh-nghiep .enterprise-section:has(.enterprise-image-placeholder) .enterprise-image-placeholder { min-height: 300px; box-shadow: 10px 10px 0 #d5ebd8, 0 18px 32px rgba(16,62,46,.14); }
+    }
+    @media (max-width: 900px) {
+      #reference-about-body .reference-section:has(.reference-club-roles) .reference-split { gap: 42px; }
+    }
+    @media (max-width: 600px) {
+      #reference-about-body .reference-section:has(.reference-club-roles) .reference-copy .section-title { font-size: 36px; }
+      #reference-about-body .reference-section:has(.reference-club-roles) .reference-detail-list { grid-template-columns: 1fr; }
+    }
+    /* Collaboration method: present the operating model as a visual step system. */
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) {
+      position: relative;
+      overflow: hidden;
+      padding: 96px 0 90px;
+      border: 0;
+      background: #eff9f2;
+    }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid)::before {
+      content: "";
+      position: absolute;
+      top: 210px;
+      right: 8%;
+      left: 8%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #a9d8b2, transparent);
+      pointer-events: none;
+    }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) > .container { position: relative; z-index: 1; }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) .enterprise-section-head {
+      max-width: 720px;
+      margin: 0 auto 52px;
+      text-align: center;
+    }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) .enterprise-section-head .vehx-eyebrow { color: #168251; }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) .enterprise-section-head .section-title {
+      max-width: 22ch;
+      margin: 18px auto 0;
+      color: #0b633d;
+      font-size: clamp(34px, 4vw, 52px);
+      line-height: 1.02;
+      text-wrap: balance;
+    }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) .enterprise-section-head .section-title .keep-together {
+      white-space: nowrap;
+    }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) .enterprise-step-grid { gap: 18px; }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) .enterprise-step {
+      position: relative;
+      min-height: 212px;
+      padding: 28px 26px 24px;
+      border: 1px solid #d8e9dc;
+      border-top: 0;
+      border-radius: 20px;
+      background: rgba(255,255,255,.94);
+      box-shadow: 0 14px 28px rgba(16,62,46,.07);
+      transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+    }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) .enterprise-step::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      height: 4px;
+      border-radius: 20px 20px 0 0;
+      background: linear-gradient(90deg, #0b633d, #b7e28a);
+    }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) .enterprise-step:hover {
+      transform: translateY(-7px);
+      border-color: #9bc9a8;
+      box-shadow: 0 22px 36px rgba(16,62,46,.13);
+    }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) .enterprise-number {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border-radius: 50%;
+      background: #e8f6dc;
+      color: #0b633d;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) .enterprise-step h3 {
+      margin: 24px 0 12px;
+      color: #0b633d;
+      font-size: 21px;
+      line-height: 1.15;
+    }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) .enterprise-step p {
+      color: #5a6d62;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) .enterprise-method-note {
+      display: block;
+      margin: 26px 0 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #567065;
+      font-size: 12px;
+    }
+    /* Fields and directions: a distinct feature-card system, separate from the process cards below. */
+    #page-doanh-nghiep .enterprise-section:not(.paper):has(.enterprise-card-grid) {
+      position: relative;
+      overflow: hidden;
+      background: #fbfdf9;
+    }
+    #page-doanh-nghiep .enterprise-section:not(.paper):has(.enterprise-card-grid)::after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      bottom: -170px;
+      width: 420px;
+      height: 420px;
+      border: 1px solid rgba(142, 204, 117, .35);
+      border-radius: 50%;
+      box-shadow: 0 0 0 28px rgba(142, 204, 117, .08), 0 0 0 56px rgba(142, 204, 117, .05);
+      pointer-events: none;
+    }
+    #page-doanh-nghiep .enterprise-section:not(.paper):has(.enterprise-card-grid) > .container { position: relative; z-index: 1; }
+    #page-doanh-nghiep .enterprise-section:not(.paper):has(.enterprise-card-grid) .enterprise-section-head {
+      max-width: 760px;
+      margin-bottom: 42px;
+    }
+    #page-doanh-nghiep .enterprise-section:not(.paper):has(.enterprise-card-grid) .enterprise-section-head .section-title {
+      max-width: 20ch;
+      margin-top: 16px;
+      color: #123f2c;
+      font-size: clamp(30px, 3.2vw, 44px);
+      line-height: 1.06;
+      letter-spacing: -.045em;
+      text-wrap: balance;
+    }
+    #page-doanh-nghiep .enterprise-section:not(.paper):has(.enterprise-card-grid) .enterprise-card-grid { gap: 20px; }
+    #page-doanh-nghiep .enterprise-section:not(.paper):has(.enterprise-card-grid) .enterprise-card {
+      position: relative;
+      min-height: 270px;
+      overflow: hidden;
+      padding: 30px 30px 28px;
+      border: 1px solid #d7e8da;
+      border-left: 5px solid #83c85f;
+      border-radius: 20px;
+      background: #fff;
+      box-shadow: 0 16px 28px rgba(21, 65, 45, .07);
+      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    }
+    #page-doanh-nghiep .enterprise-section:not(.paper):has(.enterprise-card-grid) .enterprise-card::after {
+      content: "";
+      position: absolute;
+      right: -24px;
+      top: -28px;
+      width: 118px;
+      height: 118px;
+      border: 1px solid rgba(131, 200, 95, .3);
+      border-radius: 50%;
+      box-shadow: 0 0 0 14px rgba(131, 200, 95, .08);
+      pointer-events: none;
+    }
+    #page-doanh-nghiep .enterprise-section:not(.paper):has(.enterprise-card-grid) .enterprise-card:nth-child(-n+3) {
+      border-color: #0c6a40;
+      border-left-color: #b5e779;
+      background: linear-gradient(145deg, #0b633d 0%, #08714a 100%);
+      box-shadow: 0 20px 34px rgba(10, 91, 57, .2);
+    }
+    #page-doanh-nghiep .enterprise-section:not(.paper):has(.enterprise-card-grid) .enterprise-card:hover {
+      transform: translateY(-7px);
+      border-color: #83c85f;
+      box-shadow: 0 24px 38px rgba(21, 65, 45, .15);
+    }
+    #page-doanh-nghiep .enterprise-section:not(.paper):has(.enterprise-card-grid) .enterprise-number {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #edf8e7;
+      color: #0b633d;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    #page-doanh-nghiep .enterprise-section:not(.paper):has(.enterprise-card-grid) .enterprise-card h3 {
+      position: relative;
+      z-index: 1;
+      max-width: 17ch;
+      margin: 24px 0 12px;
+      color: #0b633d;
+      font-size: 20px;
+      line-height: 1.15;
+      letter-spacing: -.025em;
+    }
+    #page-doanh-nghiep .enterprise-section:not(.paper):has(.enterprise-card-grid) .enterprise-card p {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      color: #5b7164;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    #page-doanh-nghiep .enterprise-section:not(.paper):has(.enterprise-card-grid) .enterprise-card:nth-child(-n+3) .enterprise-number {
+      background: rgba(220, 247, 198, .16);
+      color: #d5f3b5;
+    }
+    #page-doanh-nghiep .enterprise-section:not(.paper):has(.enterprise-card-grid) .enterprise-card:nth-child(-n+3) h3,
+    #page-doanh-nghiep .enterprise-section:not(.paper):has(.enterprise-card-grid) .enterprise-card:nth-child(-n+3) p { color: #fff; }
+    #page-doanh-nghiep .enterprise-section:not(.paper):has(.enterprise-card-grid) .enterprise-card:nth-child(-n+3) p { color: rgba(255,255,255,.78); }
+    /* Accountability and contact: a stronger closing information panel. */
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-contact) {
+      position: relative;
+      overflow: hidden;
+      padding: 92px 0;
+      background: linear-gradient(135deg, #f2faf3 0%, #e7f5e9 100%);
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-contact)::before {
+      content: "";
+      position: absolute;
+      left: -150px;
+      bottom: -230px;
+      width: 520px;
+      height: 520px;
+      border: 1px solid rgba(15, 112, 68, .14);
+      border-radius: 50%;
+      box-shadow: 0 0 0 28px rgba(15, 112, 68, .05), 0 0 0 58px rgba(15, 112, 68, .035);
+      pointer-events: none;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-contact) > .container { position: relative; z-index: 1; }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-contact) .enterprise-split { align-items: stretch; gap: clamp(38px, 6vw, 92px); }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-contact) .enterprise-copy { justify-content: center; }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-contact) .enterprise-copy .section-title {
+      max-width: 22ch;
+      margin: 18px 0 28px;
+      color: #123f2c;
+      font-size: clamp(34px, 4.4vw, 58px);
+      line-height: .98;
+      letter-spacing: -.055em;
+      text-wrap: balance;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-contact) .enterprise-copy > p {
+      max-width: 58ch;
+      color: #486859;
+      font-size: 15px;
+      line-height: 1.8;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-contact) .enterprise-contact {
+      position: relative;
+      min-height: 330px;
+      padding: 38px 40px 36px;
+      border: 0;
+      border-radius: 26px;
+      background: linear-gradient(145deg, #0a603b 0%, #08754b 100%);
+      box-shadow: 0 24px 46px rgba(8, 91, 56, .2);
+      color: #fff;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-contact) .enterprise-contact::after {
+      content: "";
+      position: absolute;
+      right: -54px;
+      bottom: -68px;
+      width: 230px;
+      height: 230px;
+      border: 1px solid rgba(215, 247, 181, .28);
+      border-radius: 50%;
+      box-shadow: 0 0 0 18px rgba(215, 247, 181, .08), 0 0 0 36px rgba(215, 247, 181, .05);
+      pointer-events: none;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-contact) .enterprise-contact .vehx-eyebrow { color: #d5f3b5; }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-contact) .enterprise-contact h3 {
+      position: relative;
+      z-index: 1;
+      margin: 34px 0 16px;
+      color: #fff;
+      font-size: clamp(21px, 2vw, 27px);
+      line-height: 1.2;
+      letter-spacing: -.03em;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-contact) .enterprise-contact p {
+      position: relative;
+      z-index: 1;
+      color: rgba(255,255,255,.78);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-contact) .enterprise-contact p:last-of-type {
+      margin-top: 26px;
+      margin-bottom: 8px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(213, 243, 181, .28);
+      color: #d5f3b5;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-contact) .enterprise-contact a {
+      position: relative;
+      z-index: 1;
+      display: inline-block;
+      margin: 8px 22px 0 0;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-contact) .enterprise-contact a + a { margin-top: 12px; }
+    #page-doanh-nghiep > .enterprise-section:last-child { display: none !important; }
+
+    /* Shared content hierarchy for all three Về Hà Nội Xanh pages. */
+    #page-ve-chung-toi,
+    #page-doanh-nghiep,
+    #page-doi-ngu {
+      --vehx-heading-display: clamp(40px, 4.4vw, 60px);
+      --vehx-heading-section: clamp(32px, 3.4vw, 46px);
+      --vehx-heading-card: clamp(19px, 1.6vw, 22px);
+      --vehx-copy-size: 14px;
+      --vehx-copy-leading: 1.78;
+    }
+    #page-ve-chung-toi .reference-intro .section-title,
+    #page-doanh-nghiep .enterprise-intro .section-title,
+    #page-doi-ngu .team-intro .section-title {
+      font-size: var(--vehx-heading-display);
+      font-weight: 800;
+      line-height: 1.02;
+      letter-spacing: -.055em;
+      text-wrap: balance;
+    }
+    #page-ve-chung-toi .reference-section .section-title,
+    #page-doanh-nghiep .enterprise-section .section-title,
+    #page-doi-ngu .team-section .section-title {
+      font-size: var(--vehx-heading-section);
+      font-weight: 800;
+      line-height: 1.06;
+      letter-spacing: -.05em;
+      text-wrap: balance;
+    }
+    #page-ve-chung-toi .reference-detail-list h3,
+    #page-ve-chung-toi .reference-card h3,
+    #page-doanh-nghiep .enterprise-card h3,
+    #page-doanh-nghiep .enterprise-step h3,
+    #page-doi-ngu .team-card h3 {
+      font-size: var(--vehx-heading-card);
+      font-weight: 800;
+      line-height: 1.18;
+      letter-spacing: -.025em;
+      text-wrap: balance;
+    }
+    #page-ve-chung-toi .reference-copy > p,
+    #page-ve-chung-toi .reference-value-list p,
+    #page-ve-chung-toi .reference-timeline p,
+    #page-ve-chung-toi .reference-detail-list p,
+    #page-ve-chung-toi .reference-card p,
+    #page-doanh-nghiep .enterprise-copy > p,
+    #page-doanh-nghiep .enterprise-card p,
+    #page-doanh-nghiep .enterprise-step p,
+    #page-doi-ngu .team-card > p {
+      font-size: var(--vehx-copy-size);
+      line-height: var(--vehx-copy-leading);
+      font-weight: 500;
+    }
+    #page-ve-chung-toi .vehx-eyebrow,
+    #page-doanh-nghiep .vehx-eyebrow,
+    #page-doi-ngu .vehx-eyebrow {
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    #page-ve-chung-toi .reference-section,
+    #page-doanh-nghiep .enterprise-section,
+    #page-doi-ngu .team-section { scroll-margin-top: 80px; }
+
+    /* Team opening: remove breadcrumb and give the leadership block its own visual language. */
+    #page-doi-ngu .team-crumb { display: none; }
+    #page-doi-ngu .team-intro {
+      position: relative;
+      overflow: hidden;
+      padding: 72px 0 68px;
+      border: 0;
+      background: linear-gradient(135deg, #eff9f1 0%, #f9fcf7 62%, #e4f3e7 100%);
+    }
+    #page-doi-ngu .team-intro::after {
+      content: "";
+      position: absolute;
+      right: -100px;
+      top: -180px;
+      width: 430px;
+      height: 430px;
+      border: 1px solid rgba(22, 130, 81, .18);
+      border-radius: 50%;
+      box-shadow: 0 0 0 24px rgba(22, 130, 81, .05), 0 0 0 48px rgba(22, 130, 81, .035);
+      pointer-events: none;
+    }
+    #page-doi-ngu .team-intro > .container { position: relative; z-index: 1; }
+    #page-doi-ngu .team-intro .section-title {
+      max-width: 16ch;
+      margin: 16px 0 18px;
+      color: #103e2e;
+      font-size: clamp(38px, 4.5vw, 60px);
+      line-height: .98;
+      letter-spacing: -.055em;
+      text-wrap: balance;
+    }
+    #page-doi-ngu .team-intro .team-lead { max-width: 680px; color: #496b5b; font-size: 17px; line-height: 1.75; }
+    #page-doi-ngu > .team-intro + .team-section {
+      position: relative;
+      overflow: hidden;
+      padding: 88px 0 96px;
+      background: #103e2e;
+    }
+    #page-doi-ngu > .team-intro + .team-section::before {
+      content: "01";
+      position: absolute;
+      right: 7%;
+      top: 42px;
+      color: rgba(213, 243, 181, .12);
+      font-size: clamp(100px, 16vw, 220px);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -.08em;
+      pointer-events: none;
+    }
+    #page-doi-ngu > .team-intro + .team-section::before { content: none; }
+    #page-doi-ngu > .team-intro + .team-section > .container { position: relative; z-index: 1; }
+    #page-doi-ngu > .team-intro + .team-section .team-section-head { max-width: 760px; margin: 0 0 42px; }
+    #page-doi-ngu > .team-intro + .team-section .team-section-head .vehx-eyebrow { color: #d5f3b5; }
+    #page-doi-ngu > .team-intro + .team-section .team-section-head .section-title { max-width: 18ch; margin-top: 16px; color: #fff; font-size: clamp(34px, 4vw, 52px); line-height: 1.02; letter-spacing: -.05em; }
+    #page-doi-ngu > .team-intro + .team-section .team-grid { grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); gap: 22px; align-items: stretch; }
+    #page-doi-ngu > .team-intro + .team-section .team-card { position: relative; min-height: 360px; padding: 30px; border: 1px solid rgba(255,255,255,.13); border-radius: 24px; background: rgba(255,255,255,.08); box-shadow: none; }
+    #page-doi-ngu > .team-intro + .team-section .team-card:first-child { padding: 34px; background: #fff; box-shadow: 0 22px 42px rgba(0,0,0,.16); }
+    #page-doi-ngu > .team-intro + .team-section .team-top { min-height: 0; align-items: center; gap: 18px; margin-bottom: 28px; }
+    #page-doi-ngu > .team-intro + .team-section .team-avatar { width: 78px; height: 78px; flex-basis: 78px; border: 4px solid #d5f3b5; border-radius: 50%; font-size: 22px; }
+    #page-doi-ngu > .team-intro + .team-section .team-card:first-child .team-avatar { border-color: #dff2d2; }
+    #page-doi-ngu > .team-intro + .team-section .team-tag { border-color: #bce796; color: #d5f3b5; }
+    #page-doi-ngu > .team-intro + .team-section .team-card:first-child .team-tag { color: #0b633d; }
+    #page-doi-ngu > .team-intro + .team-section .team-card h3 { margin: 9px 0 4px; color: #fff; font-size: clamp(22px, 2.2vw, 30px); letter-spacing: -.035em; }
+    #page-doi-ngu > .team-intro + .team-section .team-card:first-child h3 { color: #0b633d; }
+    #page-doi-ngu > .team-intro + .team-section .team-role { color: #c6eca8; font-size: 13px; }
+    #page-doi-ngu > .team-intro + .team-section .team-card:first-child .team-role { color: #168251; }
+    #page-doi-ngu > .team-intro + .team-section .team-card > p { color: rgba(255,255,255,.82); font-size: 14px; line-height: 1.78; }
+    #page-doi-ngu > .team-intro + .team-section .team-card:first-child > p { color: #3f5f50; }
+    #page-doi-ngu > .team-intro + .team-section .team-card:first-child::after,
+    #page-doi-ngu > .team-intro + .team-section .team-card:last-child::after { content: ""; position: absolute; right: 24px; bottom: 24px; width: 54px; height: 4px; border-radius: 99px; background: #bce796; }
+    #page-doi-ngu > .team-intro + .team-section .team-card:first-child::after { background: #168251; }
+
+    /* Advisors: a calm, editorial profile layout focused on trust and connection. */
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) {
+      position: relative;
+      overflow: hidden;
+      padding: 92px 0 100px;
+      border: 0;
+      background: #0f382c;
+    }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors)::after {
+      content: "";
+      position: absolute;
+      right: -150px;
+      bottom: -210px;
+      width: 520px;
+      height: 520px;
+      border: 1px solid rgba(213,243,181,.2);
+      border-radius: 50%;
+      box-shadow: 0 0 0 28px rgba(213,243,181,.06), 0 0 0 58px rgba(213,243,181,.035);
+      pointer-events: none;
+    }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) > .container { position: relative; z-index: 1; }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-section-head { max-width: 720px; margin: 0 auto 44px; text-align: center; }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-section-head .vehx-eyebrow { color: #d5f3b5; }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-section-head .section-title { max-width: 18ch; margin: 16px auto 0; color: #fff; font-size: clamp(34px, 4vw, 52px); line-height: 1.02; letter-spacing: -.05em; }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-grid.advisors { grid-template-columns: repeat(3, minmax(0,1fr)); gap: 18px; }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-card { position: relative; min-height: 310px; overflow: hidden; padding: 28px; border: 1px solid rgba(213,243,181,.18); border-radius: 22px; background: rgba(255,255,255,.08); box-shadow: none; }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-card::before { content: ""; position: absolute; left: 0; top: 0; width: 100%; height: 5px; background: linear-gradient(90deg,#bce796,#5ac487); }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-top { align-items: center; gap: 16px; min-height: 84px; margin-bottom: 24px; }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-avatar { width: 68px; height: 68px; flex-basis: 68px; border: 0; background: #d5f3b5; color: #0b633d; font-size: 19px; }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-tag { border-color: #bce796; color: #d5f3b5; }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-card h3 { margin: 8px 0 4px; color: #fff; font-size: 20px; letter-spacing: -.025em; }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-role { color: #bce796; font-size: 12px; }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-card > p { color: rgba(255,255,255,.78); font-size: 14px; line-height: 1.72; }
+    /* Contrast the advisor section against the dark leadership section above. */
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) { background: #f1f8ed; }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors)::after { border-color: rgba(22,130,81,.14); box-shadow: 0 0 0 28px rgba(22,130,81,.05), 0 0 0 58px rgba(22,130,81,.03); }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-section-head .vehx-eyebrow { color: #168251; }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-section-head .section-title { color: #103e2e; }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-card { border-color: #d5e7d4; background: #fff; box-shadow: 0 16px 30px rgba(16,62,46,.08); }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-avatar { background: #dff2d2; color: #0b633d; }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-tag { border-color: #83c85f; color: #0b633d; }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-card h3 { color: #0b633d; }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-role { color: #168251; }
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-card > p { color: #466457; }
+
+    /* Heads: an operational roster with numbered responsibility cards, distinct from advisors. */
+    #page-doi-ngu .team-heads-section {
+      position: relative;
+      overflow: hidden;
+      padding: 92px 0 88px;
+      background: #fbfdf9;
+    }
+    #page-doi-ngu .team-heads-section::before { content: ""; position: absolute; left: -180px; bottom: -230px; width: 500px; height: 500px; border: 1px solid rgba(22,130,81,.12); border-radius: 50%; box-shadow: 0 0 0 26px rgba(22,130,81,.04); pointer-events: none; }
+    #page-doi-ngu .team-heads-section > .container { position: relative; z-index: 1; }
+    #page-doi-ngu .team-heads-section .team-section-head { max-width: 680px; margin: 0 0 42px; }
+    #page-doi-ngu .team-heads-section .team-section-head .section-title { max-width: 18ch; margin-top: 16px; color: #103e2e; font-size: clamp(34px, 4vw, 52px); line-height: 1.02; letter-spacing: -.05em; }
+    #page-doi-ngu .team-heads-section .team-grid.heads { grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; }
+    #page-doi-ngu .team-heads-section .team-card { position: relative; min-height: 390px; padding: 24px 22px 26px; border: 1px solid #dce9df; border-radius: 18px; background: #fff; box-shadow: 0 12px 26px rgba(16,62,46,.06); }
+    #page-doi-ngu .team-heads-section .team-card::before { content: ""; position: absolute; left: 0; top: 0; width: 100%; height: 4px; border-radius: 18px 18px 0 0; background: #bce796; }
+    #page-doi-ngu .team-heads-section .team-card:nth-child(even)::before { background: #168251; }
+    #page-doi-ngu .team-heads-section .team-top { display: block; min-height: 0; margin-bottom: 26px; }
+    #page-doi-ngu .team-heads-section .team-avatar { width: 58px; height: 58px; margin-bottom: 22px; border: 0; border-radius: 14px; background: #eaf6e8; color: #0b633d; font-size: 20px; }
+    #page-doi-ngu .team-heads-section .team-tag { border-color: #83c85f; color: #0b633d; }
+    #page-doi-ngu .team-heads-section .team-card h3 { margin: 9px 0 4px; color: #0b633d; font-size: 20px; letter-spacing: -.025em; }
+    #page-doi-ngu .team-heads-section .team-role { min-height: 34px; color: #168251; font-size: 12px; }
+    #page-doi-ngu .team-heads-section .team-card > p { color: #466457; font-size: 13.5px; line-height: 1.72; }
+    #page-doi-ngu .team-heads-section .team-card { text-align: center; }
+    #page-doi-ngu .team-heads-section .team-avatar { margin-right: auto; margin-left: auto; }
+    #page-doi-ngu .team-heads-section .team-tag { justify-content: center; margin-right: auto; margin-left: auto; }
+    #page-doi-ngu .team-heads-section .team-card h3 { font-weight: 800; }
+    #page-doi-ngu .team-heads-section .team-role { font-weight: 600; }
+    #page-doi-ngu .team-heads-section .team-card > p { font-weight: 500; }
+    #page-doi-ngu .team-heads-section .team-note { position: relative; max-width: 760px; margin-top: 30px; padding-left: 16px; border-left: 3px solid #bce796; color: #567065; }
+    #page-doi-ngu .team-note,
+    #page-doi-ngu .team-cta { display: none !important; }
+    #page-doi-ngu > .team-section:has(.team-cta) { display: none !important; }
+    #reference-about-body > .reference-section:nth-last-child(2) { padding: 36px 0; }
+    #reference-about-body > .reference-section:nth-last-child(2) .reference-banner { padding: 32px 48px; }
+    #reference-about-body .reference-intro-visual figcaption {
+      right: auto;
+      bottom: 18px;
+      left: 18px;
+      max-width: calc(100% - 36px);
+      padding: 10px 14px;
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 10px;
+      background: rgba(11,99,61,.94);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      line-height: 1.25;
+      text-align: left;
+      text-transform: uppercase;
+      box-shadow: 0 8px 18px rgba(10,62,39,.18);
+    }
+    #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) {
+      margin-bottom: 24px;
+      border-bottom: 1px solid #cfe3d3;
+    }
+    #page-doanh-nghiep .enterprise-section:has(.enterprise-contact) {
+      border-top: 1px solid #d9e9dc;
+      background: linear-gradient(135deg, #f8fcf7 0%, #edf7ef 100%);
+    }
+
+    /* Final shared type scale: keep equivalent hierarchy identical across the three pages. */
+    #page-ve-chung-toi .reference-intro .section-title,
+    #page-doanh-nghiep .enterprise-intro .section-title,
+    #page-doi-ngu .team-intro .section-title { font-size: clamp(42px, 5vw, 68px); font-weight: 800; line-height: .98; letter-spacing: -.055em; text-wrap: balance; }
+    #page-ve-chung-toi .reference-section .section-title,
+    #page-doanh-nghiep .enterprise-section .section-title,
+    #page-doi-ngu .team-section .section-title { font-size: clamp(32px, 3.4vw, 46px); font-weight: 800; line-height: 1.06; letter-spacing: -.05em; text-wrap: balance; }
+    #page-ve-chung-toi .reference-detail-list h3,
+    #page-ve-chung-toi .reference-card h3,
+    #page-doanh-nghiep .enterprise-card h3,
+    #page-doanh-nghiep .enterprise-step h3,
+    #page-doi-ngu .team-card h3 { font-size: clamp(19px, 1.6vw, 22px); font-weight: 800; line-height: 1.18; letter-spacing: -.025em; text-wrap: balance; }
+    #page-ve-chung-toi .reference-copy > p,
+    #page-ve-chung-toi .reference-value-list p,
+    #page-ve-chung-toi .reference-timeline p,
+    #page-ve-chung-toi .reference-detail-list p,
+    #page-ve-chung-toi .reference-card p,
+    #page-doanh-nghiep .enterprise-copy > p,
+    #page-doanh-nghiep .enterprise-card p,
+    #page-doanh-nghiep .enterprise-step p,
+    #page-doi-ngu .team-card > p { font-size: 14px; line-height: 1.78; font-weight: 500; }
+    #page-ve-chung-toi .vehx-eyebrow,
+    #page-doanh-nghiep .vehx-eyebrow,
+    #page-doi-ngu .vehx-eyebrow { font-size: 12px; font-weight: 800; line-height: 1.2; letter-spacing: .16em; text-transform: uppercase; }
+    #page-ve-chung-toi .reference-intro .section-title { max-width: none; font-size: clamp(42px, 4.2vw, 52px); white-space: nowrap; }
+    @media (max-width: 900px) {
+      #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) { padding: 72px 0 76px; }
+      #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid)::before { display: none; }
+    }
+    @media (max-width: 600px) {
+      #page-ve-chung-toi .reference-intro .section-title { font-size: clamp(36px, 10vw, 48px); white-space: normal; }
+      #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) { padding: 60px 0 66px; }
+      #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) .enterprise-section-head { margin-bottom: 34px; }
+      #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) .enterprise-step { min-height: 0; }
+      #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) .enterprise-method-note { margin-top: 22px; }
+      #page-doanh-nghiep .enterprise-section:not(.paper):has(.enterprise-card-grid) .enterprise-card { min-height: 0; }
+      #page-doanh-nghiep .enterprise-section:has(.enterprise-contact) { padding: 72px 0; }
+      #page-doi-ngu > .team-intro + .team-section .team-grid { grid-template-columns: 1fr; }
+      #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-grid.advisors { grid-template-columns: 1fr; }
+      #page-doi-ngu .team-heads-section .team-grid.heads { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+    @media (max-width: 600px) {
+      #page-doi-ngu .team-heads-section .team-grid.heads { grid-template-columns: 1fr; }
+    }
+
+    /* Site-wide readability pass for public content cards. */
+    #page-ve-chung-toi .reference-copy > p,
+    #page-ve-chung-toi .reference-value-list p,
+    #page-ve-chung-toi .reference-timeline p,
+    #page-ve-chung-toi .reference-detail-list p,
+    #page-ve-chung-toi .reference-card p,
+    #page-doanh-nghiep .enterprise-copy > p,
+    #page-doanh-nghiep .enterprise-card p,
+    #page-doanh-nghiep .enterprise-step p,
+    #page-doi-ngu .team-card > p,
+    #page-doi-ngu .team-note {
+      color: #3f5f50;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    #page-ve-chung-toi .reference-copy > p,
+    #page-doanh-nghiep .enterprise-copy > p,
+    #page-doi-ngu .team-card > p { line-height: 1.78; }
+    #page-ve-chung-toi .reference-value-list p,
+    #page-ve-chung-toi .reference-timeline p,
+    #page-ve-chung-toi .reference-detail-list p,
+    #page-ve-chung-toi .reference-card p,
+    #page-doanh-nghiep .enterprise-card p,
+    #page-doanh-nghiep .enterprise-step p,
+    #page-doi-ngu .team-note { line-height: 1.7; }
+    #page-doanh-nghiep .enterprise-card:nth-child(-n+3) p { color: rgba(255,255,255,.86); }
+    #page-ve-chung-toi .reference-timeline a,
+    #page-ve-chung-toi .reference-method-note,
+    #page-doanh-nghiep .enterprise-method-note { color: #3f6855; font-weight: 500; }
   </style>
   <link rel="stylesheet" href="../site-header.css">
 </head>
@@ -2138,9 +3543,9 @@
 
       <section class="enterprise-section"><div class="container"><div class="enterprise-section-head enterprise-fields-head"><span class="vehx-eyebrow">Lĩnh vực và định hướng</span><h2 class="section-title">Từ nhu cầu địa phương đến phần việc cụ thể.</h2></div><div class="enterprise-card-grid"><article class="enterprise-card"><span class="enterprise-number">01</span><h3>Khảo sát và phối hợp triển khai dự án</h3><p>Ghi nhận hiện trạng, xác định phạm vi ưu tiên, chuẩn bị phương án và phối hợp thu gom rác tại địa điểm. Từng dự án làm rõ nhân lực, dụng cụ, địa điểm tiếp nhận rác, điểm tập kết và đơn vị tiếp nhận rác sau hoạt động.</p></article><article class="enterprise-card"><span class="enterprise-number">02</span><h3>Ngày tình nguyện và chương trình cộng đồng</h3><p>Phối hợp cùng doanh nghiệp, trường học và tổ chức để xây dựng hoạt động phù hợp với nhu cầu địa phương và khả năng người tham gia. Quy mô, thời gian, công việc, hậu cần và cách ghi nhận kết quả được thống nhất theo từng chương trình.</p></article><article class="enterprise-card"><span class="enterprise-number">03</span><h3>Truyền thông từ công việc thực tế</h3><p>Xây dựng ảnh, video và câu chuyện từ quá trình khảo sát, triển khai và kết quả hoạt động. Nội dung giúp cộng đồng hiểu vấn đề rác thải, công sức làm sạch và những hành động có thể thực hiện để giữ gìn môi trường.</p></article><article class="enterprise-card"><span class="enterprise-number">04</span><h3>Thử nghiệm giải pháp hỗ trợ duy trì sạch</h3><p>Tìm kiếm và thử nghiệm thiết bị, công cụ giám sát hoặc phương án thu gom phù hợp với từng địa điểm. Giải pháp cần gắn với điều kiện vận hành, đầu mối theo dõi và khả năng duy trì tại địa phương. Mắt Xanh được giới thiệu đúng giai đoạn nghiên cứu, thí điểm hoặc vận hành.</p></article><article class="enterprise-card"><span class="enterprise-number">05</span><h3>Ghi nhận kết quả theo từng dự án</h3><p>Các chỉ số có thể gồm số lượt tham gia, khối lượng rác và cách xác định, chiều dài hoặc diện tích làm sạch, điểm đã triển khai và kết quả kiểm tra sau hoạt động. Ảnh, báo cáo và hồ sơ được gắn với địa điểm, thời gian và phạm vi cụ thể.</p></article><article class="enterprise-card"><span class="enterprise-number">06</span><h3>Phối hợp cộng đồng và đối tác</h3><p>Đối tác có thể đồng hành trọn một dự án, hỗ trợ theo hạng mục, tổ chức ngày tình nguyện hoặc đóng góp chuyên môn và công nghệ. Mục tiêu, nguồn lực, trách nhiệm, sản phẩm bàn giao và cách ghi nhận đơn vị đồng hành được trao đổi theo từng chương trình.</p></article></div></div></section>
 
-      <section class="enterprise-section paper"><div class="container"><div class="enterprise-section-head"><span class="vehx-eyebrow">Phương thức phối hợp</span><h2 class="section-title">Một hành trình có mục tiêu, có trách nhiệm.</h2></div><div class="enterprise-step-grid"><article class="enterprise-step"><span class="enterprise-number">01</span><h3>Khảo sát</h3><p>Ghi nhận hiện trạng, nhu cầu và điều kiện tiếp cận tại địa điểm.</p></article><article class="enterprise-step"><span class="enterprise-number">02</span><h3>Thống nhất</h3><p>Xác định mục tiêu, phạm vi, phần việc và trách nhiệm của các bên.</p></article><article class="enterprise-step"><span class="enterprise-number">03</span><h3>Chuẩn bị</h3><p>Nhân lực, dụng cụ, bảo hộ, hậu cần và phương án tiếp nhận rác.</p></article><article class="enterprise-step"><span class="enterprise-number">04</span><h3>Triển khai</h3><p>Phối hợp hoạt động và điều chỉnh theo điều kiện hiện trường.</p></article><article class="enterprise-step"><span class="enterprise-number">05</span><h3>Tổng hợp</h3><p>Ghi nhận người tham gia, kết quả, tư liệu và bàn giao phần việc.</p></article><article class="enterprise-step"><span class="enterprise-number">06</span><h3>Theo dõi</h3><p>Kiểm tra sau hoạt động theo phạm vi và kế hoạch của dự án.</p></article></div><p class="enterprise-method-note">Khung phối hợp đề xuất; phạm vi và các sản phẩm bàn giao được thống nhất theo từng dự án.</p></div></section>
+      <section class="enterprise-section paper"><div class="container"><div class="enterprise-section-head"><span class="vehx-eyebrow">Phương thức phối hợp</span><h2 class="section-title">Một hành trình có <span class="keep-together">mục tiêu</span>, có trách nhiệm.</h2></div><div class="enterprise-step-grid"><article class="enterprise-step"><span class="enterprise-number">01</span><h3>Khảo sát</h3><p>Ghi nhận hiện trạng, nhu cầu và điều kiện tiếp cận tại địa điểm.</p></article><article class="enterprise-step"><span class="enterprise-number">02</span><h3>Thống nhất</h3><p>Xác định mục tiêu, phạm vi, phần việc và trách nhiệm của các bên.</p></article><article class="enterprise-step"><span class="enterprise-number">03</span><h3>Chuẩn bị</h3><p>Nhân lực, dụng cụ, bảo hộ, hậu cần và phương án tiếp nhận rác.</p></article><article class="enterprise-step"><span class="enterprise-number">04</span><h3>Triển khai</h3><p>Phối hợp hoạt động và điều chỉnh theo điều kiện hiện trường.</p></article><article class="enterprise-step"><span class="enterprise-number">05</span><h3>Tổng hợp</h3><p>Ghi nhận người tham gia, kết quả, tư liệu và bàn giao phần việc.</p></article><article class="enterprise-step"><span class="enterprise-number">06</span><h3>Theo dõi</h3><p>Kiểm tra sau hoạt động theo phạm vi và kế hoạch của dự án.</p></article></div><p class="enterprise-method-note">Khung phối hợp đề xuất; phạm vi và các sản phẩm bàn giao được thống nhất theo từng dự án.</p></div></section>
 
-      <section class="enterprise-section"><div class="container enterprise-split"><div class="enterprise-copy"><span class="vehx-eyebrow">Trách nhiệm và minh bạch</span><h2 class="section-title">Làm rõ mục tiêu,<br>nguồn lực và kết quả.</h2><p>Mỗi chương trình cần có phạm vi công việc, đầu mối và cách ghi nhận kết quả. Các nội dung về kinh phí, hiện vật, sản phẩm truyền thông, báo cáo và theo dõi sau hoạt động được thống nhất giữa các bên.</p><p>Kinh nghiệm và thành tích trước ngày 13/07/2026 thuộc hành trình chung hoặc CLB Hà Nội Xanh; kết quả của doanh nghiệp xã hội được ghi nhận theo từng dự án sau khi thành lập.</p></div><div class="enterprise-contact"><span class="vehx-eyebrow">Lãnh đạo doanh nghiệp</span><h3>Nguyễn Tiến Huy · Giám đốc</h3><p>Nguyễn Tiến Huy là người sáng lập Hà Nội Xanh, hiện đảm nhiệm vai trò Giám đốc Công ty Cổ phần Doanh nghiệp Xã hội Hà Nội Xanh.</p><p>Đầu mối trao đổi chương trình và hợp tác</p><a href="tel:0987231832">0987 231 832</a><a href="mailto:hanoixanhh@gmail.com">hanoixanhh@gmail.com</a></div></div></section>
+      <section class="enterprise-section"><div class="container enterprise-split"><div class="enterprise-copy"><span class="vehx-eyebrow">Trách nhiệm và minh bạch</span><h2 class="section-title">Làm rõ mục tiêu,<br>nguồn lực và kết quả.</h2><p>Mỗi chương trình cần có phạm vi công việc, đầu mối và cách ghi nhận kết quả. Các nội dung về kinh phí, hiện vật, sản phẩm truyền thông, báo cáo và theo dõi sau hoạt động được thống nhất giữa các bên.</p><p>Kinh nghiệm và thành tích trước ngày 13/07/2026 thuộc hành trình chung hoặc CLB Hà Nội Xanh; kết quả của doanh nghiệp xã hội được ghi nhận theo từng dự án sau khi thành lập.</p></div><div class="enterprise-contact"><span class="vehx-eyebrow">Lãnh đạo doanh nghiệp</span><h3>Nguyễn Tiến Huy - Giám đốc</h3><p>Nguyễn Tiến Huy là người sáng lập Hà Nội Xanh, hiện đảm nhiệm vai trò Giám đốc Công ty Cổ phần Doanh nghiệp Xã hội Hà Nội Xanh.</p><p>Đầu mối trao đổi chương trình và hợp tác</p><a href="tel:0987231832">0987 231 832</a><a href="mailto:hanoixanhh@gmail.com">hanoixanhh@gmail.com</a></div></div></section>
 
       <section class="enterprise-section"><div class="container enterprise-banner"><div><h2>Bạn có thể bắt đầu bằng một việc mình làm được.</h2><p>Một buổi tình nguyện, một kỹ năng hoặc một nguồn lực hỗ trợ đều có thể góp phần chuẩn bị tốt hơn cho hoạt động môi trường.</p></div><a class="vehx-secondary-btn" onclick="navigateParent('/tham-gia')">Cùng tham gia <i class="fa-solid fa-arrow-right"></i></a></div></section>
     </div>
@@ -2279,7 +3684,7 @@
           </div>
         </section>
 
-        <section class="reference-section paper">
+        <section class="reference-section paper mission-showcase">
           <div class="container">
             <div class="reference-split">
               <div class="reference-copy"><span class="vehx-eyebrow">Sứ mệnh</span><h2 class="section-title">Kết nối cộng đồng cùng hành động</h2><p>Kết nối cộng đồng cùng hành động để giảm rác thải tại sông, kênh mương và khu dân cư; khuyến khích mỗi người có trách nhiệm với nơi mình sinh sống. Thông qua trải nghiệm tại hiện trường và truyền thông, Hà Nội Xanh mong muốn giúp nhiều người hiểu công sức thu gom và lựa chọn hành vi có trách nhiệm hơn trong sinh hoạt hằng ngày.</p></div>
@@ -3367,6 +4772,23 @@
     if (founderPlaceholder) founderPlaceholder.innerHTML = imageMarkup('/anh-hnx/huy.webp', 'Người sáng lập');
     if (fieldPlaceholder) fieldPlaceholder.innerHTML = imageMarkup('/anh-hnx/field.webp', 'Hoạt động làm sạch');
     if (founderAvatar && founderAvatar.textContent.trim() === 'Ảnh') founderAvatar.innerHTML = imageMarkup('/anh-hnx/huy.webp', 'Avatar Nguyễn Tiến Huy');
+  })();
+</script>
+<script>
+  (() => {
+    const pageIds = ['page-ve-chung-toi', 'page-doanh-nghiep', 'page-doi-ngu'];
+    pageIds.forEach((pageId) => {
+      const page = document.getElementById(pageId);
+      if (!page) return;
+      page.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach((heading) => {
+        const walker = document.createTreeWalker(heading, NodeFilter.SHOW_TEXT);
+        const textNodes = [];
+        let node;
+        while ((node = walker.nextNode())) textNodes.push(node);
+        const lastText = textNodes[textNodes.length - 1];
+        if (lastText) lastText.nodeValue = lastText.nodeValue.replace(/\.$/, '');
+      });
+    });
   })();
 </script>
 </body>

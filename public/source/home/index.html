@@ -604,6 +604,24 @@
         .home-page .news-body { padding: 24px; }
         .home-page .news-title { font-size: 20px; }
 
+        /* Public content readability: strengthen small descriptive copy without changing metadata hierarchy. */
+        .home-page .mission-text > p,
+        .home-page .section-header p,
+        .home-page .schedule-info li,
+        .home-page .impact-card-copy,
+        .home-page .news-desc,
+        .home-page .report-step small {
+            color: #466457;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .home-page .schedule-info li,
+        .home-page .report-step small { line-height: 1.65; }
+        .home-page .impact-results small { color: #466457; font-size: 13px; font-weight: 500; }
+        .home-page .schedule-card-type,
+        .home-page .schedule-progress-copy,
+        .home-page .impact-meta { color: #527064; font-weight: 500; }
+
         @media (max-width: 1080px) {
             .home-header.site-header { height: 84px !important; min-height: 84px !important; padding: 0 24px !important; flex-wrap: nowrap !important; }
             .home-header .site-menu-toggle { display: block; margin-left: auto; flex: 0 0 auto; }
