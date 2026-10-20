@@ -2662,6 +2662,19 @@
     #page-doanh-nghiep .enterprise-founder-content p { max-width: 62ch; margin: 0 0 18px; color: #466457; font-size: 14px; font-weight: 500; line-height: 1.78; }
     #page-doanh-nghiep .enterprise-founder-commitment { padding-top: 18px; border-top: 1px solid #dcebdc; }
     #page-doanh-nghiep .enterprise-founder-commitment p { margin-bottom: 0; color: #315d46; }
+    #page-doanh-nghiep .enterprise-founder-list { display: grid; gap: 22px; margin-top: 22px; }
+    #page-doanh-nghiep .enterprise-founder-mini { display: grid; grid-template-columns: 220px minmax(0, 1fr); overflow: hidden; border: 1px solid #cfe2d1; border-radius: 22px; background: #fff; box-shadow: 0 14px 30px rgba(16,62,46,.08); }
+    #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-portrait { min-height: 250px; }
+    #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-portrait img { min-height: 250px; }
+    #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-content { padding: 30px 36px; }
+    #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-content::before { content: none; }
+    #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-content h3 { margin-top: 16px; font-size: clamp(24px, 2.6vw, 34px); }
+    #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-role { margin-bottom: 20px; }
+    @media (max-width: 760px) {
+      #page-doanh-nghiep .enterprise-founder-mini { grid-template-columns: 1fr; }
+      #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-portrait,
+      #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-portrait img { min-height: 260px; height: 260px; }
+    }
     @media (max-width: 760px) {
       #page-doanh-nghiep .enterprise-founders { padding: 70px 0 76px; }
       #page-doanh-nghiep .enterprise-founders-head { display: block; }
@@ -4848,6 +4861,81 @@
         const lastText = textNodes[textNodes.length - 1];
         if (lastText) lastText.nodeValue = lastText.nodeValue.replace(/\.$/, '');
       });
+    });
+  })();
+</script>
+<script>
+  (() => {
+    const section = document.querySelector('#page-doanh-nghiep .enterprise-founders');
+    const featured = section?.querySelector('.enterprise-founder-card');
+    if (!section || !featured) return;
+    const setText = (element, value) => { if (element) element.textContent = value || ''; };
+    const renderFounderData = (founders) => {
+      if (!Array.isArray(founders) || !founders.length) return;
+      const first = founders[0] || {};
+      const image = featured.querySelector('.enterprise-founder-portrait img');
+      const content = featured.querySelector('.enterprise-founder-content');
+      if (!content) return;
+      if (image && first.image_url) { image.src = first.image_url; image.alt = `${first.name || 'Cổ đông sáng lập'} - Cổ đông sáng lập`; }
+      setText(content.querySelector('h3'), first.name);
+      setText(content.querySelector('.enterprise-founder-role'), first.role);
+      const paragraphs = content.querySelectorAll(':scope > p');
+      setText(paragraphs[1], first.expertise);
+      setText(content.querySelector('.enterprise-founder-commitment p'), first.contribution);
+      let list = section.querySelector('.enterprise-founder-list');
+      if (!list) { list = document.createElement('div'); list.className = 'enterprise-founder-list'; featured.after(list); }
+      list.innerHTML = '';
+      founders.slice(1).forEach((founder, index) => {
+        if (!founder || !String(founder.name || '').trim()) return;
+        const card = document.createElement('article'); card.className = 'enterprise-founder-mini';
+        const portrait = document.createElement('div'); portrait.className = 'enterprise-founder-portrait';
+        if (founder.image_url) { const imageEl = document.createElement('img'); imageEl.src = founder.image_url; imageEl.alt = `${founder.name} - Cổ đông sáng lập`; portrait.appendChild(imageEl); }
+        const body = document.createElement('div'); body.className = 'enterprise-founder-content';
+        const tag = document.createElement('span'); tag.className = 'enterprise-founder-tag'; tag.textContent = `Cổ đông sáng lập · ${String(index + 2).padStart(2, '0')}`;
+        const name = document.createElement('h3'); name.textContent = founder.name;
+        const role = document.createElement('p'); role.className = 'enterprise-founder-role'; role.textContent = founder.role || '';
+        const expertiseTitle = document.createElement('h4'); expertiseTitle.textContent = 'Chuyên môn và kinh nghiệm';
+        const expertise = document.createElement('p'); expertise.textContent = founder.expertise || '';
+        const commitment = document.createElement('div'); commitment.className = 'enterprise-founder-commitment';
+        const commitmentTitle = document.createElement('h4'); commitmentTitle.textContent = 'Đóng góp và định hướng đồng hành';
+        const contribution = document.createElement('p'); contribution.textContent = founder.contribution || '';
+        commitment.append(commitmentTitle, contribution); body.append(tag, name, role, expertiseTitle, expertise, commitment); card.append(portrait, body); list.appendChild(card);
+      });
+    };
+    window.addEventListener('message', event => {
+      if (event.data?.type !== 'hnx:homepage-metrics' || !Array.isArray(event.data.metrics)) return;
+      const metric = event.data.metrics.find(item => item.metric_key === 'founding_shareholders');
+      if (metric) renderFounderData(metric.metric_value);
+    });
+  })();
+</script>
+<script>
+  (() => {
+    const grids = [...document.querySelectorAll('#page-doi-ngu .team-grid')];
+    const groups = ['leadership', 'advisors', 'heads'];
+    const renderTeam = (members) => {
+      if (!Array.isArray(members) || !members.length || grids.length < groups.length) return;
+      groups.forEach((group, groupIndex) => {
+        const grid = grids[groupIndex]; grid.innerHTML = '';
+        members.filter(member => member && member.group === group).forEach(member => {
+          const card = document.createElement('article'); card.className = 'team-card';
+          const top = document.createElement('div'); top.className = 'team-top';
+          const avatar = document.createElement('div'); avatar.className = 'team-avatar';
+          if (member.image_url) { const image = document.createElement('img'); image.src = member.image_url; image.alt = `Ảnh ${member.name || 'nhân sự'}`; avatar.appendChild(image); } else avatar.textContent = String(member.name || '').trim().split(/\s+/).map(part => part[0]).join('').slice(-2).toUpperCase();
+          const details = document.createElement('div');
+          const tag = document.createElement('span'); tag.className = 'team-tag'; tag.textContent = member.tag || '';
+          const name = document.createElement('h3'); name.textContent = member.name || '';
+          const role = document.createElement('div'); role.className = 'team-role'; role.textContent = member.role || '';
+          details.append(tag, name, role); top.append(avatar, details);
+          const description = document.createElement('p'); description.textContent = member.description || '';
+          card.append(top, description); grid.appendChild(card);
+        });
+      });
+    };
+    window.addEventListener('message', event => {
+      if (event.data?.type !== 'hnx:homepage-metrics' || !Array.isArray(event.data.metrics)) return;
+      const metric = event.data.metrics.find(item => item.metric_key === 'team_members');
+      if (metric) renderTeam(metric.metric_value);
     });
   })();
 </script>

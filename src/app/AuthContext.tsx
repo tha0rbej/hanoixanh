@@ -61,6 +61,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => { active = false }
   }, [session])
 
+  useEffect(() => {
+    if (!session || !supabaseConfigured) return
+    let active = true
+    const refreshIfNeeded = async () => {
+      const expiresSoon = !session.expires_at || session.expires_at < Math.floor(Date.now() / 1000) + 5 * 60
+      if (!expiresSoon) return
+      try {
+        const nextSession = await refreshSession(session)
+        if (active && nextSession.access_token !== session.access_token) setSession(nextSession)
+      } catch {
+        if (active) { setSession(null); setProfile(null) }
+      }
+    }
+    void refreshIfNeeded()
+    const timer = window.setInterval(() => void refreshIfNeeded(), 60_000)
+    window.addEventListener("focus", refreshIfNeeded)
+    return () => { active = false; window.clearInterval(timer); window.removeEventListener("focus", refreshIfNeeded) }
+  }, [session])
+
   const value = useMemo<AuthContextValue>(() => ({
     session,
     profile,

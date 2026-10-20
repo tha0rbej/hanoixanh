@@ -223,8 +223,9 @@
     .no-history { display: none; text-align: center; padding: 24px; background: #f8fafc; border-radius: 6px; }
     .no-history p { font-size: 14.5px; color: #64748b; margin-bottom: 12px; }
 
-    .leaderboard-section { margin: 46px 0 38px; }
-    .leaderboard-showcase { display: grid; grid-template-columns: 210px minmax(0, 860px) 210px; gap: 24px; max-width: 1348px; margin: 0 auto; align-items: stretch; }
+    .points-leaderboard-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; max-width: 1348px; margin: 46px auto 38px; align-items: start; }
+    .leaderboard-section { margin: 0; min-width: 0; }
+    .leaderboard-showcase { display: block; max-width: none; margin: 0; }
     .leaderboard-main { min-width: 0; }
     .leaderboard-head { display: flex; align-items: center; flex-direction: column; gap: 17px; margin-bottom: 20px; text-align: center; }
     .leaderboard-head-copy { max-width: 720px; }
@@ -248,27 +249,43 @@
     .leaderboard-name { overflow: hidden; color: #19352c; font-size: 14px; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
     .leaderboard-points { color: #166b43; font-size: 16px; font-weight: 900; text-align: right; }
     .leaderboard-empty { display: grid; min-height: 120px; place-items: center; padding: 24px; color: #718078; font-size: 14px; text-align: center; }
-    .leaderboard-photo { position: relative; min-height: 430px; margin: 0; overflow: hidden; border-radius: 20px; background: #dcebe1; box-shadow: 0 16px 38px rgba(16,62,46,.13); }
-    .leaderboard-photo img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .45s ease; }
-    .leaderboard-photo:hover img { transform: scale(1.035); }
-    .leaderboard-photo::after { content: ""; position: absolute; inset: 38% 0 0; background: linear-gradient(180deg, transparent, rgba(4,36,23,.88)); pointer-events: none; }
-    .leaderboard-photo-left img { object-position: 54% center; }
-    .leaderboard-photo-right img { object-position: 58% center; }
-    .leaderboard-photo figcaption { position: absolute; z-index: 1; right: 18px; bottom: 20px; left: 18px; color: #fff; }
-    .leaderboard-photo figcaption span { display: grid; width: 34px; height: 34px; margin-bottom: 10px; place-items: center; border: 1px solid rgba(255,255,255,.42); border-radius: 50%; background: rgba(255,255,255,.16); backdrop-filter: blur(5px); }
-    .leaderboard-photo figcaption strong { display: block; font-size: 17px; line-height: 1.35; }
-    .leaderboard-photo figcaption small { display: block; margin-top: 6px; color: rgba(255,255,255,.8); font-size: 11px; line-height: 1.5; }
+    .leaderboard-photo { display: none; }
+    .points-leaderboard-layout > .redeem-intro { margin: 0; min-width: 0; }
+    .points-leaderboard-layout > .redeem-intro { order: -1; }
+    .points-leaderboard-layout .redeem-intro-head { display: block; }
+    .points-leaderboard-layout .redeem-cta { margin-top: 20px; }
     .redeem-intro { margin: 0 0 46px; padding: clamp(24px, 4vw, 42px); border-radius: 16px; background: linear-gradient(135deg, #0d4e34, #168251); color: #fff; }
     .redeem-intro-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 28px; }
     .redeem-intro h2 { margin: 5px 0 9px; font-size: clamp(26px, 3vw, 36px); line-height: 1.2; }
     .redeem-intro-head p { max-width: 680px; color: rgba(255,255,255,.82); font-size: 14px; line-height: 1.7; }
     .redeem-intro .impact-kicker { color: #baf2cc !important; }
     .redeem-cta { min-height: 44px; flex: 0 0 auto; padding: 0 20px; border: 1px solid rgba(255,255,255,.55); border-radius: 8px; background: #fff; color: #0d5d3b; font-size: 13px; font-weight: 800; cursor: pointer; }
+    .redeem-exchange-cta { margin-top: 10px; background: #d7f5df; border-color: #d7f5df; }
     .redeem-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 28px; }
     .redeem-step { padding: 18px; border: 1px solid rgba(255,255,255,.16); border-radius: 11px; background: rgba(255,255,255,.08); }
     .redeem-step span { display: grid; width: 32px; height: 32px; place-items: center; margin-bottom: 12px; border-radius: 50%; background: #d7f5df; color: #0d5d3b; font-size: 13px; font-weight: 900; }
     .redeem-step strong { display: block; margin-bottom: 6px; font-size: 14px; }
     .redeem-step p { margin: 0; color: rgba(255,255,255,.76); font-size: 12px; line-height: 1.55; }
+    .green-redeem-modal { position: fixed; z-index: 3000; inset: 0; display: none; align-items: flex-start; justify-content: center; overflow: hidden; padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); background: rgba(4,36,23,.58); backdrop-filter: blur(5px); }
+    .green-redeem-modal.is-open { display: grid; }
+    .green-redeem-panel { box-sizing: border-box; width: min(560px, calc(100vw - 24px)); max-height: min(760px, calc(100vh - 24px)); max-height: min(760px, calc(100dvh - 24px)); margin: auto 0; overflow-y: auto; overscroll-behavior: contain; padding: clamp(18px, 4vw, 28px); border: 1px solid #d6e7d8; border-radius: 20px; background: #fff; box-shadow: 0 24px 70px rgba(4,36,23,.25); }
+    .green-redeem-panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 18px; }
+    .green-redeem-panel h2 { margin: 0 0 6px; color: #0d5d3b; font-size: 25px; }
+    .green-redeem-panel-head p { margin: 0; color: #5d7368; font-size: 13px; line-height: 1.55; }
+    .green-redeem-close { width: 34px; height: 34px; border: 0; border-radius: 50%; background: #eef6ef; color: #0d5d3b; font-size: 22px; cursor: pointer; }
+    .green-redeem-form { display: grid; gap: 14px; }
+    .green-redeem-form label { display: grid; gap: 7px; color: #24483a; font-size: 13px; font-weight: 750; }
+    .green-redeem-form input, .green-redeem-form select { min-height: 44px; padding: 10px 12px; border: 1px solid #cfe0d2; border-radius: 9px; background: #fbfefb; color: #19352c; font: inherit; }
+    .green-redeem-form small { color: #668073; font-size: 12px; font-weight: 500; }
+    .green-redeem-reward-preview { display: flex; align-items: center; gap: 18px; margin-top: 8px; padding: 16px; border: 1px solid #d6e7d8; border-radius: 14px; background: #f5fbf6; }
+    .green-redeem-reward-preview[hidden] { display: none; }
+    .green-redeem-reward-preview img { width: 124px; height: 124px; flex: 0 0 124px; object-fit: contain; border-radius: 12px; background: #fff; }
+    .green-redeem-reward-preview strong, .green-redeem-reward-preview small { display: block; }
+    .green-redeem-reward-preview small { margin-top: 4px; }
+    .green-redeem-submit { min-height: 46px; border: 0; border-radius: 10px; background: #0d6b42; color: #fff; font-weight: 800; cursor: pointer; }
+    .green-redeem-submit:disabled { opacity: .55; cursor: not-allowed; }
+    .green-redeem-result { display: none; padding: 22px; border-radius: 14px; background: #eef9ef; color: #0d5d3b; line-height: 1.6; }
+    .green-redeem-result.is-visible { display: block; }
 
     .impact-overview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 26px; }
     .impact-box { background: var(--bg-card); padding: 22px; border-radius: 8px; border: 1px solid var(--border-color); text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
@@ -442,6 +459,12 @@
     .modal-text { font-size: 14.5px; color: #475569; line-height: 1.7; margin-bottom: 10px; }
     .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; }
     .detail-modal-content { width: min(560px, 100%); height: min(760px, calc(100dvh - 24px)); max-width: 100%; max-height: calc(100dvh - 24px); padding: 20px 22px 0; text-align: left; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
+    .detail-modal-content { position: relative; }
+    .detail-modal-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; padding-right: 2px; scrollbar-color: #b9d7c3 transparent; scrollbar-width: thin; }
+    .detail-modal-scroll::-webkit-scrollbar { width: 6px; }
+    .detail-modal-scroll::-webkit-scrollbar-thumb { border-radius: 999px; background: #b9d7c3; }
+    .detail-modal-close { position: absolute; top: 12px; right: 14px; z-index: 2; display: grid; width: 34px; height: 34px; place-items: center; border: 0; border-radius: 50%; background: #eef7f0; color: #166534; font-size: 24px; line-height: 1; cursor: pointer; }
+    .detail-modal-close:hover { background: #dcfce7; }
     .detail-modal-content .modal-header-title { margin: 0 0 12px; font-size: clamp(19px, 2.5vw, 24px); line-height: 1.18; text-align: left; flex: 0 0 auto; overflow-wrap: anywhere; }
     .detail-modal-meta { display: grid; gap: 6px; margin-bottom: 12px; padding: 10px 12px; border: 1px solid #e5ece7; border-radius: 10px; background: #f8faf9; color: #374151; font-size: 13px; line-height: 1.35; }
     .detail-modal-meta > div { display: flex; align-items: flex-start; gap: 10px; text-align: left; }
@@ -463,6 +486,18 @@
     .detail-modal-content .modal-actions .btn-close-detail:hover { background: #f8fafc; }
     .detail-modal-content .modal-actions .btn-register-detail { background: #15803d; color: #fff; }
     .detail-modal-content .modal-actions .btn-register-detail:hover { background: #166534; }
+    .detail-modal-content .modal-actions .btn-share-detail { border: 1px solid #15803d; background: #fff; color: #166534; }
+    .detail-modal-content .modal-actions .btn-share-detail:hover { background: #ecfdf5; }
+    .share-modal-content { width: min(500px, 100%); padding: 26px; border-radius: 16px; }
+    .share-modal-content h3 { margin: 0 0 10px; color: #166534; font-size: 22px; line-height: 1.25; }
+    .share-modal-content p { margin: 0 0 18px; color: #52685b; font-size: 14px; line-height: 1.6; }
+    .share-link-row { display: flex; gap: 8px; align-items: stretch; }
+    .share-link-row input { min-width: 0; flex: 1; border: 1px solid #cfe2d4; border-radius: 9px; padding: 11px 12px; color: #355044; background: #f8fcf9; font-size: 13px; }
+    .share-copy-btn { flex: 0 0 auto; border: 0; border-radius: 9px; padding: 0 15px; background: #15803d; color: #fff; font-weight: 800; cursor: pointer; }
+    .share-copy-btn:hover { background: #166534; }
+    .share-success { display: none; margin: 12px 0 0; padding: 10px 12px; border-radius: 9px; background: #ecfdf5; color: #166534; font-size: 13px; font-weight: 700; }
+    .share-modal-close { position: absolute; top: 12px; right: 14px; width: 32px; height: 32px; border: 0; border-radius: 50%; background: #eef7f0; color: #166534; font-size: 22px; cursor: pointer; }
+    @media (max-width: 560px) { .detail-modal-content { padding: 18px 14px 0; } .detail-modal-content .modal-actions { margin-left: -14px; margin-right: -14px; padding-left: 14px; padding-right: 14px; flex-wrap: wrap; } .detail-modal-content .modal-actions .btn-pill { flex: 1 1 100%; } .share-link-row { flex-direction: column; } .share-copy-btn { min-height: 42px; } }
 
     /* AUTH & EDIT MODAL */
     .auth-modal-content { width: 440px; padding: 30px; text-align: left; border-radius: 12px; }
@@ -706,8 +741,8 @@
       .leaderboard-photo figcaption small { display: none; }
     }
     @media (max-width: 960px) {
-      .leaderboard-showcase { display: block; max-width: 820px; }
-      .leaderboard-photo { display: none; }
+      .points-leaderboard-layout { display: block; max-width: 820px; }
+      .points-leaderboard-layout > .redeem-intro { margin-top: 28px; }
     }
     @media (max-width: 640px) {
       #page-tac-dong { padding-top: 0; }
@@ -731,6 +766,19 @@
       .leaderboard-points { font-size: 13px; }
       .redeem-steps { grid-template-columns: 1fr; }
       .redeem-cta { width: 100%; }
+      .green-redeem-panel { width: calc(100vw - 16px); max-height: calc(100vh - 16px); max-height: calc(100dvh - 16px); padding: 18px; border-radius: 16px; }
+      .green-redeem-panel h2 { font-size: 22px; }
+      .green-redeem-reward-preview img { width: 96px; height: 96px; flex-basis: 96px; }
+    }
+    @media (max-width: 380px) {
+      .green-redeem-reward-preview { gap: 10px; padding: 10px; }
+      .green-redeem-reward-preview img { width: 76px; height: 76px; flex-basis: 76px; }
+    }
+    @media (max-height: 760px) {
+      .green-redeem-panel { padding-top: 14px; padding-bottom: 14px; }
+      .green-redeem-panel-head { margin-bottom: 10px; }
+      .green-redeem-form { gap: 9px; }
+      .green-redeem-reward-preview img { width: 88px; height: 88px; flex-basis: 88px; }
     }
 
     /* Campaign page layout — kept scoped to the campaign view. */
@@ -1139,12 +1187,9 @@
         </div>
       </div>
 
+      <div class="points-leaderboard-layout">
       <section class="leaderboard-section" aria-labelledby="leaderboard-title">
         <div class="leaderboard-showcase">
-          <figure class="leaderboard-photo leaderboard-photo-left">
-            <img src="Picture7.jpg" alt="Tình nguyện viên Hà Nội Xanh làm sạch dòng nước" loading="lazy">
-            <figcaption><span><i class="fa-solid fa-hands-holding-circle"></i></span><strong>Mỗi đóng góp đều được ghi nhận</strong><small>Điểm xanh lưu lại hành trình vì cộng đồng.</small></figcaption>
-          </figure>
           <div class="leaderboard-main">
             <div class="leaderboard-head">
               <div class="leaderboard-head-copy impact-section-heading" style="margin-bottom:0;">
@@ -1165,10 +1210,6 @@
               </div>
             </div>
           </div>
-          <figure class="leaderboard-photo leaderboard-photo-right">
-            <img src="Picture8.jpg" alt="Tình nguyện viên Hà Nội Xanh trong buổi ra quân" loading="lazy">
-            <figcaption><span><i class="fa-solid fa-seedling"></i></span><strong>Cùng nhau tạo thay đổi xanh</strong><small>Mỗi chiến dịch là một dấu mốc đáng nhớ.</small></figcaption>
-          </figure>
         </div>
       </section>
 
@@ -1180,6 +1221,7 @@
             <p>Điểm của từng chiến dịch đã xác nhận sẽ được cộng dồn vào tài khoản. Kho quà đổi điểm sẽ gồm vật phẩm sống xanh, quyền tham gia hoạt động đặc biệt và các phần quà từ đối tác Hà Nội Xanh.</p>
           </div>
           <button class="redeem-cta" type="button" onclick="openPointsProfile()">Xem điểm của tôi</button>
+          <button class="redeem-cta redeem-exchange-cta" type="button" onclick="openGreenRedeemModal()">Đổi điểm nhận quà xanh</button>
         </div>
         <div class="redeem-steps">
           <article class="redeem-step"><span>1</span><strong>Tham gia chiến dịch</strong><p>Đăng ký và hoàn thành hoạt động cùng cộng đồng.</p></article>
@@ -1187,6 +1229,21 @@
           <article class="redeem-step"><span>3</span><strong>Đổi quà xanh</strong><p>Dùng điểm cho các quyền lợi và quà tặng trong kho quà sắp mở.</p></article>
         </div>
       </section>
+      <div class="green-redeem-modal" id="greenRedeemModal" role="dialog" aria-modal="true" aria-labelledby="greenRedeemTitle">
+        <section class="green-redeem-panel">
+          <div class="green-redeem-panel-head"><div><h2 id="greenRedeemTitle">Đổi điểm nhận quà xanh</h2><p>Chọn phần quà, nhập số điểm muốn đổi và điền đầy đủ thông tin nhận quà.</p></div><button class="green-redeem-close" type="button" aria-label="Đóng" onclick="closeModal('greenRedeemModal')">×</button></div>
+          <form class="green-redeem-form" id="greenRedeemForm">
+            <label>Phần quà muốn nhận *<select id="greenRewardId" required><option value="">Đang tải danh sách quà…</option></select><div class="green-redeem-reward-preview" id="greenRewardPreview" hidden><img id="greenRewardImage" alt=""><div><strong id="greenRewardPreviewName"></strong><small id="greenRewardPreviewPoints"></small></div></div></label>
+            <label>Số điểm muốn đổi *<input id="greenRedeemPoints" type="number" min="1" step="1" required placeholder="Ví dụ: 30000"><small id="greenPointsBalance"></small></label>
+            <label>Họ và tên *<input id="greenRedeemName" type="text" required autocomplete="name"></label>
+            <label>Số điện thoại *<input id="greenRedeemPhone" type="tel" required autocomplete="tel"></label>
+            <label>Địa chỉ nhận quà xanh *<textarea id="greenRedeemAddress" required rows="3" autocomplete="street-address"></textarea></label>
+            <div class="green-redeem-result" id="greenRedeemResult"></div>
+            <button class="green-redeem-submit" id="greenRedeemSubmit" type="submit">Đổi điểm nhận quà xanh</button>
+          </form>
+        </section>
+      </div>
+      </div>
 
       <div class="impact-section-heading">
         <span class="impact-kicker">TÁC ĐỘNG ĐƯỢC ĐO ĐẾM</span>
@@ -1578,7 +1635,9 @@
 
   <div class="modal-backdrop" id="detailModal" onclick="if (event.target === this) closeModal('detailModal')">
     <div class="modal-content detail-modal-content">
+      <button type="button" class="detail-modal-close" aria-label="Đóng" onclick="closeModal('detailModal')">×</button>
       <h3 class="modal-header-title" id="mTitle">Chi tiết chiến dịch</h3>
+      <div class="detail-modal-scroll">
       <div class="detail-modal-meta" aria-label="Thông tin thời gian và địa điểm">
         <div><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span id="mLocation">Địa điểm chưa cập nhật</span></div>
         <div><i class="fa-regular fa-clock" aria-hidden="true"></i><span id="mTime">Thời gian chưa cập nhật</span></div>
@@ -1601,10 +1660,24 @@
         <img src="qr-zalo.png" alt="QR Zalo Hà Nội Xanh" style="width: 180px; height: 180px; object-fit: contain; margin: 10px auto; border-radius: 6px; border: 1px solid #ccc; display: block;">
         <p style="font-size: 13.5px; margin-top: 8px;">Link nhóm Zalo: <a href="https://zalo.me/g/cyutiy486" target="_blank" rel="noopener" style="color: var(--primary); font-weight: bold; text-decoration: underline;">https://zalo.me/g/cyutiy486</a></p>
       </div>
+      </div>
       <div class="modal-actions">
-        <button class="btn-pill btn-close-detail" onclick="closeModal('detailModal')">Đóng</button>
+        <button class="btn-pill btn-share-detail" id="mBtnShare" onclick="openCampaignShareModal()">Lan tỏa/chia sẻ chiến dịch</button>
         <button class="btn-pill btn-register-detail" id="mBtnJoin" onclick="registerCampaignFromModal()">Đăng ký tham gia ngay</button>
       </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="campaignShareModal" onclick="if (event.target === this) closeModal('campaignShareModal')">
+    <div class="modal-content share-modal-content" style="position:relative;">
+      <button type="button" class="share-modal-close" aria-label="Đóng" onclick="closeModal('campaignShareModal')">×</button>
+      <h3>Cùng Hà Nội Xanh lan tỏa chiến dịch</h3>
+      <p>Hãy chia sẻ chiến dịch này tới gia đình và bạn bè để nhiều người cùng biết, cùng tham gia và chung tay tạo nên một Hà Nội xanh hơn mỗi ngày.</p>
+      <div class="share-link-row">
+        <input id="campaignShareLink" type="text" readonly aria-label="Link chiến dịch">
+        <button type="button" class="share-copy-btn" onclick="copyCampaignShareLink()">Sao chép link</button>
+      </div>
+      <div id="campaignShareSuccess" class="share-success" role="status">Đã sao chép link thành công. Hãy gửi link cho những người thân thiết để họ cùng chung tay với Hà Nội Xanh!</div>
     </div>
   </div>
 
@@ -1922,6 +1995,7 @@
         // Always open at the top so the title is visible after a previous long scroll.
         detailModal.scrollTop = 0;
         if (detailContent) detailContent.scrollTop = 0;
+        detailModal.querySelector('.detail-modal-scroll')?.scrollTo({ top: 0, behavior: 'auto' });
         setDetailCarousel(0);
         document.getElementById('mTitle').innerText = data.title;
         const metaParts = String(data.meta || '').split('|').map(part => part.trim()).filter(Boolean);
@@ -1932,8 +2006,41 @@
         document.getElementById('mSupport').innerText = data.support || 'Chưa cập nhật.';
         document.getElementById('zaloGroupSection').style.display = 'none';
         document.getElementById('mBtnJoin').style.display = data.isCompleted ? 'none' : 'inline-flex';
+        document.getElementById('mBtnShare').style.display = 'inline-flex';
         detailModal.style.display = 'flex';
       }
+    }
+
+    function getCampaignShareUrl() {
+      const base = window.parent !== window ? window.parent.location.href : window.location.href;
+      const url = new URL(base);
+      url.pathname = url.pathname.replace(/\/$/, '') || '/chien-dich';
+      url.search = '';
+      url.searchParams.set('campaign', activeCampaignKey || '');
+      url.hash = '';
+      return url.toString();
+    }
+
+    function openCampaignShareModal() {
+      const input = document.getElementById('campaignShareLink');
+      const success = document.getElementById('campaignShareSuccess');
+      if (input) input.value = getCampaignShareUrl();
+      if (success) success.style.display = 'none';
+      document.getElementById('campaignShareModal').style.display = 'flex';
+    }
+
+    async function copyCampaignShareLink() {
+      const input = document.getElementById('campaignShareLink');
+      const success = document.getElementById('campaignShareSuccess');
+      const link = input?.value || getCampaignShareUrl();
+      try {
+        await navigator.clipboard.writeText(link);
+      } catch {
+        input?.focus();
+        input?.select();
+        document.execCommand('copy');
+      }
+      if (success) success.style.display = 'block';
     }
 
     function registerCampaignFromModal() {
@@ -2146,6 +2253,7 @@
     }
 
     let selectedReportImages = [];
+    let pendingSharedCampaignKey = null;
     function previewUpload(input) { selectedReportImages = [...selectedReportImages, ...input.files]; input.value = ''; renderReportImages(); }
     function renderReportImages() { const p = document.getElementById('uploadPreviewText'); p.innerHTML = ''; p.style.display = 'flex'; p.style.gap = '8px'; p.style.flexWrap = 'wrap'; selectedReportImages.forEach((file, index) => { const wrap = document.createElement('span'); wrap.style = 'position:relative;display:inline-block'; const img = document.createElement('img'); img.src = URL.createObjectURL(file); img.title = file.name; img.style = 'width:64px;height:64px;object-fit:cover;border-radius:8px'; const remove = document.createElement('button'); remove.type = 'button'; remove.textContent = '×'; remove.title = 'Xóa ảnh'; remove.style = 'position:absolute;right:-6px;top:-8px;width:22px;height:22px;border:0;border-radius:50%;background:#dc2626;color:#fff;font-weight:bold;cursor:pointer'; remove.onclick = () => { selectedReportImages.splice(index, 1); renderReportImages(); }; wrap.append(img, remove); p.appendChild(wrap); }); const add = document.createElement('button'); add.type = 'button'; add.textContent = '+'; add.title = 'Thêm ảnh'; add.style = 'width:64px;height:64px;border:2px dashed #10b981;border-radius:8px;background:#ecfdf5;color:#059669;font-size:28px;cursor:pointer'; add.onclick = () => document.getElementById('fileInput').click(); p.appendChild(add); }
 
@@ -2180,6 +2288,23 @@
         const actions = document.querySelector('#top .header-actions'); let link = document.getElementById('adminDashboardLink');
         if (currentUser?.role === 'admin' && actions && !link) { link = document.createElement('a'); link.id = 'adminDashboardLink'; link.className = 'btn-login'; link.textContent = 'DASHBOARD'; link.href = '#'; link.onclick = function(e) { e.preventDefault(); window.parent.postMessage({ type: 'hnx:navigate', path: '/admin' }, '*'); }; actions.insertBefore(link, actions.lastElementChild); }
         if (currentUser?.role !== 'admin' && link) link.remove();
+        if (currentUser && pendingSharedCampaignKey && campaignDetails[pendingSharedCampaignKey]) {
+          const sharedKey = pendingSharedCampaignKey;
+          pendingSharedCampaignKey = null;
+          window.setTimeout(() => openDetailModal(sharedKey), 80);
+        }
+      }
+      if (event.data?.type === 'hnx:shared-campaign') {
+        const sharedKey = String(event.data.campaignKey || '').trim();
+        if (!sharedKey) return;
+        pendingSharedCampaignKey = sharedKey;
+        if (currentUser && campaignDetails[sharedKey]) {
+          pendingSharedCampaignKey = null;
+          window.setTimeout(() => openDetailModal(sharedKey), 80);
+        } else {
+          openAuthModal('login');
+        }
+        return;
       }
       if (event.data?.type === 'hnx:registered-campaigns') { window.hnxRegisteredCampaigns = event.data.keys || []; }
       if (event.data?.type === 'hnx:campaign-register-result') {
@@ -2195,8 +2320,13 @@
       const modal = document.getElementById(id);
       if (!modal) return;
       modal.style.display = 'none';
+      if (id === 'greenRedeemModal') {
+        const siteHeader = document.getElementById('top');
+        if (siteHeader) { siteHeader.style.visibility = ''; siteHeader.style.pointerEvents = ''; }
+      }
       const content = modal.querySelector('.modal-content');
       if (content) content.scrollTop = 0;
+      modal.querySelectorAll('.detail-modal-scroll').forEach(element => { element.scrollTop = 0; });
     }
     document.addEventListener('keydown', function(event) { if (event.key === 'Escape') closeModal('successModal'); });
 
@@ -2228,6 +2358,11 @@
         const joinButton = document.createElement('button'); joinButton.type = 'button'; joinButton.className = 'btn-join-campaign'; joinButton.innerText = 'Tham gia ngay'; joinButton.onclick = function() { joinCampaign(c.id); }; card.querySelector('.card-bottom').appendChild(joinButton);
         pane.appendChild(card);
       });
+        if (currentUser && pendingSharedCampaignKey && campaignDetails[pendingSharedCampaignKey]) {
+          const sharedKey = pendingSharedCampaignKey;
+          pendingSharedCampaignKey = null;
+          window.setTimeout(() => openDetailModal(sharedKey), 80);
+        }
     });
 
     const defaultCampaignLocations = [
@@ -2518,5 +2653,95 @@
       renderCompletedCampaigns(impactProjects);
     });
   </script>
+<script>
+  (() => {
+    let greenRewards = [];
+    const defaultRewardImages = {
+      'Găng tay Hà Nội Xanh': '/source/rewards/green-gloves.png',
+      'Áo Hà Nội Xanh': '/source/rewards/green-shirt.png'
+    };
+    const rewardSelect = document.getElementById('greenRewardId');
+    const pointsInput = document.getElementById('greenRedeemPoints');
+    const rewardHint = document.getElementById('greenRewardHint');
+    const rewardPreview = document.getElementById('greenRewardPreview');
+    const rewardPreviewImage = document.getElementById('greenRewardImage');
+    const rewardPreviewName = document.getElementById('greenRewardPreviewName');
+    const rewardPreviewPoints = document.getElementById('greenRewardPreviewPoints');
+    const balanceHint = document.getElementById('greenPointsBalance');
+    const resultBox = document.getElementById('greenRedeemResult');
+    const submitButton = document.getElementById('greenRedeemSubmit');
+    const renderRewards = () => {
+      if (!rewardSelect) return;
+      rewardSelect.innerHTML = greenRewards.length
+        ? '<option value="">Chọn phần quà</option>' + greenRewards.map(reward => `<option value="${escapeImpactHtml(reward.id)}">${escapeImpactHtml(reward.name)} · ${Number(reward.points_cost || 0).toLocaleString('vi-VN')} điểm</option>`).join('')
+        : '<option value="">Chưa có phần quà khả dụng</option>';
+      rewardSelect.disabled = !greenRewards.length;
+      if (!greenRewards.length && rewardHint) rewardHint.textContent = 'Danh mục quà chưa được mở bán. Vui lòng thử lại sau.';
+    };
+    const updateRewardHint = () => {
+      const reward = greenRewards.find(item => item.id === rewardSelect?.value);
+      if (rewardHint) rewardHint.textContent = reward ? `${Number(reward.points_cost).toLocaleString('vi-VN')} điểm · ${reward.description || ''}` : '';
+      if (rewardPreview && rewardPreviewImage && rewardPreviewName && rewardPreviewPoints) {
+        const imageUrl = reward?.image_url || defaultRewardImages[reward?.name] || '';
+        rewardPreview.hidden = !reward || !imageUrl;
+        if (reward && imageUrl) {
+          rewardPreviewImage.src = imageUrl;
+          rewardPreviewImage.alt = `Ảnh ${reward.name || 'phần quà'}`;
+          rewardPreviewName.textContent = reward.name || 'Phần quà xanh';
+          rewardPreviewPoints.textContent = reward.description || '';
+        } else {
+          rewardPreviewImage.removeAttribute('src');
+          rewardPreviewName.textContent = '';
+          rewardPreviewPoints.textContent = '';
+        }
+      }
+      if (pointsInput) {
+        if (reward) {
+          pointsInput.min = String(reward.points_cost);
+          pointsInput.max = String(reward.points_cost);
+          pointsInput.value = String(reward.points_cost);
+        } else {
+          pointsInput.removeAttribute('min');
+          pointsInput.removeAttribute('max');
+        }
+      }
+    };
+    window.openGreenRedeemModal = () => {
+      if (!currentUser) { openAuthModal('login'); return; }
+      const siteHeader = document.getElementById('top');
+      if (siteHeader) { siteHeader.style.visibility = 'hidden'; siteHeader.style.pointerEvents = 'none'; }
+      const redeemModal = document.getElementById('greenRedeemModal');
+      if (redeemModal) { redeemModal.style.display = ''; redeemModal.classList.add('is-open'); }
+      const name = document.getElementById('greenRedeemName'); const phone = document.getElementById('greenRedeemPhone');
+      if (name && !name.value) name.value = currentUser.name || '';
+      if (phone && !phone.value && currentUser.phone && currentUser.phone !== 'Chưa cập nhật') phone.value = currentUser.phone;
+      if (balanceHint) balanceHint.textContent = `Điểm hiện có: ${Number(currentUser.points || 0).toLocaleString('vi-VN')}`;
+      if (resultBox) { resultBox.classList.remove('is-visible'); resultBox.textContent = ''; }
+      if (submitButton) submitButton.disabled = false;
+    };
+    rewardSelect?.addEventListener('change', updateRewardHint);
+    document.getElementById('greenRedeemForm')?.addEventListener('submit', event => {
+      event.preventDefault();
+      if (!currentUser) { openAuthModal('login'); return; }
+      const reward = greenRewards.find(item => item.id === rewardSelect?.value);
+      if (!rewardSelect?.value || !pointsInput?.value || !reward) return;
+      if (Number(pointsInput.value) !== Number(reward.points_cost)) { alert(`Phần quà này cần đúng ${Number(reward.points_cost).toLocaleString('vi-VN')} điểm.`); return; }
+      if (submitButton) submitButton.disabled = true;
+      window.parent.postMessage({ type: 'hnx:green-redeem', rewardId: rewardSelect.value, points: Number(pointsInput.value), fullName: document.getElementById('greenRedeemName').value.trim(), phone: document.getElementById('greenRedeemPhone').value.trim(), deliveryAddress: document.getElementById('greenRedeemAddress').value.trim() }, window.location.origin);
+    });
+    window.addEventListener('message', event => {
+      if (event.data?.type === 'hnx:green-rewards-data') { greenRewards = Array.isArray(event.data.rewards) ? event.data.rewards : []; renderRewards(); updateRewardHint(); }
+      if (event.data?.type === 'hnx:green-redeem-result') {
+        if (!event.data.ok) { if (submitButton) submitButton.disabled = false; alert(event.data.message || 'Không thể đổi quà lúc này.'); return; }
+        const redemption = event.data.redemption || {};
+        if (currentUser) currentUser.points = Number(redemption.remaining_points || 0);
+        if (typeof applyUserDataToUI === 'function') applyUserDataToUI();
+        if (resultBox) { resultBox.innerHTML = `<strong>Chúc mừng bạn đã đổi thành công ${Number(redemption.points_spent || 0).toLocaleString('vi-VN')} điểm thành ${escapeImpactHtml(redemption.reward_name || 'quà xanh')}.</strong><br>Số điểm còn lại: ${Number(redemption.remaining_points || 0).toLocaleString('vi-VN')} điểm.`; resultBox.classList.add('is-visible'); }
+        if (submitButton) { submitButton.disabled = true; submitButton.textContent = 'Đã xác nhận đổi quà'; }
+      }
+      if (event.data?.type === 'hnx:leaderboard-refresh') { leaderboardData.all = Array.isArray(event.data.rows) ? event.data.rows : []; if (activeLeaderboardPeriod === 'all') renderLeaderboard(); }
+    });
+  })();
+</script>
 </body>
 </html>

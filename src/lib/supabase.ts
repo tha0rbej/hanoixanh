@@ -360,6 +360,15 @@ export async function tableDelete(table: string, query: string, token: string) {
   await parseResponse<unknown>(response)
 }
 
+export async function rpc<T>(functionName: string, values: unknown, token: string) {
+  const response = await fetch(`${supabaseUrl}/rest/v1/rpc/${functionName}`, {
+    method: "POST",
+    headers: authHeaders(token),
+    body: JSON.stringify(values),
+  })
+  return parseResponse<T>(response)
+}
+
 export async function uploadPublicFile(file: File, token: string) {
   requireConfig()
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-")

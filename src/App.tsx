@@ -13,7 +13,7 @@ import { AuthModal } from "./app/AuthModal"
 import { AuthProvider, useAuth } from "./app/AuthContext"
 import { ResetPasswordPage } from "./app/ResetPasswordPage"
 import { DEFAULT_REWARD_PROGRAM, earnedBadges, monthsSince, normalizeRewardProgram } from "./app/rewards"
-import { consumeOAuthSession, tableInsert, tableInsertMinimal, tableSelect, updateProfile, uploadPublicFile } from "./lib/supabase"
+import { consumeOAuthSession, rpc, tableInsert, tableInsertMinimal, tableSelect, updateProfile, uploadPublicFile } from "./lib/supabase"
 
 type SourcePage = "home" | "about" | "remaining" | "profile"
 
@@ -153,7 +153,7 @@ function SourceFrame({
   useEffect(() => {
     const receiveNavigation = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return
-      const message = event.data as { type?: string; path?: string; section?: string; tab?: "login" | "register" | "reset"; campaignKey?: string; location?: string; description?: string; email?: string; latitude?: number; longitude?: number; fullName?: string; phone?: string; organization?: string; organizationType?: string; birthDate?: string; gender?: string; address?: string; occupation?: string; interests?: string; bio?: string; currentPassword?: string; newPassword?: string; image?: File; images?: File[] }
+      const message = event.data as { type?: string; path?: string; section?: string; tab?: "login" | "register" | "reset"; campaignKey?: string; location?: string; description?: string; email?: string; latitude?: number; longitude?: number; fullName?: string; phone?: string; organization?: string; organizationType?: string; birthDate?: string; gender?: string; address?: string; occupation?: string; interests?: string; bio?: string; currentPassword?: string; newPassword?: string; image?: File; images?: File[]; rewardId?: string; points?: number; deliveryAddress?: string }
       if (message?.type === "hnx:navigate" && message.path && allowedPaths.has(message.path)) {
         const section = message.section?.replace(/[^a-z0-9-]/gi, "")
         const destination = section ? `${message.path}#${section}` : message.path
@@ -191,6 +191,34 @@ function SourceFrame({
           .then((existing) => { if (existing.length) throw new Error("Bạn đã đăng ký tham gia chiến dịch này rồi."); return tableInsert("campaign_registrations", { user_id: session.user.id, campaign_key: message.campaignKey, status: "registered" }, session.access_token) })
           .then(() => frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaign-register-result", ok: true }, window.location.origin))
           .catch((error: Error) => frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaign-register-result", ok: false, message: error.message.includes("duplicate") ? "Bạn đã đăng ký tham gia chiến dịch này rồi." : error.message }, window.location.origin))
+        return
+      }
+      if (message?.type === "hnx:green-redeem") {
+        if (!session) { onAuth("login"); return }
+        void (async () => {
+          try {
+            const result = await rpc<{ id: string; reward_name: string; points_spent: number; remaining_points: number }>("redeem_green_reward", {
+              requested_reward_id: message.rewardId,
+              requested_points: Math.floor(Number(message.points || 0)),
+              recipient_name: message.fullName || "",
+              recipient_phone: message.phone || "",
+              recipient_address: message.deliveryAddress || "",
+            }, session.access_token)
+            await refreshProfile()
+            frameRef.current?.contentWindow?.postMessage({ type: "hnx:green-redeem-result", ok: true, redemption: result }, window.location.origin)
+            window.setTimeout(() => void sendAuthState(), 0)
+            const token = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
+            if (token) void (async () => {
+              const periods = ["month", "year", "all"] as const
+              const entries = await Promise.all(periods.map(async period => {
+                const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/rpc/get_points_leaderboard`, { method: "POST", headers: { apikey: token, Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ period_key: period, row_limit: 10 }) })
+                const rows = response.ok ? await response.json() : []
+                return [period, Array.isArray(rows) ? rows : []] as const
+              }))
+              frameRef.current?.contentWindow?.postMessage({ type: "hnx:leaderboard-data", leaderboards: Object.fromEntries(entries) }, window.location.origin)
+            })()
+          } catch (error) { frameRef.current?.contentWindow?.postMessage({ type: "hnx:green-redeem-result", ok: false, message: error instanceof Error ? error.message : "Không thể đổi quà lúc này." }, window.location.origin) }
+        })()
         return
       }
       if (message?.type === "hnx:pollution-report") {
@@ -257,14 +285,23 @@ function SourceFrame({
 
   useEffect(() => {
     void sendAuthState()
-  }, [profile, session])
+    const sharedCampaign = new URLSearchParams(location.search).get("campaign")
+    if (sharedCampaign && page === "remaining") {
+      window.setTimeout(() => frameRef.current?.contentWindow?.postMessage({ type: "hnx:shared-campaign", campaignKey: sharedCampaign }, window.location.origin), 120)
+    }
+  }, [location.search, page, profile, session])
 
   const handleFrameLoad = () => {
     if (page === "home") frameRef.current?.contentWindow?.postMessage({ type: "hnx:scroll-top" }, window.location.origin)
     void sendAuthState()
+    const sharedCampaign = new URLSearchParams(location.search).get("campaign")
+    if (sharedCampaign && page === "remaining") {
+      frameRef.current?.contentWindow?.postMessage({ type: "hnx:shared-campaign", campaignKey: sharedCampaign }, window.location.origin)
+    }
     const token = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
     if (token) void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/campaigns?select=*&order=start_at.desc`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(campaigns => frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaigns-data", campaigns }, window.location.origin))
     if (token) void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/homepage_metrics?select=metric_key,metric_value`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(metrics => frameRef.current?.contentWindow?.postMessage({ type: "hnx:homepage-metrics", metrics }, window.location.origin))
+    if (token && page === "remaining") void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/green_rewards?select=*&active=eq.true&order=sort_order.asc`, { cache: "no-store", headers: { apikey: token, Authorization: `Bearer ${session?.access_token || token}` } }).then(response => response.ok ? response.json() : Promise.reject(new Error(`Không tải được danh mục quà (${response.status}).`))).then(rewards => frameRef.current?.contentWindow?.postMessage({ type: "hnx:green-rewards-data", rewards: Array.isArray(rewards) ? rewards : [] }, window.location.origin)).catch(() => frameRef.current?.contentWindow?.postMessage({ type: "hnx:green-rewards-data", rewards: [] }, window.location.origin))
     if (token) void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/posts?select=*&status=eq.published&order=published_at.desc.nullslast,created_at.desc`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(posts => frameRef.current?.contentWindow?.postMessage({ type: "hnx:posts-data", posts: Array.isArray(posts) ? posts : [] }, window.location.origin))
     if (token && page === "remaining") void (async () => {
       const periods = ["month", "year", "all"] as const
@@ -318,6 +355,8 @@ function SourceFrame({
 function AppRoutes() {
   const [authTab, setAuthTab] = useState<("login" | "register" | "reset") | null>(null)
   const navigate = useNavigate()
+  const location = useLocation()
+  const { session } = useAuth()
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""))
@@ -343,6 +382,10 @@ function AppRoutes() {
       navigate(`/dat-lai-mat-khau${window.location.hash}`, { replace: true })
     }
   }, [navigate])
+  useEffect(() => {
+    const sharedCampaign = new URLSearchParams(location.search).get("campaign")
+    if (sharedCampaign && location.pathname === "/chien-dich" && !session) setAuthTab("login")
+  }, [location.pathname, location.search, session])
   const openAuth = (tab: "login" | "register" | "reset") => setAuthTab(tab)
   const closeAuth = () => setAuthTab(null)
   return (
