@@ -199,6 +199,12 @@
 .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
 .wide-field { margin-top: 14px; }
 .admin-panel textarea { min-height: 86px; resize: vertical; }
+.admin-campaign-form form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
+.admin-campaign-form form > .form-grid { grid-column: 1 / -1; gap: 10px 14px; }
+.admin-campaign-form form > .wide-field { margin-top: 0; }
+.admin-campaign-form form > .wide-field textarea { min-height: 58px; }
+.admin-campaign-form form > .admin-primary { margin-top: 2px; }
+.admin-campaign-form form > .wide-field:nth-of-type(5) { grid-column: 1 / -1; }
 .admin-panel .large-textarea { min-height: 170px; }
 .admin-panel form > .admin-primary { margin-top: 16px; }
 .admin-panel > hr { margin: 28px 0 18px; border: 0; border-top: 1px solid #e7efe9; }
@@ -276,6 +282,9 @@
   .form-grid { grid-template-columns: 1fr; }
   .admin-points-editor { grid-template-columns: 1fr; }
   .admin-panel-heading { flex-direction: column; }
+  .admin-campaign-form form { grid-template-columns: 1fr; }
+  .admin-campaign-form form > .form-grid { grid-column: auto; }
+  .admin-campaign-form form > .wide-field { grid-column: auto; }
   .admin-panel input, .admin-panel textarea, .admin-panel select { font-size: 16px; }
   .admin-table-wrap, .admin-panel:has(> table) { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .admin-table-wrap table, .admin-panel > table { min-width: 720px; }
