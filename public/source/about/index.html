@@ -2579,6 +2579,7 @@
       text-transform: uppercase;
       box-shadow: 0 8px 18px rgba(10,62,39,.18);
     }
+    #reference-about-body .reference-intro-visual figcaption { display: none !important; }
     #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) {
       margin-bottom: 24px;
       border-bottom: 1px solid #cfe3d3;
@@ -2613,6 +2614,63 @@
     #page-doanh-nghiep .vehx-eyebrow,
     #page-doi-ngu .vehx-eyebrow { font-size: 12px; font-weight: 800; line-height: 1.2; letter-spacing: .16em; text-transform: uppercase; }
     #page-ve-chung-toi .reference-intro .section-title { max-width: none; font-size: clamp(42px, 4.2vw, 52px); white-space: nowrap; }
+    /* Founding shareholders: people-first section for the social enterprise page. */
+    #page-doanh-nghiep .enterprise-founders {
+      position: relative;
+      overflow: hidden;
+      padding: 96px 0 104px;
+      background: #f5f9f1;
+      border-top: 1px solid #dcebdc;
+      border-bottom: 1px solid #dcebdc;
+    }
+    #page-doanh-nghiep .enterprise-founders::before {
+      content: "";
+      position: absolute;
+      left: -170px;
+      top: -220px;
+      width: 500px;
+      height: 500px;
+      border: 1px solid rgba(22,130,81,.12);
+      border-radius: 50%;
+      box-shadow: 0 0 0 28px rgba(22,130,81,.04), 0 0 0 58px rgba(22,130,81,.025);
+      pointer-events: none;
+    }
+    #page-doanh-nghiep .enterprise-founders > .container { position: relative; z-index: 1; }
+    #page-doanh-nghiep .enterprise-founders-head { display: flex; align-items: end; justify-content: space-between; gap: 32px; margin-bottom: 42px; }
+    #page-doanh-nghiep .enterprise-founders-head .section-title { max-width: 15ch; margin-top: 16px; color: #103e2e; }
+    #page-doanh-nghiep .enterprise-founders-intro { max-width: 390px; margin: 0 0 4px; color: #567065; font-size: 14px; line-height: 1.75; }
+    #page-doanh-nghiep .enterprise-founder-card {
+      display: grid;
+      grid-template-columns: minmax(260px, .72fr) minmax(0, 1.28fr);
+      overflow: hidden;
+      min-height: 390px;
+      border: 1px solid #cfe2d1;
+      border-radius: 26px;
+      background: #fff;
+      box-shadow: 0 20px 42px rgba(16,62,46,.1);
+    }
+    #page-doanh-nghiep .enterprise-founder-portrait { position: relative; min-height: 390px; background: #d9eed8; }
+    #page-doanh-nghiep .enterprise-founder-portrait::after { content: ""; position: absolute; right: 24px; bottom: 24px; width: 82px; height: 5px; border-radius: 99px; background: #d5f3b5; }
+    #page-doanh-nghiep .enterprise-founder-portrait img { display: block; width: 100%; height: 100%; min-height: 390px; object-fit: cover; object-position: 35% 50%; }
+    #page-doanh-nghiep .enterprise-founder-content { position: relative; padding: 42px 48px 38px; }
+    #page-doanh-nghiep .enterprise-founder-content::before { content: "01"; position: absolute; right: 36px; top: 28px; color: #e5f2e2; font-size: 84px; font-weight: 900; line-height: 1; letter-spacing: -.08em; }
+    #page-doanh-nghiep .enterprise-founder-content > * { position: relative; z-index: 1; }
+    #page-doanh-nghiep .enterprise-founder-tag { display: inline-flex; padding: 7px 11px; border-radius: 999px; background: #e8f5df; color: #0b633d; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    #page-doanh-nghiep .enterprise-founder-content h3 { max-width: 18ch; margin: 22px 0 8px; color: #0b633d; font-size: clamp(27px, 3vw, 40px); line-height: 1.02; letter-spacing: -.045em; }
+    #page-doanh-nghiep .enterprise-founder-role { margin: 0 0 28px; color: #168251; font-size: 14px; font-weight: 700; }
+    #page-doanh-nghiep .enterprise-founder-content h4 { margin: 0 0 8px; color: #173f2e; font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    #page-doanh-nghiep .enterprise-founder-content p { max-width: 62ch; margin: 0 0 18px; color: #466457; font-size: 14px; font-weight: 500; line-height: 1.78; }
+    #page-doanh-nghiep .enterprise-founder-commitment { padding-top: 18px; border-top: 1px solid #dcebdc; }
+    #page-doanh-nghiep .enterprise-founder-commitment p { margin-bottom: 0; color: #315d46; }
+    @media (max-width: 760px) {
+      #page-doanh-nghiep .enterprise-founders { padding: 70px 0 76px; }
+      #page-doanh-nghiep .enterprise-founders-head { display: block; }
+      #page-doanh-nghiep .enterprise-founders-intro { margin-top: 18px; }
+      #page-doanh-nghiep .enterprise-founder-card { grid-template-columns: 1fr; }
+      #page-doanh-nghiep .enterprise-founder-portrait,
+      #page-doanh-nghiep .enterprise-founder-portrait img { min-height: 300px; height: 300px; }
+      #page-doanh-nghiep .enterprise-founder-content { padding: 30px 24px; }
+    }
     @media (max-width: 900px) {
       #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid) { padding: 72px 0 76px; }
       #page-doanh-nghiep .enterprise-section.paper:has(.enterprise-step-grid)::before { display: none; }
@@ -3538,6 +3596,8 @@
       <section class="enterprise-intro"><div class="container"><div class="enterprise-crumb"><a onclick="navigateParent('/')">Trang chủ</a><span>/</span>Doanh nghiệp xã hội</div><span class="vehx-eyebrow">Doanh nghiệp xã hội</span><h1 class="section-title">Kết nối nguồn lực cho những thay đổi có thể duy trì.</h1><p class="enterprise-lead">Công ty Cổ phần Doanh nghiệp Xã hội Hà Nội Xanh · Thành lập ngày 13/07/2026.</p></div></section>
 
       <section class="enterprise-section"><div class="container enterprise-split"><div class="enterprise-copy"><h2 class="section-title">Tiếp nối tinh thần hành động.<br>Phát triển năng lực triển khai.</h2><p>Doanh nghiệp xã hội Hà Nội Xanh được thành lập ngày 13/07/2026, tiếp nối kinh nghiệm và tinh thần hành động từ hành trình tình nguyện Hà Nội Xanh. Chúng tôi hướng tới xây dựng các dự án môi trường có mục tiêu cụ thể, kết nối nguồn lực và tổ chức sự phối hợp giữa địa phương, cộng đồng và các đơn vị đồng hành.</p><p>Thực tế dọn rác cho thấy một địa điểm sau khi được làm sạch vẫn có thể bị ô nhiễm trở lại. Để duy trì thành quả, cần phương án thu gom, đầu mối theo dõi, nguồn lực ổn định và sự tham gia của cộng đồng. Doanh nghiệp xã hội Hà Nội Xanh được phát triển để từng bước đáp ứng những nhu cầu đó, thông qua việc xây dựng dự án, phối hợp triển khai và theo dõi kết quả theo phạm vi đã thống nhất.</p><a class="vehx-secondary-btn" onclick="navigateParent('/lien-he')">Trao đổi hợp tác <i class="fa-solid fa-arrow-right"></i></a></div><div class="enterprise-image-placeholder"><!-- Chèn ảnh vào đây --><span>Ảnh hoạt động làm sạch môi trường</span></div></div></section>
+
+      <section class="enterprise-founders"><div class="container"><div class="enterprise-founders-head"><div><span class="vehx-eyebrow">Con người và trách nhiệm</span><h2 class="section-title">Cổ đông sáng lập</h2></div><p class="enterprise-founders-intro">Những người đặt nền móng cho doanh nghiệp xã hội và cùng chịu trách nhiệm đưa sứ mệnh cộng đồng thành những việc làm cụ thể.</p></div><article class="enterprise-founder-card"><div class="enterprise-founder-portrait"><img src="/anh-hnx/huy.webp" alt="Nguyễn Tiến Huy, cổ đông sáng lập Hà Nội Xanh"></div><div class="enterprise-founder-content"><span class="enterprise-founder-tag">Cổ đông sáng lập · 01</span><h3>Nguyễn Tiến Huy</h3><p class="enterprise-founder-role">Người sáng lập Hà Nội Xanh · Giám đốc Doanh nghiệp xã hội</p><h4>Chuyên môn và kinh nghiệm</h4><p>Nguyễn Tiến Huy khởi xướng Hà Nội Xanh từ tháng 12/2022, trực tiếp tổ chức các hoạt động làm sạch sông, kênh mương và kết nối lực lượng tình nguyện. Anh có kinh nghiệm điều phối hiện trường, phối hợp địa phương, kết nối nguồn lực và truyền thông từ công việc thực tế.</p><div class="enterprise-founder-commitment"><h4>Đóng góp và định hướng đồng hành</h4><p>Anh định hướng doanh nghiệp phát triển các dự án môi trường có mục tiêu rõ ràng, có đầu mối theo dõi và có cách ghi nhận kết quả cụ thể. Cam kết của anh là kết nối cộng đồng, đối tác và nguồn lực để duy trì những địa điểm đã được làm sạch lâu dài hơn.</p></div></div></article></div></section>
 
       <section class="enterprise-section paper"><div class="container enterprise-split"><div class="enterprise-copy"><span class="vehx-eyebrow">Sứ mệnh doanh nghiệp</span><h2 class="section-title">Tạo kết nối giữa nguồn lực và nhu cầu môi trường</h2><p>Kết nối nguồn lực, chuyên môn và sự tham gia của cộng đồng để triển khai những công việc thiết thực tại các điểm ô nhiễm; góp phần gìn giữ khu vực đã được làm sạch và mở rộng khả năng cùng hành động của các bên.</p></div><div class="enterprise-copy"><span class="vehx-eyebrow">Tầm nhìn doanh nghiệp</span><h2 class="section-title">Phát triển mô hình môi trường gắn với cộng đồng</h2><p>Hướng tới xây dựng năng lực triển khai các dự án môi trường có mục tiêu và trách nhiệm rõ ràng; thử nghiệm, đánh giá và nhân rộng mô hình phù hợp với điều kiện từng địa phương. Việc mở rộng dựa trên kết quả thực tế và khả năng duy trì.</p></div></div></section>
 
