@@ -4277,6 +4277,7 @@
     }
 
     function openDonateModal() {
+      if (window.parent !== window) window.parent.postMessage({ type: 'hnx:donation-info' }, '*');
       document.getElementById('donateModal').style.display = 'flex';
     }
 

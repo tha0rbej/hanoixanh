@@ -14,6 +14,7 @@ import { AuthProvider, useAuth } from "./app/AuthContext"
 import { ResetPasswordPage } from "./app/ResetPasswordPage"
 import { DEFAULT_REWARD_PROGRAM, earnedBadges, monthsSince, normalizeRewardProgram } from "./app/rewards"
 import { consumeOAuthSession, rpc, tableInsert, tableInsertMinimal, tableSelect, updateProfile, uploadPublicFile } from "./lib/supabase"
+import { trackEvent, trackPageView } from "./lib/analytics"
 
 type SourcePage = "home" | "about" | "remaining" | "profile"
 
@@ -161,6 +162,10 @@ function SourceFrame({
         return
       }
       if (message?.type === "hnx:auth-open") { onAuth(message.tab || "login"); return }
+      if (message?.type === "hnx:donation-info") {
+        trackEvent("click_donation_info", { click_location: page })
+        return
+      }
       if (message?.type === "hnx:volunteer-register" || message?.type === "hnx:partner-register") {
         if (!session) { onAuth("login"); return }
         void (async () => {
@@ -181,15 +186,16 @@ function SourceFrame({
       }
       if (message?.type === "hnx:contact-message") {
         void tableInsertMinimal("contact_messages", { name: message.fullName || profile?.full_name || "Khách chưa đăng nhập", email: message.email || profile?.email || "", message: message.description || "", user_id: session?.user.id || null }, session?.access_token || "")
-          .then(() => frameRef.current?.contentWindow?.postMessage({ type: "hnx:contact-message-result", ok: true }, window.location.origin))
+          .then(() => { trackEvent("send_message_success"); frameRef.current?.contentWindow?.postMessage({ type: "hnx:contact-message-result", ok: true }, window.location.origin) })
           .catch((error: Error) => frameRef.current?.contentWindow?.postMessage({ type: "hnx:contact-message-result", ok: false, message: error.message || "Không thể gửi lời nhắn." }, window.location.origin))
         return
       }
       if (message?.type === "hnx:campaign-register") {
+        trackEvent("click_register", { campaign_id: message.campaignKey || "unknown", click_location: page === "home" ? "homepage_campaign_modal" : "campaign_detail_modal" })
         if (!session) { onAuth("login"); return }
         void tableSelect<{ id: string }>("campaign_registrations", "id", session.access_token, `&user_id=eq.${encodeURIComponent(session.user.id)}&campaign_key=eq.${encodeURIComponent(message.campaignKey || "")}&limit=1`)
           .then((existing) => { if (existing.length) throw new Error("Bạn đã đăng ký tham gia chiến dịch này rồi."); return tableInsert("campaign_registrations", { user_id: session.user.id, campaign_key: message.campaignKey, status: "registered" }, session.access_token) })
-          .then(() => frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaign-register-result", ok: true }, window.location.origin))
+          .then(() => { trackEvent("volunteer_registration_success", { campaign_id: message.campaignKey || "unknown" }); frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaign-register-result", ok: true }, window.location.origin) })
           .catch((error: Error) => frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaign-register-result", ok: false, message: error.message.includes("duplicate") ? "Bạn đã đăng ký tham gia chiến dịch này rồi." : error.message }, window.location.origin))
         return
       }
@@ -229,6 +235,7 @@ function SourceFrame({
             const firstImage = images.find((image): image is File => image instanceof File)
             const photoUrl = firstImage ? await uploadPublicFile(firstImage, session.access_token) : null
             await tableInsertMinimal("pollution_reports", { user_id: session.user.id, location_name: message.location, address: message.location, latitude: message.latitude || null, longitude: message.longitude || null, description: message.description, photo_url: photoUrl, status: "new", severity: "medium" }, session.access_token)
+            trackEvent("pollution_report_success", { report_type: "pollution" })
             frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: true }, window.location.origin)
           } catch (error) { frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: false, message: error instanceof Error ? error.message : "Không gửi được báo cáo." }, window.location.origin) }
         })()
@@ -266,7 +273,7 @@ function SourceFrame({
     }
     window.addEventListener("message", receiveNavigation)
     return () => window.removeEventListener("message", receiveNavigation)
-  }, [changePassword, location.pathname, navigate, onAuth, profile, refreshProfile, session, signOut])
+  }, [changePassword, location.pathname, navigate, onAuth, page, profile, refreshProfile, session, signOut])
 
   useEffect(() => {
     const report = pendingReportRef.current
@@ -278,6 +285,7 @@ function SourceFrame({
         const firstImage = images.find((image): image is File => image instanceof File)
         const photoUrl = firstImage ? await uploadPublicFile(firstImage, session.access_token) : null
         await tableInsertMinimal("pollution_reports", { user_id: session.user.id, location_name: report.location, address: report.location, latitude: report.latitude || null, longitude: report.longitude || null, description: report.description, photo_url: photoUrl, status: "new", severity: "medium" }, session.access_token)
+        trackEvent("pollution_report_success", { report_type: "pollution" })
         frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: true }, window.location.origin)
       } catch (error) { frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: false, message: error instanceof Error ? error.message : "Không gửi được báo cáo." }, window.location.origin) }
     })()
@@ -357,6 +365,9 @@ function AppRoutes() {
   const navigate = useNavigate()
   const location = useLocation()
   const { session } = useAuth()
+  useEffect(() => {
+    trackPageView(location.pathname)
+  }, [location.pathname])
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""))

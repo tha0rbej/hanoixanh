@@ -2063,7 +2063,7 @@
       registerCampaignFromModal();
     }
 
-    function openDonateModal() { document.getElementById('donateModal').style.display = 'flex'; }
+    function openDonateModal() { if (window.parent !== window) window.parent.postMessage({ type: 'hnx:donation-info' }, '*'); document.getElementById('donateModal').style.display = 'flex'; }
 
     const defaultImpactProjects = [
       { title: "Dự án 1 – Chợ Tứ Liên (Tây Hồ)", description: "Mương nước ngập rác sinh hoạt dày đặc ➔ Đã khơi thông dòng chảy hoàn toàn.", before_url: "Picture1.jpg", after_url: "Picture2.jpg", completed_at: "2026-07-27", location: "Chợ Tứ Liên, Tây Hồ, Hà Nội", participants: "45" },

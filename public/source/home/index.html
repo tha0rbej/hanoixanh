@@ -1291,6 +1291,7 @@
     }
 
     function openHomeDonateModal() {
+        if (window.parent !== window) window.parent.postMessage({ type: 'hnx:donation-info' }, '*');
         document.getElementById('homeDonateModal')?.classList.add('open');
         document.body.style.overflow = 'hidden';
     }
