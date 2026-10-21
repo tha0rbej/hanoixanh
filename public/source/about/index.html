@@ -2653,7 +2653,7 @@
     #page-doanh-nghiep .enterprise-founder-portrait::after { content: ""; position: absolute; right: 24px; bottom: 24px; width: 82px; height: 5px; border-radius: 99px; background: #d5f3b5; }
     #page-doanh-nghiep .enterprise-founder-portrait img { display: block; width: 100%; height: 100%; min-height: 390px; object-fit: cover; object-position: 35% 50%; }
     #page-doanh-nghiep .enterprise-founder-content { position: relative; padding: 42px 48px 38px; }
-    #page-doanh-nghiep .enterprise-founder-content::before { content: "01"; position: absolute; right: 36px; top: 28px; color: #e5f2e2; font-size: 84px; font-weight: 900; line-height: 1; letter-spacing: -.08em; }
+    #page-doanh-nghiep .enterprise-founder-content::before { content: attr(data-founder-number); position: absolute; right: 36px; top: 28px; color: #e5f2e2; font-size: 84px; font-weight: 900; line-height: 1; letter-spacing: -.08em; }
     #page-doanh-nghiep .enterprise-founder-content > * { position: relative; z-index: 1; }
     #page-doanh-nghiep .enterprise-founder-tag { display: inline-flex; padding: 7px 11px; border-radius: 999px; background: #e8f5df; color: #0b633d; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
     #page-doanh-nghiep .enterprise-founder-content h3 { max-width: 18ch; margin: 22px 0 8px; color: #0b633d; font-size: clamp(27px, 3vw, 40px); line-height: 1.02; letter-spacing: -.045em; }
@@ -2663,17 +2663,15 @@
     #page-doanh-nghiep .enterprise-founder-commitment { padding-top: 18px; border-top: 1px solid #dcebdc; }
     #page-doanh-nghiep .enterprise-founder-commitment p { margin-bottom: 0; color: #315d46; }
     #page-doanh-nghiep .enterprise-founder-list { display: grid; gap: 22px; margin-top: 22px; }
-    #page-doanh-nghiep .enterprise-founder-mini { display: grid; grid-template-columns: 220px minmax(0, 1fr); overflow: hidden; border: 1px solid #cfe2d1; border-radius: 22px; background: #fff; box-shadow: 0 14px 30px rgba(16,62,46,.08); }
-    #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-portrait { min-height: 250px; }
-    #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-portrait img { min-height: 250px; }
-    #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-content { padding: 30px 36px; }
-    #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-content::before { content: none; }
-    #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-content h3 { margin-top: 16px; font-size: clamp(24px, 2.6vw, 34px); }
-    #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-role { margin-bottom: 20px; }
+    #page-doanh-nghiep .enterprise-founder-mini { display: grid; grid-template-columns: minmax(260px, .72fr) minmax(0, 1.28fr); overflow: hidden; min-height: 390px; border: 1px solid #cfe2d1; border-radius: 26px; background: #fff; box-shadow: 0 20px 42px rgba(16,62,46,.1); }
+    #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-portrait { min-height: 390px; }
+    #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-portrait img { min-height: 390px; }
+    #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-content { padding: 42px 48px 38px; }
+    #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-content::before { content: attr(data-founder-number); position: absolute; right: 36px; top: 28px; color: #e5f2e2; font-size: 84px; font-weight: 900; line-height: 1; letter-spacing: -.08em; }
     @media (max-width: 760px) {
       #page-doanh-nghiep .enterprise-founder-mini { grid-template-columns: 1fr; }
       #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-portrait,
-      #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-portrait img { min-height: 260px; height: 260px; }
+      #page-doanh-nghiep .enterprise-founder-mini .enterprise-founder-portrait img { min-height: 300px; height: 300px; }
     }
     @media (max-width: 760px) {
       #page-doanh-nghiep .enterprise-founders { padding: 70px 0 76px; }
@@ -4876,6 +4874,7 @@
       const image = featured.querySelector('.enterprise-founder-portrait img');
       const content = featured.querySelector('.enterprise-founder-content');
       if (!content) return;
+      content.dataset.founderNumber = '01';
       if (image && first.image_url) { image.src = first.image_url; image.alt = `${first.name || 'Cổ đông sáng lập'} - Cổ đông sáng lập`; }
       setText(content.querySelector('h3'), first.name);
       setText(content.querySelector('.enterprise-founder-role'), first.role);
@@ -4890,8 +4889,9 @@
         const card = document.createElement('article'); card.className = 'enterprise-founder-mini';
         const portrait = document.createElement('div'); portrait.className = 'enterprise-founder-portrait';
         if (founder.image_url) { const imageEl = document.createElement('img'); imageEl.src = founder.image_url; imageEl.alt = `${founder.name} - Cổ đông sáng lập`; portrait.appendChild(imageEl); }
-        const body = document.createElement('div'); body.className = 'enterprise-founder-content';
-        const tag = document.createElement('span'); tag.className = 'enterprise-founder-tag'; tag.textContent = `Cổ đông sáng lập · ${String(index + 2).padStart(2, '0')}`;
+        const number = String(index + 2).padStart(2, '0');
+        const body = document.createElement('div'); body.className = 'enterprise-founder-content'; body.dataset.founderNumber = number;
+        const tag = document.createElement('span'); tag.className = 'enterprise-founder-tag'; tag.textContent = `Cổ đông sáng lập · ${number}`;
         const name = document.createElement('h3'); name.textContent = founder.name;
         const role = document.createElement('p'); role.className = 'enterprise-founder-role'; role.textContent = founder.role || '';
         const expertiseTitle = document.createElement('h4'); expertiseTitle.textContent = 'Chuyên môn và kinh nghiệm';
