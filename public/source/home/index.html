@@ -751,7 +751,7 @@
             <i class="fa-solid fa-map-location-dot"></i>
             Xem Bản Đồ Hoạt Động
         </a>
-        <a href="../../tham-gia" target="_parent" class="btn-outline">
+        <a href="../../chien-dich" target="_parent" class="btn-outline">
             <i class="fa-solid fa-calendar-days"></i>
             Đăng Ký Tình Nguyện
         </a>
@@ -1045,7 +1045,7 @@
                         <span class="date" id="detail-date">Cập nhật: 28/08/2026</span>
                     </div>
                     <h3 id="detail-title">Sông Tô Lịch – Đoạn Hoàng Quốc Việt</h3>
-                    <p>Số lượng tình nguyện viên: <strong id="detail-volunteers">45 người</strong></p>
+                    <p>Số tình nguyện viên đã đăng ký: <strong id="detail-volunteers">0 người</strong></p>
                 </div>
                 <div class="action">
                     <div class="amount">
@@ -1364,6 +1364,7 @@
     function homeCampaignIsCompleted(campaign) {
         const status = String(campaign?.status || '').toLowerCase();
         if (['completed', 'done', 'finished'].includes(status)) return true;
+        if (['upcoming', 'active', 'open', 'ongoing'].includes(status)) return false;
         const endAt = homeCampaignTime(campaign?.end_at);
         const startAt = homeCampaignTime(campaign?.start_at);
         return Number.isFinite(endAt) ? endAt <= Date.now() : Number.isFinite(startAt) && startAt <= Date.now();
@@ -1380,7 +1381,10 @@
         if (!grid || !Array.isArray(campaigns)) return;
         homeCampaigns.clear();
         campaigns.forEach(c => homeCampaigns.set(String(c.id), c));
-        const items = campaigns.slice().sort((a, b) => {
+        // Trang chủ chỉ ưu tiên các chiến dịch đang mở/đang diễn ra.
+        // Danh sách đầy đủ vẫn được giữ trong `homeCampaigns` và gửi nguyên vẹn
+        // cho bản đồ tương tác ở phía dưới.
+        const items = campaigns.filter(c => !homeCampaignIsCompleted(c)).sort((a, b) => {
             const aCompleted = homeCampaignIsCompleted(a);
             const bCompleted = homeCampaignIsCompleted(b);
             if (aCompleted !== bCompleted) return aCompleted ? 1 : -1;
@@ -1388,13 +1392,13 @@
             const bTime = homeCampaignTime(bCompleted ? (b.end_at || b.start_at) : (b.start_at || b.end_at));
             return aCompleted ? bTime - aTime : aTime - bTime;
         });
-        grid.innerHTML = items.map((c, index) => {
+        grid.innerHTML = items.length ? items.map((c, index) => {
             const isUpcoming = !homeCampaignIsCompleted(c);
             const date = formatHomeVietnamDate(c.start_at);
             const time = `${formatHomeVietnamDate(c.start_at, true).split(', ').pop()} - ${formatHomeVietnamDate(c.end_at || c.start_at, true).split(', ').pop()}`;
-            const capacity = Math.max(1, Number(c.capacity) || 1);
-            const joined = Math.min(capacity, Math.max(0, Number(c.registered_count ?? c.volunteers_registered) || (isUpcoming ? Math.round(capacity * .65) : capacity)));
-            const progress = Math.round((joined / capacity) * 100);
+            const capacity = Math.max(0, Number(c.capacity) || 0);
+            const joined = Math.max(0, Number(c.registered_count ?? c.volunteers_registered ?? 0));
+            const progress = capacity ? Math.min(100, Math.round((joined / capacity) * 100)) : 0;
             const imageList = Array.isArray(c.image_urls) ? c.image_urls.filter(Boolean) : [];
             const image = imageList[0] || c.image_url || homeCampaignImages[index % homeCampaignImages.length];
             const safeId = escapeNewsHtml(String(c.id || ''));
@@ -1402,8 +1406,12 @@
                 ? `<button type="button" class="schedule-register home-campaign-open" data-campaign-id="${safeId}">${registeredHomeCampaigns.has(String(c.id)) ? 'Đã đăng ký' : 'Đăng ký'}</button>`
                 : '<span class="schedule-ended">Đã kết thúc</span>';
             return `<article class="schedule-card"><img class="schedule-card-image" src="${image}" alt="${escapeNewsHtml(c.title || 'Chiến dịch Hà Nội Xanh')}"><div class="schedule-card-body"><div class="schedule-status"><span class="status-tag ${isUpcoming ? 'upcoming' : 'completed'}">${isUpcoming ? 'Sắp diễn ra' : 'Đã kết thúc'}</span><span class="schedule-card-type">Hoạt động cộng đồng</span></div><h3>${escapeNewsHtml(c.title || '')}</h3><ul class="schedule-info"><li><i class="fa-solid fa-location-dot"></i> ${escapeNewsHtml(c.location || 'Địa điểm đang cập nhật')}</li><li><i class="fa-regular fa-calendar"></i> ${isUpcoming ? `${date} · ${time}` : `Hoàn thành ngày ${date}`}</li></ul><div class="schedule-progress-copy"><strong>${joined}/${capacity} tình nguyện viên</strong><span>${isUpcoming ? 'đã đăng ký / quy mô' : 'đã tham gia / quy mô'}</span></div><div class="schedule-progress"><span style="width:${progress}%"></span></div><div class="schedule-card-actions"><a href="../../chien-dich" target="_parent" class="schedule-detail-link">Xem chi tiết →</a>${action}</div></div></article>`;
-        }).join('');
+        }).join('') : '<p class="schedule-empty">Hiện chưa có chiến dịch đang diễn ra.</p>';
         grid.querySelectorAll('.home-campaign-open').forEach(button => button.addEventListener('click', () => openHomeCampaignModal(button.dataset.campaignId)));
+        grid.querySelectorAll('.schedule-card').forEach(card => card.addEventListener('click', event => {
+            if (event.target.closest('a, button')) return;
+            if (typeof window.focusHomeCampaignOnMap === 'function') window.focusHomeCampaignOnMap(card.querySelector('.home-campaign-open')?.dataset.campaignId);
+        }));
     }
     window.addEventListener('message', function(event) {
         if (event.data?.type === 'hnx:posts-data') { renderHomeNews(event.data.posts || []); return; }
@@ -1512,10 +1520,10 @@
         
         // 1. Cấu hình các điểm trên bản đồ với tọa độ thực tế tại Hà Nội
         const defaultHomeMapLocations = {
-            upcoming_1: { title: "Ra quân làm sạch kênh mương - Xanh bầu trời", shortLoc: "Đường CN8, P. Xuân Phương", date: "Cập nhật: 12/09/2026", volunteers: "70–100 người", amountLabel: "Quy mô:", amount: "100 TNV", img: "../remaining/Picture7.jpg", coords: [21.042, 105.748], status: "Sắp ra quân", color: "#ef4444", completed: false, campaignKey: "upcoming_1" },
-            comp_1: { title: "Dự án 1 – Chợ Tứ Liên (Tây Hồ)", shortLoc: "Chợ Tứ Liên, Tây Hồ", date: "Cập nhật: 27/07/2026", volunteers: "45 người", amountLabel: "Kết quả:", amount: "Đã làm sạch", img: "../remaining/Picture2.jpg", coords: [21.065, 105.820], status: "Đã hoàn thành", color: "#10b981", completed: true, campaignKey: "comp_1" },
-            comp_2: { title: "Dự án 2 – Ngõ 236 Âu Cơ, Hồng Hà", shortLoc: "Ngõ 236 Âu Cơ, P. Hồng Hà", date: "Cập nhật: 12/07/2026", volunteers: "80 người", amountLabel: "Kết quả:", amount: "Đã làm sạch", img: "../remaining/Picture4.jpg", coords: [21.070, 105.835], status: "Đã hoàn thành", color: "#10b981", completed: true, campaignKey: "comp_2" },
-            comp_3: { title: "Dự án 3 – Bãi bồi Cầu Long Biên", shortLoc: "Bãi bồi Cầu Long Biên, Hoàn Kiếm", date: "Cập nhật: 06/2026", volunteers: "90 người", amountLabel: "Kết quả:", amount: "Đã làm sạch", img: "../remaining/Picture6.jpg", coords: [21.030, 105.852], status: "Đã hoàn thành", color: "#10b981", completed: true, campaignKey: "comp_3" }
+            upcoming_1: { title: "Ra quân làm sạch kênh mương - Xanh bầu trời", shortLoc: "Đường CN8, P. Xuân Phương", date: "Cập nhật: 12/09/2026", volunteers: "0 người", amountLabel: "Quy mô:", amount: "100 TNV", img: "../remaining/Picture7.jpg", coords: [21.042, 105.748], status: "Sắp ra quân", color: "#ef4444", completed: false, campaignKey: "upcoming_1" },
+            comp_1: { title: "Dự án 1 – Chợ Tứ Liên (Tây Hồ)", shortLoc: "Chợ Tứ Liên, Tây Hồ", date: "Cập nhật: 27/07/2026", volunteers: "0 người", amountLabel: "Quy mô:", amount: "45 TNV", img: "../remaining/Picture2.jpg", coords: [21.065, 105.820], status: "Đã hoàn thành", color: "#10b981", completed: true, campaignKey: "comp_1" },
+            comp_2: { title: "Dự án 2 – Ngõ 236 Âu Cơ, Hồng Hà", shortLoc: "Ngõ 236 Âu Cơ, P. Hồng Hà", date: "Cập nhật: 12/07/2026", volunteers: "0 người", amountLabel: "Quy mô:", amount: "80 TNV", img: "../remaining/Picture4.jpg", coords: [21.070, 105.835], status: "Đã hoàn thành", color: "#10b981", completed: true, campaignKey: "comp_2" },
+            comp_3: { title: "Dự án 3 – Bãi bồi Cầu Long Biên", shortLoc: "Bãi bồi Cầu Long Biên, Hoàn Kiếm", date: "Cập nhật: 06/2026", volunteers: "0 người", amountLabel: "Quy mô:", amount: "90 TNV", img: "../remaining/Picture6.jpg", coords: [21.030, 105.852], status: "Đã hoàn thành", color: "#10b981", completed: true, campaignKey: "comp_3" }
         };
         let locations = { ...defaultHomeMapLocations };
 
@@ -1553,7 +1561,7 @@
             const entries = Object.entries(locations);
             if (sidebarHeaderCount) sidebarHeaderCount.textContent = `DANH SÁCH CHIẾN DỊCH (${entries.length})`;
             if (trackedCount) trackedCount.innerHTML = `<i class="fa-solid fa-circle" style="color:#10b981;font-size:10px"></i> ${entries.length} ĐIỂM ĐANG THEO DÕI`;
-            sidebarList.innerHTML = entries.map(([id, loc], index) => `<div class="map-card ${loc.completed ? 'completed' : 'warning'}${index === 0 ? ' active' : ''}" data-id="${escapeNewsHtml(id)}"><div class="card-top"><h4>${escapeNewsHtml(loc.title)}</h4><span class="status-badge ${loc.completed ? 'done' : 'need-help'}">${escapeNewsHtml(loc.status)}</span></div><div class="loc"><i class="fa-solid fa-location-dot"></i> ${escapeNewsHtml(loc.shortLoc)}</div><div class="card-stats"><div class="volunteers">Tình nguyện viên:<strong>${escapeNewsHtml(loc.volunteers)}</strong></div><div class="trash">${escapeNewsHtml(loc.amountLabel)}<strong>${escapeNewsHtml(loc.amount)}</strong></div></div></div>`).join('');
+            sidebarList.innerHTML = entries.map(([id, loc], index) => `<div class="map-card ${loc.completed ? 'completed' : 'warning'}${index === 0 ? ' active' : ''}" data-id="${escapeNewsHtml(id)}"><div class="card-top"><h4>${escapeNewsHtml(loc.title)}</h4><span class="status-badge ${loc.completed ? 'done' : 'need-help'}">${escapeNewsHtml(loc.status)}</span></div><div class="loc"><i class="fa-solid fa-location-dot"></i> ${escapeNewsHtml(loc.shortLoc)}</div><div class="card-stats"><div class="volunteers">Số TNV đã đăng ký:<strong>${escapeNewsHtml(loc.volunteers)}</strong></div><div class="trash">${escapeNewsHtml(loc.amountLabel)}<strong>${escapeNewsHtml(loc.amount)}</strong></div></div></div>`).join('');
             cards = Array.from(sidebarList.querySelectorAll('.map-card'));
 
             entries.forEach(([id, loc], index) => {
@@ -1624,6 +1632,14 @@
             return Object.values(defaultHomeMapLocations).find(location => text.includes(normalizeCampaignText(location.shortLoc)) || text.includes(normalizeCampaignText(location.title)) || normalizeCampaignText(location.shortLoc).split(',').some(part => part.trim().length > 4 && text.includes(part.trim())));
         }
 
+        function fallbackHomeMapCoordinates(index) {
+            // Campaigns created before coordinates were required still need a visible,
+            // stable map point instead of disappearing from the synchronized list.
+            const column = index % 4;
+            const row = Math.floor(index / 4);
+            return [21.0285 + (row - 0.5) * 0.018, 105.8542 + (column - 1.5) * 0.026];
+        }
+
         function homeCampaignResult(campaign, completed) {
             const tons = Number(campaign?.trash_tons || 0);
             const kilograms = Number(campaign?.trash_kg || campaign?.collected_waste_kg || 0);
@@ -1634,6 +1650,13 @@
             return completed ? 'Đã hoàn thành' : (capacity > 0 ? `${capacity.toLocaleString('vi-VN')} TNV` : 'Đang cập nhật');
         }
 
+        window.focusHomeCampaignOnMap = function(campaignKey) {
+            const id = String(campaignKey || '');
+            if (!locations[id]) return;
+            document.getElementById('ban-do-hoat-dong')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            window.setTimeout(() => activateLocation(id, true, true), 120);
+        };
+
         window.updateHomeCampaignMap = function(campaigns) {
             const rows = Array.isArray(campaigns) ? campaigns : [];
             const nextLocations = {};
@@ -1641,20 +1664,20 @@
                 const fallback = fallbackHomeMapLocation(campaign);
                 const latitude = Number(campaign.latitude), longitude = Number(campaign.longitude);
                 const hasCoordinates = validHomeMapCoordinate(latitude, longitude);
-                const coords = hasCoordinates ? [latitude, longitude] : fallback?.coords;
-                if (!coords) return;
+                const coords = hasCoordinates ? [latitude, longitude] : (fallback?.coords || fallbackHomeMapCoordinates(index));
                 const completed = homeCampaignCompleted(campaign);
                 const dateValue = campaign.end_at || campaign.start_at;
                 const dateText = formatHomeVietnamDate(dateValue);
-                const capacity = Number(campaign.capacity || 0);
+            const registered = Math.max(0, Number(campaign.registered_count ?? campaign.volunteers_registered ?? 0));
+            const capacity = Math.max(0, Number(campaign.capacity || 0));
                 const id = String(campaign.id || `campaign_${index}`);
                 nextLocations[id] = {
                     title: campaign.title || 'Chiến dịch Hà Nội Xanh',
                     shortLoc: campaign.location || fallback?.shortLoc || 'Hà Nội',
                     date: `Cập nhật: ${dateText}`,
-                    volunteers: capacity > 0 ? `${capacity.toLocaleString('vi-VN')} người` : 'Đang cập nhật',
-                    amountLabel: completed ? 'Kết quả:' : 'Quy mô:',
-                    amount: homeCampaignResult(campaign, completed),
+                    volunteers: `${registered.toLocaleString('vi-VN')} người`,
+                    amountLabel: 'Quy mô:',
+                    amount: capacity > 0 ? `${capacity.toLocaleString('vi-VN')} TNV` : 'Đang cập nhật',
                     img: (Array.isArray(campaign.image_urls) ? campaign.image_urls.filter(Boolean)[0] : '') || campaign.image_url || fallback?.img || 'trangchu3.jpg',
                     coords,
                     status: completed ? 'Đã hoàn thành' : 'Sắp ra quân',

@@ -135,6 +135,10 @@
     
     .card-bottom { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 6px; border-top: 1px solid #f1f5f9; padding-top: 8px; width: 100%; }
     .card-members { font-size: 12.5px; color: var(--text-sub); font-weight: 600; }
+    .campaign-progress-copy { width: 100%; display: flex; justify-content: space-between; gap: 8px; color: var(--text-sub); font-size: 12px; }
+    .campaign-progress-copy strong { color: #087443; font-size: 12.5px; }
+    .campaign-progress { width: 100%; height: 5px; overflow: hidden; border-radius: 999px; background: #e5efe8; }
+    .campaign-progress span { display: block; height: 100%; border-radius: inherit; background: #168a45; transition: width .25s ease; }
     .btn-view { border: 1px solid var(--primary); background: #fff; color: var(--primary); font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 4px; text-decoration: none; cursor: pointer; width: 100%; text-align: center; }
     .btn-view:hover { background: var(--primary-light); }
     .btn-join-campaign { border: 0; background: #15803d; color: #fff; font-size: 12px; font-weight: 800; padding: 6px 14px; border-radius: 8px; cursor: pointer; width: 100%; text-align: center; transition: background .18s ease, transform .18s ease, box-shadow .18s ease; }
@@ -819,7 +823,7 @@
     #page-chien-dich .report-form-card { padding: 30px; border: 1px solid #e0e9e3; border-radius: 18px; background: #fff; box-shadow: 0 12px 34px rgba(14, 78, 43, .08); }
     #page-chien-dich .report-form-card .form-group { margin-bottom: 18px; }
     #page-chien-dich .report-form-card .form-group input, #page-chien-dich .report-form-card .form-group textarea { min-height: 48px; border: 1.5px solid #cbd9d0; border-radius: 9px; padding: 12px 14px; }
-    #page-chien-dich .report-form-card .form-group textarea { min-height: 132px; resize: vertical; }
+    #page-chien-dich .report-form-card .form-group textarea { min-height: 280px; resize: vertical; line-height: 1.65; }
     #page-chien-dich .report-form-card .btn-pick-location, #page-chien-dich .report-form-card .upload-box { border-radius: 10px; }
     #page-chien-dich .report-form-card .upload-box { min-height: 118px; display: grid; place-items: center; }
     #page-chien-dich .report-form-card .btn-submit-report { min-height: 48px; border-radius: 10px; }
@@ -874,7 +878,7 @@
       #page-chien-dich .report-form-card { padding: 18px 22px; }
       #page-chien-dich .report-form-card .form-group { margin-bottom: 10px; }
       #page-chien-dich .report-form-card .form-group input { min-height: 40px; padding: 8px 12px; }
-      #page-chien-dich .report-form-card .form-group textarea { min-height: 76px; padding: 8px 12px; }
+      #page-chien-dich .report-form-card .form-group textarea { min-height: 180px; padding: 10px 12px; }
       #page-chien-dich .report-form-card .upload-box { min-height: 76px; }
       #page-chien-dich .report-form-card .btn-pick-location, #page-chien-dich .report-form-card .btn-submit-report { min-height: 40px; }
     }
@@ -1116,7 +1120,7 @@
 
             <div class="form-group">
               <label>Mô tả chi tiết*</label>
-              <textarea id="reportDesc" rows="3" placeholder="Mô tả tình trạng ô nhiễm, loại rác thải..." required></textarea>
+      <textarea id="reportDesc" rows="12" maxlength="20000" placeholder="Mô tả chi tiết tình trạng ô nhiễm, loại rác thải, phạm vi, thời gian quan sát, mức độ ảnh hưởng và các thông tin liên quan..." required></textarea>
             </div>
 
             <div class="form-group">
@@ -2365,12 +2369,15 @@
         const pane = ended ? groups.completed : groups.upcoming;
         const card = document.createElement('div'); card.className = 'camp-card'; card.id = 'campaign-card-' + c.id; card.dataset.campaignKey = c.id; card.setAttribute('role', 'button'); card.tabIndex = 0;
         const campaignImages = Array.isArray(c.image_urls) && c.image_urls.filter(Boolean).length ? c.image_urls.filter(Boolean).slice(0, 4) : [c.image_url].filter(Boolean);
-        card.innerHTML = '<div class="card-thumb"><span class="badge-card">' + (ended ? 'Đã diễn ra' : 'Sắp diễn ra') + '</span>' + (campaignImages[0] ? '<img src="' + campaignImages[0] + '" alt="">' : '') + '</div><div class="card-info"><h4></h4><div class="card-meta-line"><i class="fa-solid fa-location-dot ui-icon" aria-hidden="true"></i> ' + (c.location || '') + '</div><div class="card-meta-line"><i class="fa-regular fa-calendar ui-icon" aria-hidden="true"></i> ' + formatVietnamDateTime(c.start_at) + '</div><div class="card-desc"></div><div class="card-bottom"><span class="card-members"><i class="fa-solid fa-user-group ui-icon" aria-hidden="true"></i> ' + (c.capacity || '') + ' người tham gia</span><button class="btn-view">Xem chi tiết →</button></div></div>';
+        const campaignCapacity = Math.max(0, Number(c.capacity) || 0);
+        const campaignRegistered = Math.max(0, Number(c.registered_count ?? c.volunteers_registered ?? 0));
+        const campaignProgress = campaignCapacity ? Math.min(100, Math.round((campaignRegistered / campaignCapacity) * 100)) : 0;
+        card.innerHTML = '<div class="card-thumb"><span class="badge-card">' + (ended ? 'Đã diễn ra' : 'Sắp diễn ra') + '</span>' + (campaignImages[0] ? '<img src="' + campaignImages[0] + '" alt="">' : '') + '</div><div class="card-info"><h4></h4><div class="card-meta-line"><i class="fa-solid fa-location-dot ui-icon" aria-hidden="true"></i> ' + (c.location || '') + '</div><div class="card-meta-line"><i class="fa-regular fa-calendar ui-icon" aria-hidden="true"></i> ' + formatVietnamDateTime(c.start_at) + '</div><div class="card-desc"></div><div class="card-bottom"><div class="campaign-progress-copy"><strong>' + campaignRegistered.toLocaleString('vi-VN') + '/' + (campaignCapacity || 0).toLocaleString('vi-VN') + ' tình nguyện viên</strong><span>đã đăng ký / quy mô</span></div><div class="campaign-progress" aria-label="Tiến độ đăng ký"><span style="width:' + campaignProgress + '%"></span></div><button class="btn-view">Xem chi tiết →</button></div></div>';
         card.querySelector('h4').textContent = c.title || ''; card.querySelector('.card-desc').textContent = c.description || '';
         campaignDetails[c.id] = { isCompleted: ended, title: c.title || '', meta: (c.location || '') + ' | ' + formatVietnamDateTime(c.start_at), status: c.pollution_status || c.description || 'Chưa cập nhật.', action: c.action_plan || 'Chưa cập nhật.', support: c.support_equipment || 'Chưa cập nhật.', image: campaignImages[0] || '', image_urls: campaignImages };
         card.onclick = function(event) { if (!event.target.closest('.btn-view, .btn-join-campaign')) focusCampaignOnMap(c.id, event); };
         card.onkeydown = function(event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); focusCampaignOnMap(c.id, event); } };
-        card.querySelector('.btn-view').onclick = function() { openDetailModal(c.id); };
+        card.querySelector('.btn-view').onclick = function(event) { event.stopPropagation(); focusCampaignOnMap(c.id); openDetailModal(c.id); };
         const joinButton = document.createElement('button'); joinButton.type = 'button'; joinButton.className = 'btn-join-campaign'; joinButton.innerText = 'Tham gia ngay'; joinButton.onclick = function() { joinCampaign(c.id); }; card.querySelector('.card-bottom').appendChild(joinButton);
         pane.appendChild(card);
       });
@@ -2457,6 +2464,7 @@
     function campaignIsCompleted(campaign) {
       const status = String(campaign?.status || '').toLowerCase();
       if (status === 'completed' || status === 'done' || status === 'finished') return true;
+      if (status === 'upcoming' || status === 'active' || status === 'open' || status === 'ongoing') return false;
       const endAt = campaignTime(campaign?.end_at);
       const startAt = campaignTime(campaign?.start_at);
       return Number.isFinite(endAt) ? endAt <= Date.now() : Number.isFinite(startAt) && startAt <= Date.now();
@@ -2469,6 +2477,12 @@
     function fallbackLocationForCampaign(campaign) {
       const text = normalizeMapText(`${campaign?.title || ''} ${campaign?.location || ''}`);
       return defaultCampaignLocations.find(location => location.keywords.some(keyword => text.includes(normalizeMapText(keyword))));
+    }
+
+    function fallbackCampaignCoordinates(index) {
+      const column = index % 4;
+      const row = Math.floor(index / 4);
+      return { lat: 21.0285 + (row - 0.5) * 0.018, lng: 105.8542 + (column - 1.5) * 0.026 };
     }
 
     function validHanoiCoordinate(latitude, longitude) {
@@ -2502,8 +2516,9 @@
 
     function renderCampaignLocations(campaigns) {
       const rows = Array.isArray(campaigns) ? campaigns : [];
-      const mapped = rows.map(campaign => {
+      const mapped = rows.map((campaign, index) => {
         const fallback = fallbackLocationForCampaign(campaign);
+        const generated = fallbackCampaignCoordinates(index);
         const lat = Number(campaign.latitude);
         const lng = Number(campaign.longitude);
         const hasValidCoordinate = validHanoiCoordinate(lat, lng);
@@ -2511,8 +2526,8 @@
         return {
           name: campaign.title || 'Chiến dịch Hà Nội Xanh',
           keywords: [campaign.title, campaign.location].filter(Boolean),
-          lat: hasValidCoordinate ? lat : fallback?.lat,
-          lng: hasValidCoordinate ? lng : fallback?.lng,
+          lat: hasValidCoordinate ? lat : (fallback?.lat ?? generated.lat),
+          lng: hasValidCoordinate ? lng : (fallback?.lng ?? generated.lng),
           location: campaign.location || fallback?.location || 'Hà Nội',
           image: campaign.image_url || fallback?.image,
           status: completed ? 'Đã hoàn thành' : 'Sắp ra quân',
@@ -2527,9 +2542,10 @@
           count: 1
         };
       }).filter(item => Number.isFinite(item.lat) && Number.isFinite(item.lng));
-      const mappedKeys = new Set(mapped.map(item => String(item.campaignKey || '')));
-      const fallbackLocations = defaultCampaignLocations.filter(item => !mappedKeys.has(String(item.campaignKey)));
-      knownCampaignLocations = mapped.length ? mapped.concat(fallbackLocations) : defaultCampaignLocations;
+      // When the database returns campaigns, it is the complete source of truth.
+      // Do not append the old hard-coded map points, otherwise the map can show
+      // stale campaigns or duplicate entries beside the Admin data.
+      knownCampaignLocations = mapped.length ? mapped : defaultCampaignLocations;
 
       campaignMapMarkers.forEach(marker => bMap.removeLayer(marker));
       campaignMapMarkers = [];

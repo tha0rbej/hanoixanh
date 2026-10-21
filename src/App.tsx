@@ -189,7 +189,11 @@ function SourceFrame({
         if (!session) { onAuth("login"); return }
         void tableSelect<{ id: string }>("campaign_registrations", "id", session.access_token, `&user_id=eq.${encodeURIComponent(session.user.id)}&campaign_key=eq.${encodeURIComponent(message.campaignKey || "")}&limit=1`)
           .then((existing) => { if (existing.length) throw new Error("Bạn đã đăng ký tham gia chiến dịch này rồi."); return tableInsert("campaign_registrations", { user_id: session.user.id, campaign_key: message.campaignKey, status: "registered" }, session.access_token) })
-          .then(() => frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaign-register-result", ok: true }, window.location.origin))
+          .then(async () => {
+            frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaign-register-result", ok: true }, window.location.origin)
+            await sendCampaignsState()
+            void sendAuthState()
+          })
           .catch((error: Error) => frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaign-register-result", ok: false, message: error.message.includes("duplicate") ? "Bạn đã đăng ký tham gia chiến dịch này rồi." : error.message }, window.location.origin))
         return
       }
@@ -226,9 +230,13 @@ function SourceFrame({
         void (async () => {
           try {
             const images = Array.isArray(message.images) ? message.images : (message.image ? [message.image] : [])
-            const firstImage = images.find((image): image is File => image instanceof File)
-            const photoUrl = firstImage ? await uploadPublicFile(firstImage, session.access_token) : null
-            await tableInsertMinimal("pollution_reports", { user_id: session.user.id, location_name: message.location, address: message.location, latitude: message.latitude || null, longitude: message.longitude || null, description: message.description, photo_url: photoUrl, status: "new", severity: "medium" }, session.access_token)
+            const photoUrls = await Promise.all(images.filter((image): image is File => image instanceof File).map(image => uploadPublicFile(image, session.access_token)))
+            try {
+              await tableInsertMinimal("pollution_reports", { user_id: session.user.id, location_name: message.location, address: message.location, latitude: message.latitude || null, longitude: message.longitude || null, description: message.description, photo_url: photoUrls[0] || null, photo_urls: photoUrls, status: "new", severity: "medium" }, session.access_token)
+            } catch (cause) {
+              if (!String(cause).includes("photo_urls")) throw cause
+              await tableInsertMinimal("pollution_reports", { user_id: session.user.id, location_name: message.location, address: message.location, latitude: message.latitude || null, longitude: message.longitude || null, description: message.description, photo_url: photoUrls[0] || null, status: "new", severity: "medium" }, session.access_token)
+            }
             frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: true }, window.location.origin)
           } catch (error) { frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: false, message: error instanceof Error ? error.message : "Không gửi được báo cáo." }, window.location.origin) }
         })()
@@ -275,9 +283,13 @@ function SourceFrame({
     void (async () => {
       try {
         const images = Array.isArray(report.images) ? report.images : (report.image ? [report.image] : [])
-        const firstImage = images.find((image): image is File => image instanceof File)
-        const photoUrl = firstImage ? await uploadPublicFile(firstImage, session.access_token) : null
-        await tableInsertMinimal("pollution_reports", { user_id: session.user.id, location_name: report.location, address: report.location, latitude: report.latitude || null, longitude: report.longitude || null, description: report.description, photo_url: photoUrl, status: "new", severity: "medium" }, session.access_token)
+        const photoUrls = await Promise.all(images.filter((image): image is File => image instanceof File).map(image => uploadPublicFile(image, session.access_token)))
+        try {
+          await tableInsertMinimal("pollution_reports", { user_id: session.user.id, location_name: report.location, address: report.location, latitude: report.latitude || null, longitude: report.longitude || null, description: report.description, photo_url: photoUrls[0] || null, photo_urls: photoUrls, status: "new", severity: "medium" }, session.access_token)
+        } catch (cause) {
+          if (!String(cause).includes("photo_urls")) throw cause
+          await tableInsertMinimal("pollution_reports", { user_id: session.user.id, location_name: report.location, address: report.location, latitude: report.latitude || null, longitude: report.longitude || null, description: report.description, photo_url: photoUrls[0] || null, status: "new", severity: "medium" }, session.access_token)
+        }
         frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: true }, window.location.origin)
       } catch (error) { frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: false, message: error instanceof Error ? error.message : "Không gửi được báo cáo." }, window.location.origin) }
     })()
@@ -291,6 +303,43 @@ function SourceFrame({
     }
   }, [location.search, page, profile, session])
 
+  const sendCampaignsState = async () => {
+    const token = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined
+    if (!token || !supabaseUrl) return
+    try {
+      const response = await fetch(`${supabaseUrl}/rest/v1/campaigns?select=*&order=start_at.desc`, {
+        cache: "no-store",
+        headers: { apikey: token, Authorization: `Bearer ${token}` },
+      })
+      if (!response.ok) return
+      const campaigns = await response.json()
+      if (!Array.isArray(campaigns)) return
+      let countsByCampaign = new Map<string, number>()
+      try {
+        const countResponse = await fetch(`${supabaseUrl}/rest/v1/rpc/get_campaign_registration_counts`, {
+          cache: "no-store",
+          headers: { apikey: token, Authorization: `Bearer ${token}` },
+        })
+        if (countResponse.ok) {
+          const countRows = await countResponse.json()
+          if (Array.isArray(countRows)) countsByCampaign = new Map(countRows.map(row => [String(row.campaign_id), Number(row.registered_count || 0)]))
+        }
+      } catch {
+        // Keep the denormalized campaign value when the count RPC is not deployed yet.
+      }
+      const synchronizedCampaigns = campaigns.map(campaign => ({
+        ...campaign,
+        registered_count: countsByCampaign.has(String(campaign.id))
+          ? countsByCampaign.get(String(campaign.id))
+          : Number(campaign.registered_count || 0),
+      }))
+      frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaigns-data", campaigns: synchronizedCampaigns }, window.location.origin)
+    } catch {
+      // The page keeps its current campaign list when a background refresh fails.
+    }
+  }
+
   const handleFrameLoad = () => {
     if (page === "home") frameRef.current?.contentWindow?.postMessage({ type: "hnx:scroll-top" }, window.location.origin)
     void sendAuthState()
@@ -299,7 +348,7 @@ function SourceFrame({
       frameRef.current?.contentWindow?.postMessage({ type: "hnx:shared-campaign", campaignKey: sharedCampaign }, window.location.origin)
     }
     const token = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
-    if (token) void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/campaigns?select=*&order=start_at.desc`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(campaigns => frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaigns-data", campaigns }, window.location.origin))
+    void sendCampaignsState()
     if (token) void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/homepage_metrics?select=metric_key,metric_value`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(metrics => frameRef.current?.contentWindow?.postMessage({ type: "hnx:homepage-metrics", metrics }, window.location.origin))
     if (token && page === "remaining") void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/green_rewards?select=*&active=eq.true&order=sort_order.asc`, { cache: "no-store", headers: { apikey: token, Authorization: `Bearer ${session?.access_token || token}` } }).then(response => response.ok ? response.json() : Promise.reject(new Error(`Không tải được danh mục quà (${response.status}).`))).then(rewards => frameRef.current?.contentWindow?.postMessage({ type: "hnx:green-rewards-data", rewards: Array.isArray(rewards) ? rewards : [] }, window.location.origin)).catch(() => frameRef.current?.contentWindow?.postMessage({ type: "hnx:green-rewards-data", rewards: [] }, window.location.origin))
     if (token) void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/posts?select=*&status=eq.published&order=published_at.desc.nullslast,created_at.desc`, { headers: { apikey: token, Authorization: `Bearer ${token}` } }).then(r => r.json()).then(posts => frameRef.current?.contentWindow?.postMessage({ type: "hnx:posts-data", posts: Array.isArray(posts) ? posts : [] }, window.location.origin))
@@ -330,13 +379,16 @@ function SourceFrame({
   }, [page, source])
 
   useEffect(() => {
-    if (!frameRef.current?.contentWindow || page === "home") return
-    const token = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
-    if (!token) return
-    void fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/campaigns?select=*&order=start_at.desc`, { headers: { apikey: token, Authorization: `Bearer ${token}` } })
-      .then((response) => response.json())
-      .then((campaigns) => frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaigns-data", campaigns }, window.location.origin))
-      .catch(() => undefined)
+    if (!['home', 'about', 'remaining'].includes(page)) return
+    const refresh = () => { void sendCampaignsState() }
+    const timer = window.setInterval(refresh, 10000)
+    window.addEventListener('focus', refresh)
+    document.addEventListener('visibilitychange', refresh)
+    return () => {
+      window.clearInterval(timer)
+      window.removeEventListener('focus', refresh)
+      document.removeEventListener('visibilitychange', refresh)
+    }
   }, [page, source])
 
   return (
