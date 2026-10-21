@@ -5,8 +5,8 @@ import { ImpactContentEditor } from "./ImpactContentEditor"
 import { DEFAULT_REWARD_PROGRAM, clampCampaignPoints, normalizeRewardProgram, updateCumulativePoints, type BadgeRule } from "./rewards"
 
 type Row = Record<string, unknown> & { id: string }
-type Form = { title: string; location: string; start_at: string; end_at: string; capacity: string; registered_count: string; reward_points: string; status: string; description: string; pollution_status: string; action_plan: string; support_equipment: string; image_url: string; image_urls: string[] }
-const empty: Form = { title: "", location: "", start_at: "", end_at: "", capacity: "", registered_count: "0", reward_points: "10000", status: "upcoming", description: "", pollution_status: "", action_plan: "", support_equipment: "", image_url: "", image_urls: [] }
+type Form = { title: string; location: string; latitude?: string; longitude?: string; start_at: string; end_at: string; capacity: string; registered_count: string; reward_points: string; status: string; description: string; pollution_status: string; action_plan: string; support_equipment: string; image_url: string; image_urls: string[] }
+const empty: Form = { title: "", location: "", latitude: "", longitude: "", start_at: "", end_at: "", capacity: "", registered_count: "0", reward_points: "10000", status: "upcoming", description: "", pollution_status: "", action_plan: "", support_equipment: "", image_url: "", image_urls: [] }
 const ADMIN_MENU_GROUPS = [
   { label: "Nội dung CLB", items: [["admin-account", "Tài khoản admin"], ["founders", "Cổ đông sáng lập"], ["team", "Đội ngũ"], ["green-rewards", "Quà xanh"], ["homepage", "Tác động"], ["campaigns", "Chiến dịch"], ["posts", "Tin tức"]] },
   { label: "Nội dung người dùng", items: [["accounts", "Tài khoản người dùng"], ["rewards", "Điểm & huy hiệu"], ["registrations", "Đăng ký theo chiến dịch"], ["redemptions", "Đổi quà"], ["messages", "Lời nhắn"], ["reports", "Báo cáo ô nhiễm"]] },
@@ -211,6 +211,61 @@ export function ConnectedAdminDashboard({ onLogin }: { onLogin?: () => void }) {
   }, [tab, posts, session, profile])
   if (!profile || profile.role !== "admin") return <main className="admin-locked"><div><h1>Đăng nhập quản trị</h1>{onLogin && <button className="auth-primary" onClick={onLogin}>ĐĂNG NHẬP</button>}</div></main>
   const set = (key: keyof Form, value: string | string[]) => setForm(x => ({ ...x, [key]: value }))
+  useEffect(() => {
+    if (!editing) return
+    const row = campaigns.find(item => item.id === editing)
+    if (!row) return
+    setForm(current => ({ ...current, latitude: current.latitude || val(row, "latitude"), longitude: current.longitude || val(row, "longitude") }))
+  }, [editing, campaigns])
+  useEffect(() => {
+    if (tab !== "campaigns") return
+    const locationInput = Array.from(document.querySelectorAll<HTMLInputElement>(".admin-panel form input"))[1]
+    const locationLabel = locationInput?.closest("label")
+    if (!locationInput || !locationLabel || document.getElementById("hnx-campaign-location-picker")) return
+    const panel = document.createElement("div")
+    panel.id = "hnx-campaign-location-picker"
+    panel.className = "wide-field"
+    panel.style.gridColumn = "1 / -1"
+    panel.innerHTML = '<strong>Vị trí trên bản đồ</strong><small>Nhập địa chỉ rồi bấm tìm. Với ngách nhỏ, địa chỉ cũ hoặc kết quả không chính xác, hãy bấm trực tiếp lên bản đồ để ghim đúng điểm. Tọa độ sẽ được lưu cùng chiến dịch.</small><div style="display:flex;gap:8px;margin:10px 0"><button type="button" data-map-search>Tìm địa chỉ</button><button type="button" data-map-clear>Bỏ ghim</button></div><div data-map-host style="min-height:300px;border-radius:12px;overflow:hidden;border:1px solid #cfe2d1;background:#e8f2e9"></div><small data-map-message></small><div class="form-grid" style="margin-top:10px"><label>Vĩ độ<input type="text" data-map-lat readonly></label><label>Kinh độ<input type="text" data-map-lng readonly></label></div>'
+    locationLabel.after(panel)
+    const host = panel.querySelector<HTMLElement>("[data-map-host]")
+    const message = panel.querySelector<HTMLElement>("[data-map-message]")
+    const latOutput = panel.querySelector<HTMLInputElement>("[data-map-lat]")
+    const lngOutput = panel.querySelector<HTMLInputElement>("[data-map-lng]")
+    const win = window as any
+    let map: any = null
+    let marker: any = null
+    let disposed = false
+    const setPoint = (lat: number, lng: number, zoom = 16) => {
+      if (!map || !win.L) return
+      if (!marker) marker = win.L.marker([lat, lng]).addTo(map)
+      else marker.setLatLng([lat, lng])
+      map.setView([lat, lng], zoom)
+      const nextLat = lat.toFixed(6); const nextLng = lng.toFixed(6)
+      if (latOutput) latOutput.value = nextLat
+      if (lngOutput) lngOutput.value = nextLng
+      setForm(current => ({ ...current, latitude: nextLat, longitude: nextLng }))
+    }
+    const loadLeaflet = async () => {
+      if (!document.getElementById("hnx-leaflet-css")) { const link = document.createElement("link"); link.id = "hnx-leaflet-css"; link.rel = "stylesheet"; link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"; document.head.appendChild(link) }
+      if (!win.L) await new Promise<void>((resolve, reject) => { const existing = document.getElementById("hnx-leaflet-script") as HTMLScriptElement | null; if (existing) { existing.addEventListener("load", () => resolve(), { once: true }); existing.addEventListener("error", () => reject(new Error("leaflet")), { once: true }); return } const script = document.createElement("script"); script.id = "hnx-leaflet-script"; script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"; script.onload = () => resolve(); script.onerror = () => reject(new Error("leaflet")); document.body.appendChild(script) })
+      if (disposed || !host) return
+      const initialLat = Number(form.latitude) || 21.0285; const initialLng = Number(form.longitude) || 105.8048
+      map = win.L.map(host).setView([initialLat, initialLng], form.latitude && form.longitude ? 16 : 11)
+      win.L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap" }).addTo(map)
+      map.on("click", (event: any) => setPoint(event.latlng.lat, event.latlng.lng))
+      if (form.latitude && form.longitude) setPoint(initialLat, initialLng, 16)
+    }
+    void loadLeaflet().catch(() => { if (message) message.textContent = "Không tải được bản đồ. Hãy nhập tọa độ thủ công trong cơ sở dữ liệu hoặc thử lại." })
+    panel.querySelector<HTMLButtonElement>("[data-map-search]")?.addEventListener("click", async () => {
+      const query = locationInput.value.trim()
+      if (!query) { if (message) message.textContent = "Hãy nhập địa điểm trước khi tìm."; return }
+      if (message) message.textContent = "Đang tìm vị trí…"
+      try { const response = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=vn&q=${encodeURIComponent(`${query}, Hà Nội, Việt Nam`)}`); const results = await response.json(); if (!results[0]) { if (message) message.textContent = "Không tìm thấy chính xác. Hãy bấm trực tiếp vào vị trí đúng trên bản đồ."; return } setPoint(Number(results[0].lat), Number(results[0].lon)); if (message) message.textContent = "Đã tìm thấy. Nếu chưa đúng điểm, hãy bấm lại trực tiếp trên bản đồ để ghim chính xác." } catch { if (message) message.textContent = "Không tra được địa chỉ. Hãy bấm trực tiếp lên bản đồ hoặc nhập tọa độ." }
+    })
+    panel.querySelector<HTMLButtonElement>("[data-map-clear]")?.addEventListener("click", () => { if (marker && map) { map.removeLayer(marker); marker = null } setForm(current => ({ ...current, latitude: "", longitude: "" })); if (latOutput) latOutput.value = ""; if (lngOutput) lngOutput.value = ""; if (message) message.textContent = "Đã bỏ ghim; chiến dịch sẽ dùng địa chỉ văn bản/fallback bản đồ." })
+    return () => { disposed = true; if (map) map.remove(); panel.remove() }
+  }, [tab, editing])
   async function image(e: ChangeEvent<HTMLInputElement>, index: number) { const file = e.target.files?.[0]; if (!file || !session || index < 0 || index > 3) return; setUploading(true); try { const url = await uploadPublicFile(file, session.access_token); const urls = [...form.image_urls]; urls[index] = url; set("image_urls", urls.slice(0, 4)); set("image_url", urls[0] || "") } catch (x) { setError(x instanceof Error ? x.message : "Không tải được ảnh") } finally { setUploading(false); e.target.value = "" } }
   async function save(e: FormEvent) { e.preventDefault(); if (!session) return; setError(""); setNotice(""); const payload = { ...form, start_at: new Date(form.start_at).toISOString(), end_at: form.end_at ? new Date(form.end_at).toISOString() : null, capacity: form.capacity ? Number(form.capacity) : null, registered_count: Math.max(0, Math.round(Number(form.registered_count) || 0)), reward_points: clampCampaignPoints(Number(form.reward_points)) }; try { if (editing) await tableUpdate("campaigns", `id=eq.${editing}`, payload, session.access_token); else await tableInsert("campaigns", payload, session.access_token); setForm(empty); setEditing(null); await load() } catch (x) { if (isCampaignImageGalleryMissingError(x)) { const { image_urls: _imageUrls, ...legacyPayload } = payload; try { if (editing) await tableUpdate("campaigns", `id=eq.${editing}`, legacyPayload, session.access_token); else await tableInsert("campaigns", legacyPayload, session.access_token); setNotice("Đã lưu chiến dịch. Hệ thống đang dùng ảnh đại diện cũ; hãy cập nhật cột image_urls để dùng đủ 4 ảnh."); setForm(empty); setEditing(null); await load(); return } catch (fallback) { setError(fallback instanceof Error ? fallback.message : "Không lưu được chiến dịch"); return } } if (!isRewardSchemaMissingError(x)) { setError(x instanceof Error ? x.message : "Không lưu được chiến dịch"); return } const { reward_points: _rewardPoints, ...legacyPayload } = payload; if (editing) await tableUpdate("campaigns", `id=eq.${editing}`, legacyPayload, session.access_token); else await tableInsert("campaigns", legacyPayload, session.access_token); setRewardSchemaReady(false); setNotice("Đã lưu chiến dịch. Điểm thưởng sẽ hoạt động sau khi cơ sở dữ liệu được cập nhật."); setForm(empty); setEditing(null); await load() } }
   async function remove(id: string) { if (!session || !confirm("Xóa chiến dịch này? Các lượt đăng ký thuộc chiến dịch cũng sẽ được gỡ khỏi danh sách.")) return; try { await tableDelete("campaign_registrations", `or=(campaign_id.eq.${id},campaign_key.eq.${id})`, session.access_token) } catch { /* campaign_id rows still cascade; legacy orphan rows are filtered from the UI */ } await tableDelete("campaigns", `id=eq.${id}`, session.access_token); await load() }
