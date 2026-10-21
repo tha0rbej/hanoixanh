@@ -2556,6 +2556,54 @@
     #page-doi-ngu .team-heads-section .team-role { font-weight: 600; }
     #page-doi-ngu .team-heads-section .team-card > p { font-weight: 500; }
     #page-doi-ngu .team-heads-section .team-note { position: relative; max-width: 760px; margin-top: 30px; padding-left: 16px; border-left: 3px solid #bce796; color: #567065; }
+    /* Keep every team portrait clearly visible across all team groups. */
+    #page-doi-ngu .team-avatar,
+    #page-doi-ngu > .team-intro + .team-section .team-avatar,
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-avatar,
+    #page-doi-ngu .team-heads-section .team-avatar {
+      width: 190px !important;
+      height: 190px !important;
+      flex-basis: 190px !important;
+    }
+    #page-doi-ngu .team-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    /* Keep the enlarged portraits responsive so each team block remains within the viewport. */
+    #page-doi-ngu .team-avatar,
+    #page-doi-ngu > .team-intro + .team-section .team-avatar,
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-avatar,
+    #page-doi-ngu .team-heads-section .team-avatar {
+      width: min(190px, 18vh, 30vw) !important;
+      height: min(190px, 18vh, 30vw) !important;
+      flex-basis: min(190px, 18vh, 30vw) !important;
+    }
+    #page-doi-ngu > .team-intro + .team-section .team-card,
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-card,
+    #page-doi-ngu .team-heads-section .team-card { min-height: 0; }
+    #page-doi-ngu > .team-intro + .team-section,
+    #page-doi-ngu .team-section.paper:has(.team-grid.advisors),
+    #page-doi-ngu .team-heads-section { padding-top: clamp(36px, 7vh, 92px); padding-bottom: clamp(40px, 8vh, 100px); }
+    @media (max-width: 760px) {
+      #page-doi-ngu .team-avatar,
+      #page-doi-ngu > .team-intro + .team-section .team-avatar,
+      #page-doi-ngu .team-section.paper:has(.team-grid.advisors) .team-avatar,
+      #page-doi-ngu .team-heads-section .team-avatar {
+        width: min(160px, 28vw, 20vh) !important;
+        height: min(160px, 28vw, 20vh) !important;
+        flex-basis: min(160px, 28vw, 20vh) !important;
+      }
+    }
+    /* Compact only the heads block so its heading and four cards fit together in one viewport. */
+    #page-doi-ngu .team-heads-section { padding-top: clamp(18px, 4vh, 48px); padding-bottom: clamp(24px, 5vh, 56px); }
+    #page-doi-ngu .team-heads-section .team-section-head { margin-bottom: clamp(18px, 3vh, 30px); }
+    #page-doi-ngu .team-heads-section .team-section-head .section-title { font-size: clamp(30px, 3.2vw, 44px); }
+    #page-doi-ngu .team-heads-section .team-card { padding: 18px 16px 20px; }
+    #page-doi-ngu .team-heads-section .team-avatar {
+      width: min(160px, 16vh, 26vw) !important;
+      height: min(160px, 16vh, 26vw) !important;
+      flex-basis: min(160px, 16vh, 26vw) !important;
+      margin-bottom: 14px;
+    }
+    #page-doi-ngu .team-heads-section .team-top { margin-bottom: 16px; }
+    #page-doi-ngu .team-heads-section .team-card > p { font-size: 12px; line-height: 1.55; }
     #page-doi-ngu .team-note,
     #page-doi-ngu .team-cta { display: none !important; }
     #page-doi-ngu > .team-section:has(.team-cta) { display: none !important; }

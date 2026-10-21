@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&family=Muli:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Thư viện bản đồ Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="../remaining/leaflet/leaflet.css" />
 
     <style>
         * {
@@ -1271,7 +1271,7 @@
 
 <!-- Thư viện bản đồ Leaflet JS -->
 <script src="../site-header.js"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="../remaining/leaflet/leaflet.js"></script>
 
 <!-- Script khởi tạo Bản đồ thực và gán tương tác -->
 <script>
@@ -1527,12 +1527,54 @@
         };
         let locations = { ...defaultHomeMapLocations };
 
-        const map = L.map('real-map', {zoomControl: false}).setView([21.015, 105.805], 12);
+        const map = L.map('real-map', {
+            zoomControl: false,
+            zoomAnimation: false,
+            fadeAnimation: false
+        }).setView([21.015, 105.805], 12);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        const homeMapTileOptions = {
             attribution: '© OpenStreetMap contributors',
-            maxZoom: 18,
-        }).addTo(map);
+            maxZoom: 19,
+            maxNativeZoom: 19,
+            keepBuffer: 2
+        };
+
+        function addHomeMapTiles() {
+            const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', homeMapTileOptions);
+            let usingBackup = false;
+            let stalledRequestTimer;
+            const clearStallTimer = () => window.clearTimeout(stalledRequestTimer);
+            const useBackup = () => {
+                if (usingBackup) return;
+                usingBackup = true;
+                clearStallTimer();
+                map.attributionControl.addAttribution('Tiles © <a href="https://www.openstreetmap.de/">OpenStreetMap Deutschland</a>');
+                tiles.options.maxNativeZoom = 18;
+                tiles.setUrl('https://tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png');
+            };
+            tiles.on('tileerror', useBackup);
+            tiles.on('loading', () => {
+                clearStallTimer();
+                if (!usingBackup) stalledRequestTimer = window.setTimeout(useBackup, 10000);
+            });
+            tiles.on('load', clearStallTimer);
+            return tiles.addTo(map);
+        }
+
+        addHomeMapTiles();
+
+        const homeMapContainer = document.getElementById('real-map');
+        function refreshHomeMap() {
+            if (!homeMapContainer?.isConnected || !homeMapContainer.offsetWidth || !homeMapContainer.offsetHeight) return;
+            map.invalidateSize({ pan: false, animate: false });
+        }
+        [0, 80, 200, 500, 1000].forEach(delay => window.setTimeout(refreshHomeMap, delay));
+        window.addEventListener('resize', refreshHomeMap, { passive: true });
+        window.addEventListener('pageshow', refreshHomeMap);
+        window.addEventListener('orientationchange', () => window.setTimeout(refreshHomeMap, 100), { passive: true });
+        document.addEventListener('visibilitychange', refreshHomeMap);
+        if (window.ResizeObserver) new ResizeObserver(refreshHomeMap).observe(homeMapContainer);
 
         const markers = {};
         let cards = [];

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="leaflet/leaflet.css" />
   <style>
     :root {
       --primary: #168A45;
@@ -1740,17 +1740,39 @@
       <button type="button" aria-label="Đóng" onclick="closeModal('successModal')" style="position:absolute;right:12px;top:8px;border:0;background:transparent;color:#64748b;font-size:24px;line-height:1;cursor:pointer;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       <div style="width:54px;height:54px;margin:8px auto 14px;border-radius:16px;background:#e9f7ee;color:#168a45;display:grid;place-items:center;font-size:22px;"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
       <h3 id="successModalTitle" style="color: var(--primary); margin-bottom: 10px; font-size: 20px;">Gửi báo cáo thành công!</h3>
-      <p style="font-size: 14px; color: var(--text-sub); margin-bottom: 20px;">Cảm ơn sự đóng góp của bạn! Thông tin điểm đen đã được ghi nhận.</p>
+      <p id="campaignJoinSuccessText" style="font-size: 14px; color: var(--text-sub); margin-bottom: 14px;">Cảm ơn sự đóng góp của bạn! Thông tin điểm đen đã được ghi nhận.</p>
+      <div id="campaignJoinQrWrap" style="display:none; margin: 0 auto 14px; width: 190px; padding: 8px; border: 1px solid #dce9df; border-radius: 12px; background: #fff;"><img id="campaignJoinQr" src="" alt="Mã QR vào nhóm Zalo" style="display:block; width:100%; height:auto; border-radius: 6px;"></div>
+      <a id="campaignJoinZalo" href="#" target="_blank" rel="noopener" style="display:none; margin: 0 auto 18px; color: #087443; font-weight: 800; text-decoration: underline;">Mở nhóm Zalo</a>
       <button type="button" class="btn-pill btn-join" onclick="closeModal('successModal')">Đóng</button>
     </div>
   </div>
 
   <script src="../site-header.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="leaflet/leaflet.js"></script>
   <script>
     let registeredUsers = [];
     let currentUser = null;
     let activeCampaignKey = null;
+    let campaignJoinSettings = { qr_url: '', zalo_url: '' };
+
+    function applyCampaignJoinSettings(value) {
+      const settings = value && typeof value === 'object' ? value : {};
+      campaignJoinSettings = { qr_url: String(settings.qr_url || ''), zalo_url: String(settings.zalo_url || '') };
+      const qrWrap = document.getElementById('campaignJoinQrWrap');
+      const qr = document.getElementById('campaignJoinQr');
+      const zalo = document.getElementById('campaignJoinZalo');
+      if (qr && campaignJoinSettings.qr_url) qr.src = campaignJoinSettings.qr_url;
+      if (qrWrap) qrWrap.style.display = campaignJoinSettings.qr_url ? 'block' : 'none';
+      if (zalo) { zalo.href = campaignJoinSettings.zalo_url || '#'; zalo.style.display = campaignJoinSettings.zalo_url ? 'inline-block' : 'none'; }
+    }
+
+    function openCampaignJoinSuccessModal() {
+      applyCampaignJoinSettings(campaignJoinSettings);
+      document.getElementById('successModalTitle').innerText = 'Chúc mừng bạn đã đăng ký thành công!';
+      document.getElementById('campaignJoinSuccessText').innerText = 'Vui lòng quét mã QR hoặc bấm link Zalo bên dưới để vào nhóm.';
+      const modal = document.getElementById('successModal');
+      if (modal) modal.style.display = 'flex';
+    }
 
     function navigateParent(path) {
       window.parent.postMessage({ type: 'hnx:navigate', path }, '*');
@@ -2066,7 +2088,7 @@
       applyUserDataToUI();
       document.getElementById('zaloGroupSection').style.display = 'block';
       document.getElementById('mBtnJoin').style.display = 'none';
-      alert('Đăng ký tham gia thành công! Vui lòng quét mã QR hoặc bấm link Zalo bên dưới để vào nhóm.');
+      openCampaignJoinSuccessModal();
     }
 
     function joinCampaign(key) {
@@ -2203,6 +2225,7 @@
 
     function renderImpactMetrics(rows) {
       const metrics = Object.fromEntries((rows || []).map(row => [row.metric_key, row.metric_value]));
+      applyCampaignJoinSettings(metrics.campaign_join_settings);
       const overview = metrics.overview || {};
       const overviewItems = [
         [overview.campaigns, 'Chiến dịch đã thực hiện'],
@@ -2319,11 +2342,11 @@
       }
       if (event.data?.type === 'hnx:registered-campaigns') { window.hnxRegisteredCampaigns = event.data.keys || []; }
       if (event.data?.type === 'hnx:campaign-register-result') {
-        if (event.data.ok) { document.getElementById('zaloGroupSection').style.display = 'block'; document.getElementById('mBtnJoin').style.display = 'none'; alert('Đăng ký tham gia thành công! Vui lòng quét mã QR hoặc bấm link Zalo bên dưới để vào nhóm.'); } else alert(event.data.message || 'Không thể đăng ký chiến dịch.');
+        if (event.data.ok) { document.getElementById('zaloGroupSection').style.display = 'block'; document.getElementById('mBtnJoin').style.display = 'none'; openCampaignJoinSuccessModal(); } else alert(event.data.message || 'Không thể đăng ký chiến dịch.');
       }
       if (event.data?.type === 'hnx:pollution-report-result') {
         if (event.data.ok) { document.getElementById('pollutionForm').reset(); selectedReportImages = []; renderReportImages(); }
-        if (event.data.ok) { document.getElementById('successModal').style.display = 'flex'; } else alert(event.data.message || 'Không thể gửi báo cáo.');
+        if (event.data.ok) { document.getElementById('successModalTitle').innerText = 'Gửi báo cáo thành công!'; document.getElementById('campaignJoinSuccessText').innerText = 'Cảm ơn sự đóng góp của bạn! Thông tin điểm đen đã được ghi nhận.'; document.getElementById('campaignJoinQrWrap').style.display = 'none'; document.getElementById('campaignJoinZalo').style.display = 'none'; document.getElementById('successModal').style.display = 'flex'; } else alert(event.data.message || 'Không thể gửi báo cáo.');
       }
     });
 
@@ -2378,7 +2401,9 @@
         card.onclick = function(event) { if (!event.target.closest('.btn-view, .btn-join-campaign')) focusCampaignOnMap(c.id, event); };
         card.onkeydown = function(event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); focusCampaignOnMap(c.id, event); } };
         card.querySelector('.btn-view').onclick = function(event) { event.stopPropagation(); focusCampaignOnMap(c.id); openDetailModal(c.id); };
-        const joinButton = document.createElement('button'); joinButton.type = 'button'; joinButton.className = 'btn-join-campaign'; joinButton.innerText = 'Tham gia ngay'; joinButton.onclick = function() { joinCampaign(c.id); }; card.querySelector('.card-bottom').appendChild(joinButton);
+        if (!ended) {
+          const joinButton = document.createElement('button'); joinButton.type = 'button'; joinButton.className = 'btn-join-campaign'; joinButton.innerText = 'Tham gia ngay'; joinButton.onclick = function() { joinCampaign(c.id); }; card.querySelector('.card-bottom').appendChild(joinButton);
+        }
         pane.appendChild(card);
       });
         if (currentUser && pendingSharedCampaignKey && campaignDetails[pendingSharedCampaignKey]) {
@@ -2411,10 +2436,56 @@
       zoom: 11,
       minZoom: 9.5,
       maxZoom: 17,
-      zoomControl: false
+      zoomControl: false,
+      zoomAnimation: false,
+      fadeAnimation: false
     });
     L.control.zoom({ position: 'bottomright' }).addTo(bMap);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(bMap);
+    const mapTileOptions = {
+      maxZoom: 19,
+      maxNativeZoom: 19,
+      keepBuffer: 2,
+      attribution: '© OpenStreetMap contributors'
+    };
+    function addMapTiles(map) {
+      const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', mapTileOptions);
+      let usingBackup = false;
+      let stalledRequestTimer;
+      const clearStallTimer = () => window.clearTimeout(stalledRequestTimer);
+      const useBackup = () => {
+        if (usingBackup) return;
+        usingBackup = true;
+        clearStallTimer();
+        map.attributionControl.addAttribution('Tiles © <a href="https://www.openstreetmap.de/">OpenStreetMap Deutschland</a>');
+        tiles.options.maxNativeZoom = 18;
+        tiles.setUrl('https://tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png');
+      };
+      tiles.on('tileerror', useBackup);
+      tiles.on('loading', () => {
+        clearStallTimer();
+        if (!usingBackup) stalledRequestTimer = window.setTimeout(useBackup, 10000);
+      });
+      tiles.on('load', clearStallTimer);
+      return tiles.addTo(map);
+    }
+    addMapTiles(bMap);
+
+    function refreshLeafletMap(map, container) {
+      if (!map || !container || !container.isConnected || !container.offsetWidth || !container.offsetHeight) return;
+      map.invalidateSize({ pan: false, animate: false });
+    }
+
+    function maintainLeafletMap(map, container) {
+      const refresh = () => refreshLeafletMap(map, container);
+      [0, 80, 200, 500, 1000].forEach(delay => window.setTimeout(refresh, delay));
+      window.addEventListener('resize', refresh, { passive: true });
+      window.addEventListener('pageshow', refresh);
+      window.addEventListener('orientationchange', () => window.setTimeout(refresh, 100), { passive: true });
+      document.addEventListener('visibilitychange', refresh);
+      if (window.ResizeObserver) new ResizeObserver(refresh).observe(container);
+    }
+
+    maintainLeafletMap(bMap, document.getElementById('boundaryMap'));
 
     const addressInput = document.getElementById('reportLocation');
     const reportDescInput = document.getElementById('reportDesc');
@@ -2662,14 +2733,15 @@
     function openLocationPicker() {
       document.getElementById('pickerModal').style.display = 'flex';
       if (!pMap) {
-        pMap = L.map('pickerMap').setView([21.0285, 105.8048], 14);
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(pMap);
+        pMap = L.map('pickerMap', { zoomAnimation: false, fadeAnimation: false }).setView([21.0285, 105.8048], 14);
+        addMapTiles(pMap);
         pMarker = L.marker([21.0285, 105.8048], { draggable: true, icon: createMapMarkerIcon('fa-location-crosshairs', '#168a45') }).addTo(pMap);
         pMarker.on('dragend', e => fetchRealAddress(e.target.getLatLng().lat, e.target.getLatLng().lng));
         pMap.on('click', e => { pMarker.setLatLng(e.latlng); fetchRealAddress(e.latlng.lat, e.latlng.lng); });
         fetchRealAddress(21.0285, 105.8048);
+        maintainLeafletMap(pMap, document.getElementById('pickerMap'));
       }
-      setTimeout(() => { pMap.invalidateSize(); }, 200);
+      [0, 100, 250, 500].forEach(delay => window.setTimeout(() => refreshLeafletMap(pMap, document.getElementById('pickerMap')), delay));
     }
 
     function fetchRealAddress(lat, lng) {
