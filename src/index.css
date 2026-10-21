@@ -196,15 +196,6 @@
 .admin-table-wrap button:not(.link-danger) { border: 1px solid #b7ddc2; border-radius: 7px; padding: 7px 10px; background: #ecfdf3; color: #166534; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; transition: background-color .18s ease, border-color .18s ease, color .18s ease; }
 .admin-table-wrap button:not(.link-danger):hover, .admin-table-wrap button:not(.link-danger):focus-visible, .admin-table-wrap button:not(.link-danger):active { border-color: #0f382c; background: #0f382c; color: #fff; }
 .admin-table-wrap button:disabled { cursor: wait; opacity: .62; }
-.admin-account-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
-.admin-account-tab { display: grid; gap: 8px; min-width: 205px; padding: 10px; border: 1px solid #dbe4df; border-radius: 11px; background: #fff; }
-.admin-account-tabs button { border: 1px solid #b7ddc2; border-radius: 9px; padding: 10px 13px; background: white; color: #166534; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
-.admin-account-tabs button:hover, .admin-account-tabs button:focus-visible { border-color: #0f382c; background: #ecfdf3; }
-.admin-account-tabs .admin-export-button { border-color: #15803d; background: #f0fdf4; color: #15803d; }
-.admin-account-tab .admin-export-button { width: 100%; border-color: #15803d; background: #15803d; color: #fff; text-transform: uppercase; letter-spacing: .03em; }
-.admin-account-tab .admin-export-button { font-size: 0; }
-.admin-account-tab .admin-export-button::after { content: "TẢI FILE CSV"; font-size: 12px; }
-.admin-account-tab .admin-export-button:hover, .admin-account-tab .admin-export-button:focus-visible { background: #0f382c; border-color: #0f382c; color: #fff; }
 .admin-account-filter { border: 1px solid #e2ebe5; border-radius: 14px; padding: 20px; background: #fff; box-shadow: 0 6px 22px rgba(15,56,44,.04); }
 .admin-account-filter h3 { margin: 0 0 12px; color: #0f382c; font-size: 18px; }
 .admin-account-filter p { margin: 0 0 14px; color: #52665b; }
