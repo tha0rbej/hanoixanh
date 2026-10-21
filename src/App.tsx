@@ -65,7 +65,7 @@ function SourceFrame({
 }) {
   const location = useLocation()
   const navigate = useNavigate()
-  const { session, profile, loading: authLoading, refreshProfile, signOut, changePassword } = useAuth()
+  const { session, profile, refreshProfile, signOut, changePassword } = useAuth()
   const frameRef = useRef<HTMLIFrameElement>(null)
   const pendingReportRef = useRef<{ location?: string; description?: string; latitude?: number; longitude?: number; image?: File | null; images?: File[] } | null>(null)
   const baseUrl = import.meta.env.BASE_URL.endsWith("/")
@@ -398,7 +398,7 @@ function SourceFrame({
       key={source}
       src={source}
       title={title}
-      style={{ visibility: authLoading ? "hidden" : "visible" }}
+      style={{ visibility: "visible" }}
       className="site-frame"
     />
   )
