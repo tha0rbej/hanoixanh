@@ -203,6 +203,7 @@
 .admin-account-filter-actions button:not(.admin-primary) { border: 0; padding: 10px 0; background: transparent; color: #24342b; font: inherit; cursor: pointer; }
 .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
 .wide-field { margin-top: 14px; }
+.admin-panel label.wide-field > img { width: 180px !important; height: 180px !important; object-fit: cover; border-radius: 18px; }
 .admin-panel textarea { min-height: 86px; resize: vertical; }
 .admin-campaign-form form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
 .admin-campaign-form form > .form-grid { grid-column: 1 / -1; gap: 10px 14px; }
