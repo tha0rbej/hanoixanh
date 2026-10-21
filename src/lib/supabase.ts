@@ -22,6 +22,7 @@ export type HnxProfile = {
   bio?: string | null
   points_balance?: number
   role: UserRole
+  last_login_at?: string | null
   created_at?: string
 }
 
@@ -289,6 +290,12 @@ export async function getProfile(id: string, token?: string): Promise<HnxProfile
     interests: stored.interests ?? metadataText("interests") ?? null,
     bio: stored.bio ?? metadataText("bio") ?? null,
   }
+}
+
+export async function recordProfileLogin(id: string, token: string) {
+  const timestamp = new Date().toISOString()
+  await tableUpdate("profiles", `id=eq.${encodeURIComponent(id)}`, { last_login_at: timestamp }, token)
+  return timestamp
 }
 
 export async function updateProfile(id: string, values: Partial<Pick<HnxProfile, "full_name" | "phone" | "avatar_url" | "birth_date" | "gender" | "address" | "occupation" | "interests" | "bio">>, token: string) {

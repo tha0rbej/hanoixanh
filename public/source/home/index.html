@@ -819,7 +819,7 @@
 <section class="schedule-section" id="chien-dich-sap-dien-ra">
     <div class="section-header">
         <span class="section-eyebrow">LỊCH HẸN VỚI THÀNH PHỐ</span>
-        <h2>Chiến dịch sắp diễn ra</h2>
+        <h2>Các chiến dịch Hà Nội Xanh</h2>
         <p>Dành một buổi sáng. Góp một thay đổi. Tìm hoạt động phù hợp và cùng chúng tôi ra quân.</p>
     </div>
     <div class="schedule-grid">
@@ -1354,24 +1354,49 @@
         window.parent.postMessage({ type: 'hnx:campaign-register', campaignKey: activeHomeCampaignId }, '*');
     });
 
+    function homeCampaignTime(value) {
+        if (!value) return NaN;
+        const raw = String(value).trim();
+        const vietnameseValue = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(raw) ? raw : (raw.includes('T') ? `${raw}+07:00` : `${raw}T00:00:00+07:00`);
+        return new Date(vietnameseValue).getTime();
+    }
+
+    function homeCampaignIsCompleted(campaign) {
+        const status = String(campaign?.status || '').toLowerCase();
+        if (['completed', 'done', 'finished'].includes(status)) return true;
+        const endAt = homeCampaignTime(campaign?.end_at);
+        const startAt = homeCampaignTime(campaign?.start_at);
+        return Number.isFinite(endAt) ? endAt <= Date.now() : Number.isFinite(startAt) && startAt <= Date.now();
+    }
+
+    function formatHomeVietnamDate(value, withTime = false) {
+        const time = homeCampaignTime(value);
+        if (!Number.isFinite(time)) return 'Đang cập nhật';
+        return new Intl.DateTimeFormat('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', dateStyle: 'short', ...(withTime ? { timeStyle: 'short' } : {}) }).format(new Date(time));
+    }
+
     function renderHomeCampaigns(campaigns) {
         const grid = document.querySelector('.schedule-grid');
         if (!grid || !Array.isArray(campaigns)) return;
         homeCampaigns.clear();
         campaigns.forEach(c => homeCampaigns.set(String(c.id), c));
-        const upcoming = campaigns.find(c => c.status === 'upcoming');
-        const completed = campaigns.filter(c => c.status === 'completed').sort((a, b) => new Date(b.start_at) - new Date(a.start_at)).slice(0, 2);
-        const items = [upcoming, ...completed].filter(Boolean);
+        const items = campaigns.slice().sort((a, b) => {
+            const aCompleted = homeCampaignIsCompleted(a);
+            const bCompleted = homeCampaignIsCompleted(b);
+            if (aCompleted !== bCompleted) return aCompleted ? 1 : -1;
+            const aTime = homeCampaignTime(aCompleted ? (a.end_at || a.start_at) : (a.start_at || a.end_at));
+            const bTime = homeCampaignTime(bCompleted ? (b.end_at || b.start_at) : (b.start_at || b.end_at));
+            return aCompleted ? bTime - aTime : aTime - bTime;
+        });
         grid.innerHTML = items.map((c, index) => {
-            const isUpcoming = c === upcoming;
-            const start = new Date(c.start_at);
-            const end = c.end_at ? new Date(c.end_at) : start;
-            const date = start.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const time = `${start.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`;
+            const isUpcoming = !homeCampaignIsCompleted(c);
+            const date = formatHomeVietnamDate(c.start_at);
+            const time = `${formatHomeVietnamDate(c.start_at, true).split(', ').pop()} - ${formatHomeVietnamDate(c.end_at || c.start_at, true).split(', ').pop()}`;
             const capacity = Math.max(1, Number(c.capacity) || 1);
             const joined = Math.min(capacity, Math.max(0, Number(c.registered_count ?? c.volunteers_registered) || (isUpcoming ? Math.round(capacity * .65) : capacity)));
             const progress = Math.round((joined / capacity) * 100);
-            const image = homeCampaignImages[index % homeCampaignImages.length];
+            const imageList = Array.isArray(c.image_urls) ? c.image_urls.filter(Boolean) : [];
+            const image = imageList[0] || c.image_url || homeCampaignImages[index % homeCampaignImages.length];
             const safeId = escapeNewsHtml(String(c.id || ''));
             const action = isUpcoming
                 ? `<button type="button" class="schedule-register home-campaign-open" data-campaign-id="${safeId}">${registeredHomeCampaigns.has(String(c.id)) ? 'Đã đăng ký' : 'Đăng ký'}</button>`
@@ -1582,10 +1607,7 @@
         }
 
         function homeCampaignCompleted(campaign) {
-            const status = String(campaign?.status || '').toLowerCase();
-            if (['completed', 'done', 'finished'].includes(status)) return true;
-            const endAt = campaign?.end_at || campaign?.start_at;
-            return Boolean(endAt && new Date(endAt).getTime() < Date.now() && status !== 'upcoming');
+            return homeCampaignIsCompleted(campaign);
         }
 
         function validHomeMapCoordinate(latitude, longitude) {
@@ -1623,8 +1645,7 @@
                 if (!coords) return;
                 const completed = homeCampaignCompleted(campaign);
                 const dateValue = campaign.end_at || campaign.start_at;
-                const date = dateValue ? new Date(dateValue) : null;
-                const dateText = date && !Number.isNaN(date.getTime()) ? date.toLocaleDateString('vi-VN') : 'Đang cập nhật';
+                const dateText = formatHomeVietnamDate(dateValue);
                 const capacity = Number(campaign.capacity || 0);
                 const id = String(campaign.id || `campaign_${index}`);
                 nextLocations[id] = {
@@ -1634,7 +1655,7 @@
                     volunteers: capacity > 0 ? `${capacity.toLocaleString('vi-VN')} người` : 'Đang cập nhật',
                     amountLabel: completed ? 'Kết quả:' : 'Quy mô:',
                     amount: homeCampaignResult(campaign, completed),
-                    img: campaign.image_url || fallback?.img || 'trangchu3.jpg',
+                    img: (Array.isArray(campaign.image_urls) ? campaign.image_urls.filter(Boolean)[0] : '') || campaign.image_url || fallback?.img || 'trangchu3.jpg',
                     coords,
                     status: completed ? 'Đã hoàn thành' : 'Sắp ra quân',
                     color: completed ? '#10b981' : '#ef4444',

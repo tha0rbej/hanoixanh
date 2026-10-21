@@ -1650,6 +1650,7 @@
           <button type="button" class="active" onclick="setDetailCarousel(0)"></button>
           <button type="button" onclick="setDetailCarousel(1)"></button>
           <button type="button" onclick="setDetailCarousel(2)"></button>
+          <button type="button" onclick="setDetailCarousel(3)"></button>
         </div>
       </div>
       <section class="detail-modal-block"><h4>Tình trạng ô nhiễm</h4><p id="mStatus">Mô tả tình trạng rác...</p></section>
@@ -1968,7 +1969,7 @@
       document.getElementById('impact-before-after')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    const detailCarouselImages = [
+    let detailCarouselImages = [
       'https://picsum.photos/800/450?random=1',
       'https://picsum.photos/800/450?random=2',
       'https://picsum.photos/800/450?random=3'
@@ -1979,7 +1980,8 @@
       detailCarouselIndex = (index + detailCarouselImages.length) % detailCarouselImages.length;
       const image = document.getElementById('mCarouselImage');
       if (image) image.src = detailCarouselImages[detailCarouselIndex];
-      document.querySelectorAll('.detail-modal-carousel-dots button').forEach((dot, dotIndex) => dot.classList.toggle('active', dotIndex === detailCarouselIndex));
+      document.querySelectorAll('.detail-modal-carousel-dots button').forEach((dot, dotIndex) => { dot.style.display = dotIndex < detailCarouselImages.length ? '' : 'none'; dot.classList.toggle('active', dotIndex === detailCarouselIndex); });
+      document.querySelectorAll('.detail-modal-carousel-btn').forEach(button => { button.style.display = detailCarouselImages.length > 1 ? '' : 'none'; });
     }
 
     function changeDetailCarousel(direction) {
@@ -1996,6 +1998,11 @@
         detailModal.scrollTop = 0;
         if (detailContent) detailContent.scrollTop = 0;
         detailModal.querySelector('.detail-modal-scroll')?.scrollTo({ top: 0, behavior: 'auto' });
+        detailCarouselImages = Array.isArray(data.image_urls) && data.image_urls.filter(Boolean).length ? data.image_urls.filter(Boolean).slice(0, 4) : [data.image].filter(Boolean).length ? [data.image] : [
+          'https://picsum.photos/800/450?random=1',
+          'https://picsum.photos/800/450?random=2',
+          'https://picsum.photos/800/450?random=3'
+        ];
         setDetailCarousel(0);
         document.getElementById('mTitle').innerText = data.title;
         const metaParts = String(data.meta || '').split('|').map(part => part.trim()).filter(Boolean);
@@ -2343,15 +2350,24 @@
       if (event.data?.type !== 'hnx:campaigns-data' || !Array.isArray(event.data.campaigns)) return;
       const groups = { upcoming: document.getElementById('pane-upcoming'), completed: document.getElementById('pane-completed') };
       groups.upcoming.innerHTML = '';
+      groups.completed.innerHTML = '';
       if (typeof renderCampaignLocations === 'function') renderCampaignLocations(event.data.campaigns);
-      event.data.campaigns.forEach(function(c) {
+      const sortedCampaigns = event.data.campaigns.slice().sort(function(a, b) {
+        const aEnded = campaignIsCompleted(a);
+        const bEnded = campaignIsCompleted(b);
+        if (aEnded !== bEnded) return aEnded ? 1 : -1;
+        const aTime = campaignSortTime(a);
+        const bTime = campaignSortTime(b);
+        return aEnded ? bTime - aTime : aTime - bTime;
+      });
+      sortedCampaigns.forEach(function(c) {
         const ended = campaignIsCompleted(c);
-        if (ended) return;
         const pane = ended ? groups.completed : groups.upcoming;
         const card = document.createElement('div'); card.className = 'camp-card'; card.id = 'campaign-card-' + c.id; card.dataset.campaignKey = c.id; card.setAttribute('role', 'button'); card.tabIndex = 0;
-        card.innerHTML = '<div class="card-thumb"><span class="badge-card">' + (ended ? 'Đã diễn ra' : 'Sắp diễn ra') + '</span>' + (c.image_url ? '<img src="' + c.image_url + '" alt="">' : '') + '</div><div class="card-info"><h4></h4><div class="card-meta-line"><i class="fa-solid fa-location-dot ui-icon" aria-hidden="true"></i> ' + (c.location || '') + '</div><div class="card-meta-line"><i class="fa-regular fa-calendar ui-icon" aria-hidden="true"></i> ' + new Date(c.start_at).toLocaleString('vi-VN') + '</div><div class="card-desc"></div><div class="card-bottom"><span class="card-members"><i class="fa-solid fa-user-group ui-icon" aria-hidden="true"></i> ' + (c.capacity || '') + ' người tham gia</span><button class="btn-view">Xem chi tiết →</button></div></div>';
+        const campaignImages = Array.isArray(c.image_urls) && c.image_urls.filter(Boolean).length ? c.image_urls.filter(Boolean).slice(0, 4) : [c.image_url].filter(Boolean);
+        card.innerHTML = '<div class="card-thumb"><span class="badge-card">' + (ended ? 'Đã diễn ra' : 'Sắp diễn ra') + '</span>' + (campaignImages[0] ? '<img src="' + campaignImages[0] + '" alt="">' : '') + '</div><div class="card-info"><h4></h4><div class="card-meta-line"><i class="fa-solid fa-location-dot ui-icon" aria-hidden="true"></i> ' + (c.location || '') + '</div><div class="card-meta-line"><i class="fa-regular fa-calendar ui-icon" aria-hidden="true"></i> ' + formatVietnamDateTime(c.start_at) + '</div><div class="card-desc"></div><div class="card-bottom"><span class="card-members"><i class="fa-solid fa-user-group ui-icon" aria-hidden="true"></i> ' + (c.capacity || '') + ' người tham gia</span><button class="btn-view">Xem chi tiết →</button></div></div>';
         card.querySelector('h4').textContent = c.title || ''; card.querySelector('.card-desc').textContent = c.description || '';
-        campaignDetails[c.id] = { isCompleted: ended, title: c.title || '', meta: (c.location || '') + ' | ' + new Date(c.start_at).toLocaleString('vi-VN'), status: c.pollution_status || c.description || 'Chưa cập nhật.', action: c.action_plan || 'Chưa cập nhật.', support: c.support_equipment || 'Chưa cập nhật.' };
+        campaignDetails[c.id] = { isCompleted: ended, title: c.title || '', meta: (c.location || '') + ' | ' + formatVietnamDateTime(c.start_at), status: c.pollution_status || c.description || 'Chưa cập nhật.', action: c.action_plan || 'Chưa cập nhật.', support: c.support_equipment || 'Chưa cập nhật.', image: campaignImages[0] || '', image_urls: campaignImages };
         card.onclick = function(event) { if (!event.target.closest('.btn-view, .btn-join-campaign')) focusCampaignOnMap(c.id, event); };
         card.onkeydown = function(event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); focusCampaignOnMap(c.id, event); } };
         card.querySelector('.btn-view').onclick = function() { openDetailModal(c.id); };
@@ -2419,11 +2435,31 @@
     let currentActiveMarker = null;
     let campaignMapMarkers = [];
 
+    function campaignTime(value) {
+      if (!value) return NaN;
+      const raw = String(value).trim();
+      const vietnameseValue = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(raw) ? raw : (raw.includes('T') ? `${raw}+07:00` : `${raw}T00:00:00+07:00`);
+      const parsed = new Date(vietnameseValue);
+      return parsed.getTime();
+    }
+
+    function formatVietnamDateTime(value) {
+      const time = campaignTime(value);
+      if (Number.isNaN(time)) return 'Thời gian chưa cập nhật';
+      return new Intl.DateTimeFormat('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', dateStyle: 'short', timeStyle: 'short' }).format(new Date(time));
+    }
+
+    function campaignSortTime(campaign) {
+      const value = campaignIsCompleted(campaign) ? (campaign?.end_at || campaign?.start_at) : (campaign?.start_at || campaign?.end_at);
+      return campaignTime(value) || Number.MAX_SAFE_INTEGER;
+    }
+
     function campaignIsCompleted(campaign) {
       const status = String(campaign?.status || '').toLowerCase();
       if (status === 'completed' || status === 'done' || status === 'finished') return true;
-      const endAt = campaign?.end_at || campaign?.start_at;
-      return Boolean(endAt && new Date(endAt).getTime() < Date.now() && status !== 'upcoming');
+      const endAt = campaignTime(campaign?.end_at);
+      const startAt = campaignTime(campaign?.start_at);
+      return Number.isFinite(endAt) ? endAt <= Date.now() : Number.isFinite(startAt) && startAt <= Date.now();
     }
 
     function normalizeMapText(value) {
@@ -2444,16 +2480,14 @@
     function campaignMapDescription(campaign, fallbackLocation) {
       const description = String(campaign?.description || campaign?.pollution_status || '').trim();
       const location = String(campaign?.location || fallbackLocation || 'Hà Nội').trim();
-      const dateValue = campaign?.start_at ? new Date(campaign.start_at) : null;
-      const dateText = dateValue && !Number.isNaN(dateValue.getTime()) ? dateValue.toLocaleString('vi-VN') : '';
+      const dateText = campaign?.start_at ? formatVietnamDateTime(campaign.start_at) : '';
       return [location, dateText, description || 'Hoạt động làm sạch môi trường cùng Hà Nội Xanh.'].filter(Boolean).join(' • ');
     }
 
     function mapCampaignDate(campaign) {
       const value = campaign?.end_at || campaign?.start_at;
       if (!value) return 'Đang cập nhật';
-      const date = new Date(value);
-      return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString('vi-VN');
+      return Number.isNaN(campaignTime(value)) ? String(value) : new Intl.DateTimeFormat('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', dateStyle: 'short' }).format(new Date(campaignTime(value)));
     }
 
     function mapCampaignResult(campaign, completed) {
