@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import type { ContactMessage } from "@/app/types";
 import { createId } from "@/app/utils";
+import { trackEvent } from "@/lib/analytics";
 
 export default function ContactForm({ warning, onSave }: { warning: string; onSave: (message: ContactMessage) => void }) {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -8,6 +9,7 @@ export default function ContactForm({ warning, onSave }: { warning: string; onSa
   const submit = (event: FormEvent) => {
     event.preventDefault();
     onSave({ id: createId(), name: form.name.trim(), email: form.email.trim(), message: form.message.trim(), createdAt: new Date().toISOString() });
+    trackEvent("send_message_success");
     setForm({ name: "", email: "", message: "" }); setSaved(true);
   };
   if (saved) return <div role="status" className="py-10 text-center"><div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-emerald-50 text-2xl text-emerald-600"><i className="fa-solid fa-check" aria-hidden="true" /></div><h3 className="mt-3 text-2xl font-black">Đã lưu lời nhắn</h3><p className="mx-auto mt-2 max-w-md text-sm text-gray-600">Lời nhắn mới chỉ nằm trên thiết bị này, chưa được gửi tới Hà Nội Xanh.</p><button type="button" onClick={() => setSaved(false)} className="mt-5 font-bold text-emerald-700 underline">Viết lời nhắn khác</button></div>;

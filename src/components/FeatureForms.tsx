@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import type { CampaignEvent, PollutionReport, VolunteerRegistration } from "@/app/types";
 import { createId, formatVietnameseDate, isDuplicateRegistration, isValidVietnamesePhone } from "@/app/utils";
+import { trackEvent } from "@/lib/analytics";
 
 const inputClass = "mt-1 w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200";
 
@@ -13,6 +14,7 @@ export function RegistrationForm({ event, registrations, warning, onSave, onCanc
     if (!form.fullName.trim() || !form.email.trim() || !isValidVietnamesePhone(form.phone)) return setError("Vui lòng nhập đủ thông tin và kiểm tra lại số điện thoại Việt Nam.");
     if (isDuplicateRegistration(registrations, event.id, form.email, form.phone)) return setError("Email hoặc số điện thoại này đã đăng ký sự kiện.");
     onSave({ id: createId(), eventId: event.id, fullName: form.fullName.trim(), phone: form.phone.trim(), email: form.email.trim(), note: form.note.trim(), createdAt: new Date().toISOString() });
+    trackEvent("volunteer_registration_saved", { campaign_id: event.id });
     setForm({ fullName: "", phone: "", email: "", note: "" }); setError("");
   };
   return <>
@@ -38,7 +40,7 @@ export function ReportForm({ reports, warning, onSave }: { reports: PollutionRep
     setGeoStatus("Đang lấy vị trí…");
     navigator.geolocation.getCurrentPosition(({ coords }) => { setForm((current) => ({ ...current, latitude: coords.latitude, longitude: coords.longitude })); setGeoStatus("Đã lấy tọa độ hiện tại."); }, () => setGeoStatus("Không lấy được GPS. Vui lòng nhập địa chỉ thủ công."), { timeout: 10000, enableHighAccuracy: true });
   };
-  const submit = (e: FormEvent) => { e.preventDefault(); onSave({ id: createId(), address: form.address.trim(), description: form.description.trim(), latitude: form.latitude, longitude: form.longitude, createdAt: new Date().toISOString() }); setForm({ address: "", description: "", latitude: undefined, longitude: undefined }); setGeoStatus(""); };
+  const submit = (e: FormEvent) => { e.preventDefault(); onSave({ id: createId(), address: form.address.trim(), description: form.description.trim(), latitude: form.latitude, longitude: form.longitude, createdAt: new Date().toISOString() }); trackEvent("pollution_report_saved", { report_type: "pollution" }); setForm({ address: "", description: "", latitude: undefined, longitude: undefined }); setGeoStatus(""); };
   return <><p className="mb-4 rounded-lg bg-amber-50 p-3 text-xs text-amber-900">Báo cáo chỉ được lưu trên thiết bị này và chưa gửi tới ban điều hành.</p><form onSubmit={submit} className="space-y-4">
     <label className="block text-sm font-bold">Địa chỉ hoặc mô tả vị trí *<input className={inputClass} value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} required /></label>
     <div><button type="button" onClick={locate} className="rounded-lg border border-emerald-600 px-4 py-2 text-sm font-bold text-emerald-800">Lấy GPS hiện tại</button>{geoStatus && <p role="status" className="mt-2 text-xs text-gray-600">{geoStatus}</p>}</div>
