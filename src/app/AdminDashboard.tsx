@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react"
 import { useAuth } from "./AuthContext"
-import { tableDelete, tableInsert, tableSelect, tableUpdate, uploadPublicFile } from "../lib/supabase"
+import { rpc, tableDelete, tableInsert, tableSelect, tableUpdate, uploadPublicFile } from "../lib/supabase"
 
 type Row = Record<string, unknown> & { id: string }
 type Tab = "overview" | "messages" | "reports" | "campaigns" | "posts" | "people" | "points"
@@ -82,6 +82,11 @@ export function AdminDashboard({ onLogin }: { onLogin?: () => void }) {
     try { await tableDelete(table, `id=eq.${encodeURIComponent(id)}`, session.access_token); await load() }
     catch (cause) { setError(cause instanceof Error ? cause.message : "Không xóa được bản ghi.") }
   }
+  async function removeUser(id: string) {
+    if (!session || id === profile?.id || !window.confirm("Xóa tài khoản này? Các báo cáo và đăng ký liên quan cũng sẽ bị xóa.")) return
+    try { await rpc("delete_user_account", { target_user_id: id }, session.access_token); await load() }
+    catch (cause) { setError(cause instanceof Error ? cause.message : "Không xóa được tài khoản.") }
+  }
   async function attachImage(event: ChangeEvent<HTMLInputElement>, setter: (url: string) => void) {
     const file = event.target.files?.[0]; if (!file || !session) return
     try { setter(await uploadPublicFile(file, session.access_token)) }
@@ -100,7 +105,11 @@ export function AdminDashboard({ onLogin }: { onLogin?: () => void }) {
   return <main className="admin-shell"><aside className="admin-sidebar"><div className="admin-brand"><img src="/source/home/logo.jpg" alt="Hà Nội Xanh"/><div><strong>HÀ NỘI XANH</strong><small>ADMIN CONSOLE</small></div></div><nav>{([["overview", "Tổng quan"], ["people", "Tài khoản"], ["reports", "Báo cáo ô nhiễm"], ["campaigns", "Chiến dịch"], ["posts", "Bài viết"], ["points", "Điểm dọn dẹp"]] as [Tab, string][]).map(([key, label]) => <button key={key} className={tab === key ? "active" : ""} onClick={() => setTab(key)}>{label}</button>)}</nav><button className="admin-signout" onClick={() => void signOut()}>Đăng xuất</button></aside><section className="admin-content"><header className="admin-topbar"><div><p className="admin-kicker">BẢNG ĐIỀU KHIỂN</p><h1>{tab === "overview" ? "Tổng quan hoạt động" : tab === "people" ? "Tài khoản người dùng" : tab === "reports" ? "Báo cáo ô nhiễm" : tab === "campaigns" ? "Quản lý chiến dịch" : tab === "posts" ? "Quản lý bài viết" : "Quản lý điểm dọn dẹp"}</h1></div><div className="admin-user"><span>{profile.full_name || profile.email}</span><small>ADMIN</small></div></header>{error && <div className="admin-error">{error}</div>}{loading ? <div className="admin-loading">Đang tải dữ liệu…</div> : <>{tab === "overview" && <Overview rows={rows} stats={stats} />}{tab === "people" && <People profiles={rows.profiles} registrations={rows.registrations} />}{tab === "reports" && <Reports rows={rows.reports} onStatus={updateReport} />}{tab === "campaigns" && <Campaigns rows={rows.campaigns} form={campaign} setForm={setCampaign} onSubmit={createCampaign} onDelete={(id) => remove("campaigns", id)} />}{tab === "posts" && <Posts rows={rows.posts} form={post} setForm={setPost} onSubmit={createPost} onDelete={(id) => remove("posts", id)} onImage={(e, setter) => void attachImage(e, setter)} />}{tab === "points" && <Points rows={rows.points} form={point} setForm={setPoint} onSubmit={createPoint} onDelete={(id) => remove("cleanup_points", id)} />}</>}</section></main>
 }
 
-function People({ profiles, registrations }: { profiles: Row[]; registrations: Row[] }) {
+function People({ profiles, onDelete }: { profiles: Row[]; registrations: Row[]; onDelete?: (id: string) => Promise<void> }) {
+  return <div className="admin-page"><section className="admin-panel"><h2>Tất cả tài khoản ({profiles.length})</h2><div className="admin-table-wrap"><table><thead><tr><th>Họ tên</th><th>Email</th><th>Ngày tạo</th><th></th></tr></thead><tbody>{profiles.map((row) => <tr key={row.id}><td>{value(row, "full_name") || "Chưa cập nhật"}</td><td>{value(row, "email")}</td><td>{formatDate(row.created_at)}</td><td>{onDelete && <button className="link-danger" onClick={() => void onDelete(row.id)}>Xóa</button>}</td></tr>)}</tbody></table>{!profiles.length && <p className="admin-empty">Chưa có tài khoản.</p>}</div></section></div>
+}
+
+function PeopleLegacy({ profiles, registrations, onDelete }: { profiles: Row[]; registrations: Row[]; onDelete: (id: string) => Promise<void> }) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const selected = profiles.find((row) => row.id === selectedId)
   const userRegistrations = selected ? registrations.filter((row) => value(row, "user_id") === selected.id && value(row, "status") !== "cancelled") : []
