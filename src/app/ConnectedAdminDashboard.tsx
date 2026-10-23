@@ -489,43 +489,19 @@ function Simple({ title, rows, cols }: { title: string; rows: Row[]; cols: strin
   const volunteer = title.startsWith("Tình nguyện viên")
   const report = title.startsWith("Báo cáo")
   const { session } = useAuth()
-  useEffect(() => {
-    if (!report || !session) return
-    const table = document.querySelector(".admin-content .admin-panel table")
-    const body = table?.querySelector("tbody")
-    if (!table || !body) return
-    const header = table.querySelector("thead tr")
-    if (header && !header.querySelector("[data-report-delete-header]")) {
-      const cell = document.createElement("th")
-      cell.dataset.reportDeleteHeader = "true"
-      header.appendChild(cell)
+  const deleteReport = async (row: Row) => {
+    if (!session || !window.confirm("Xóa báo cáo ô nhiễm này? Dữ liệu sẽ bị xóa khỏi Supabase.")) return
+    try {
+      await tableDelete("pollution_reports", `id=eq.${encodeURIComponent(row.id)}`, session.access_token)
+      window.location.reload()
+    } catch (cause) {
+      window.alert(cause instanceof Error ? cause.message : "Không xóa được báo cáo.")
     }
-    Array.from(body.rows).forEach((row, index) => {
-      if (row.querySelector("[data-report-delete]")) return
-      const reportRow = rows[index]
-      const cell = document.createElement("td")
-      const button = document.createElement("button")
-      button.type = "button"
-      button.className = "link-danger"
-      button.dataset.reportDelete = "true"
-      button.textContent = "Xóa"
-      button.addEventListener("click", async () => {
-        if (!reportRow || !window.confirm("Xóa báo cáo ô nhiễm này? Dữ liệu sẽ bị xóa khỏi Supabase.")) return
-        try {
-          await tableDelete("pollution_reports", `id=eq.${encodeURIComponent(reportRow.id)}`, session.access_token)
-          window.location.reload()
-        } catch (cause) {
-          window.alert(cause instanceof Error ? cause.message : "Không xóa được báo cáo.")
-        }
-      })
-      cell.appendChild(button)
-      row.appendChild(cell)
-    })
-  }, [report, rows, session])
+  }
   const actual = volunteer
     ? [["name", "Họ tên"], ["email", "Email"], ["phone", "Số điện thoại"], ["created_at", "Ngày đăng ký"]]
     : report
-      ? [["name", "Họ tên"], ["email", "Email"], ["location_name", "Địa điểm"], ["description", "Mô tả"], ["photo_urls", "Ảnh"], ["created_at", "Ngày gửi"]]
+      ? [["name", "Họ tên"], ["email", "Email"], ["location_name", "Địa điểm"], ["description", "Mô tả"], ["photo_urls", "Ảnh"], ["created_at", "Ngày gửi"], ["_delete", "Thao tác"]]
       : cols
   const reportImageUrls = (r: Row) => {
     if (Array.isArray(r.photo_urls)) {
@@ -543,9 +519,11 @@ function Simple({ title, rows, cols }: { title: string; rows: Row[]; cols: strin
     }
     return r.photo_url ? [String(r.photo_url)] : []
   }
-  const cell = (r: Row, key: string) => key === "photo_urls"
-    ? <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{reportImageUrls(r).map((url, i, urls) => <button type="button" key={i} onClick={() => { setGallery({ urls, index: i }); setZoomed(false) }} style={{ border: 0, padding: 0, background: "transparent", cursor: "zoom-in" }} aria-label={`Xem ảnh ${i + 1}`}><img src={url} alt={`Ảnh báo cáo ${i + 1}`} style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 6, display: "block" }} /></button>)}</div>
-    : key === "created_at" ? new Date(String(r[key])).toLocaleString("vi-VN") : String(r[key] ?? "")
+  const cell = (r: Row, key: string) => key === "_delete"
+    ? <button type="button" className="link-danger" onClick={() => void deleteReport(r)}>Xóa</button>
+    : key === "photo_urls"
+      ? <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{reportImageUrls(r).map((url, i, urls) => <button type="button" key={i} onClick={() => { setGallery({ urls, index: i }); setZoomed(false) }} style={{ border: 0, padding: 0, background: "transparent", cursor: "zoom-in" }} aria-label={`Xem ảnh ${i + 1}`}><img src={url} alt={`Ảnh báo cáo ${i + 1}`} style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 6, display: "block" }} /></button>)}</div>
+      : key === "created_at" ? new Date(String(r[key])).toLocaleString("vi-VN") : String(r[key] ?? "")
   const currentUrl = gallery?.urls[gallery.index]
   return <><List title={title}><table><thead><tr>{actual.map(c => <th key={c[0]}>{c[1]}</th>)}</tr></thead><tbody>{rows.map(r => <tr key={r.id}>{actual.map(c => <td key={c[0]}>{cell(r, c[0])}</td>)}</tr>)}</tbody></table></List>{gallery && currentUrl && <div role="dialog" aria-modal="true" aria-label="Xem ảnh báo cáo" onClick={() => setGallery(null)} style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(2, 20, 13, .82)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}><div onClick={event => event.stopPropagation()} style={{ position: "relative", width: "min(1100px, 96vw)", height: "min(820px, 92vh)", display: "flex", alignItems: "center", justifyContent: "center" }}><button type="button" onClick={() => setGallery(null)} aria-label="Đóng" style={{ position: "absolute", top: 0, right: 0, zIndex: 2, border: 0, borderRadius: 999, width: 42, height: 42, background: "#fff", color: "#123", fontSize: 26, cursor: "pointer" }}>×</button>{gallery.urls.length > 1 && <><button type="button" onClick={() => { setGallery({ ...gallery, index: (gallery.index - 1 + gallery.urls.length) % gallery.urls.length }); setZoomed(false) }} aria-label="Ảnh trước" style={{ position: "absolute", left: 8, zIndex: 2, border: 0, borderRadius: 999, width: 46, height: 46, background: "#fff", fontSize: 26, cursor: "pointer" }}>‹</button><button type="button" onClick={() => { setGallery({ ...gallery, index: (gallery.index + 1) % gallery.urls.length }); setZoomed(false) }} aria-label="Ảnh tiếp theo" style={{ position: "absolute", right: 8, zIndex: 2, border: 0, borderRadius: 999, width: 46, height: 46, background: "#fff", fontSize: 26, cursor: "pointer" }}>›</button></>}<img src={currentUrl} alt={`Ảnh báo cáo ${gallery.index + 1} trên ${gallery.urls.length}`} onClick={() => setZoomed(value => !value)} style={{ maxWidth: "88%", maxHeight: "88%", objectFit: "contain", borderRadius: 12, boxShadow: "0 20px 60px rgba(0,0,0,.35)", cursor: zoomed ? "zoom-out" : "zoom-in", transform: zoomed ? "scale(1.45)" : "scale(1)", transition: "transform .2s ease" }} /><span style={{ position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)", color: "#fff", background: "rgba(0,0,0,.55)", borderRadius: 999, padding: "7px 14px", fontSize: 13 }}>{gallery.index + 1}/{gallery.urls.length} · Bấm vào ảnh để phóng to/thu nhỏ</span></div></div>}</>
 }
