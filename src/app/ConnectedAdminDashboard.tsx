@@ -488,6 +488,40 @@ function Simple({ title, rows, cols }: { title: string; rows: Row[]; cols: strin
   const [zoomed, setZoomed] = useState(false)
   const volunteer = title.startsWith("Tình nguyện viên")
   const report = title.startsWith("Báo cáo")
+  const { session } = useAuth()
+  useEffect(() => {
+    if (!report || !session) return
+    const table = document.querySelector(".admin-content .admin-panel table")
+    const body = table?.querySelector("tbody")
+    if (!table || !body) return
+    const header = table.querySelector("thead tr")
+    if (header && !header.querySelector("[data-report-delete-header]")) {
+      const cell = document.createElement("th")
+      cell.dataset.reportDeleteHeader = "true"
+      header.appendChild(cell)
+    }
+    Array.from(body.rows).forEach((row, index) => {
+      if (row.querySelector("[data-report-delete]")) return
+      const reportRow = rows[index]
+      const cell = document.createElement("td")
+      const button = document.createElement("button")
+      button.type = "button"
+      button.className = "link-danger"
+      button.dataset.reportDelete = "true"
+      button.textContent = "Xóa"
+      button.addEventListener("click", async () => {
+        if (!reportRow || !window.confirm("Xóa báo cáo ô nhiễm này? Dữ liệu sẽ bị xóa khỏi Supabase.")) return
+        try {
+          await tableDelete("pollution_reports", `id=eq.${encodeURIComponent(reportRow.id)}`, session.access_token)
+          window.location.reload()
+        } catch (cause) {
+          window.alert(cause instanceof Error ? cause.message : "Không xóa được báo cáo.")
+        }
+      })
+      cell.appendChild(button)
+      row.appendChild(cell)
+    })
+  }, [report, rows, session])
   const actual = volunteer
     ? [["name", "Họ tên"], ["email", "Email"], ["phone", "Số điện thoại"], ["created_at", "Ngày đăng ký"]]
     : report
