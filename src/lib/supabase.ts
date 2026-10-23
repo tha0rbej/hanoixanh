@@ -362,9 +362,12 @@ export async function tableUpdate<T>(table: string, query: string, values: unkno
   return parseResponse<T[]>(response)
 }
 
-export async function tableDelete(table: string, query: string, token: string) {
-  const response = await fetch(`${supabaseUrl}/rest/v1/${table}?${query}`, { method: "DELETE", headers: authHeaders(token) })
-  await parseResponse<unknown>(response)
+export async function tableDelete<T = Record<string, unknown>>(table: string, query: string, token: string) {
+  const response = await fetch(`${supabaseUrl}/rest/v1/${table}?${query}`, {
+    method: "DELETE",
+    headers: { ...authHeaders(token), Prefer: "return=representation" },
+  })
+  return parseResponse<T[]>(response)
 }
 
 export async function rpc<T>(functionName: string, values: unknown, token: string) {
