@@ -65,7 +65,24 @@ export function ConnectedAdminDashboard({ onLogin }: { onLogin?: () => void }) {
   const [profiles, setProfiles] = useState<Row[]>([])
   const [newsCatalogChecked, setNewsCatalogChecked] = useState(false)
   const { session, profile, signOut } = useAuth(); const [tab, setTab] = useState("campaigns"); const [campaigns, setCampaigns] = useState<Row[]>([]); const [homepageMetrics, setHomepageMetrics] = useState<Row[]>([]); const [posts, setPosts] = useState<Row[]>([]); const [reports, setReports] = useState<Row[]>([]); const [messages, setMessages] = useState<Row[]>([]); const [registrations, setRegistrations] = useState<Row[]>([]); const [volunteers, setVolunteers] = useState<Row[]>([]); const [greenRewards, setGreenRewards] = useState<Row[]>([]); const [redemptions, setRedemptions] = useState<Row[]>([]); const [form, setForm] = useState<Form>(empty); const [editing, setEditing] = useState<string | null>(null); const [error, setError] = useState(""); const [notice, setNotice] = useState(""); const [rewardSchemaReady, setRewardSchemaReady] = useState<boolean | null>(null); const [uploading, setUploading] = useState(false)
-  const load = useCallback(async () => { if (!session) return; const results = await Promise.allSettled([tableSelect<Row>("campaigns", "*", session.access_token, "&order=start_at.desc"), tableSelect<Row>("pollution_reports", "*", session.access_token, "&order=created_at.desc"), tableSelect<Row>("contact_messages", "*", session.access_token, "&order=created_at.desc"), tableSelect<Row>("campaign_registrations", "*,campaigns(title)", session.access_token, "&order=created_at.desc")]); const [c, r, m, v] = results.map(x => x.status === "fulfilled" ? x.value : []) as Row[][]; setCampaigns(c); setReports(r); setMessages(m); setRegistrations(v); const failed = results.find(x => x.status === "rejected"); if (failed) setError("Một số dữ liệu dashboard chưa tải được.") }, [session])
+  const load = useCallback(async () => {
+    if (!session) return
+    const results = await Promise.allSettled([
+      tableSelect<Row>("campaigns", "*", session.access_token, "&order=start_at.desc"),
+      tableSelect<Row>("pollution_reports", "*,profiles(full_name,email,phone)", session.access_token, "&order=created_at.desc"),
+      tableSelect<Row>("contact_messages", "*", session.access_token, "&order=created_at.desc"),
+      tableSelect<Row>("campaign_registrations", "*,campaigns(title)", session.access_token, "&order=created_at.desc"),
+    ])
+    const [campaignRows, reportRows, messageRows, registrationRows] = results.map(result => result.status === "fulfilled" ? result.value : []) as Row[][]
+    setCampaigns(campaignRows)
+    setReports(reportRows.map(row => {
+      const reporter = (row.profiles || {}) as Record<string, unknown>
+      return { ...row, name: reporter.full_name || "Chưa cập nhật", email: reporter.email || "Chưa cập nhật" }
+    }))
+    setMessages(messageRows)
+    setRegistrations(registrationRows)
+    if (results.some(result => result.status === "rejected")) setError("Một số dữ liệu dashboard chưa tải được.")
+  }, [session])
   useEffect(() => { void load() }, [load])
   useEffect(() => {
     if (!session) return
