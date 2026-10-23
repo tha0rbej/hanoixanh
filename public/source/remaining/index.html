@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="leaflet/leaflet.css" />
   <style>
     :root {
       --primary: #168A45;
@@ -135,6 +135,10 @@
     
     .card-bottom { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 6px; border-top: 1px solid #f1f5f9; padding-top: 8px; width: 100%; }
     .card-members { font-size: 12.5px; color: var(--text-sub); font-weight: 600; }
+    .campaign-progress-copy { width: 100%; display: flex; justify-content: space-between; gap: 8px; color: var(--text-sub); font-size: 12px; }
+    .campaign-progress-copy strong { color: #087443; font-size: 12.5px; }
+    .campaign-progress { width: 100%; height: 5px; overflow: hidden; border-radius: 999px; background: #e5efe8; }
+    .campaign-progress span { display: block; height: 100%; border-radius: inherit; background: #168a45; transition: width .25s ease; }
     .btn-view { border: 1px solid var(--primary); background: #fff; color: var(--primary); font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 4px; text-decoration: none; cursor: pointer; width: 100%; text-align: center; }
     .btn-view:hover { background: var(--primary-light); }
     .btn-join-campaign { border: 0; background: #15803d; color: #fff; font-size: 12px; font-weight: 800; padding: 6px 14px; border-radius: 8px; cursor: pointer; width: 100%; text-align: center; transition: background .18s ease, transform .18s ease, box-shadow .18s ease; }
@@ -819,7 +823,7 @@
     #page-chien-dich .report-form-card { padding: 30px; border: 1px solid #e0e9e3; border-radius: 18px; background: #fff; box-shadow: 0 12px 34px rgba(14, 78, 43, .08); }
     #page-chien-dich .report-form-card .form-group { margin-bottom: 18px; }
     #page-chien-dich .report-form-card .form-group input, #page-chien-dich .report-form-card .form-group textarea { min-height: 48px; border: 1.5px solid #cbd9d0; border-radius: 9px; padding: 12px 14px; }
-    #page-chien-dich .report-form-card .form-group textarea { min-height: 132px; resize: vertical; }
+    #page-chien-dich .report-form-card .form-group textarea { min-height: 280px; resize: vertical; line-height: 1.65; }
     #page-chien-dich .report-form-card .btn-pick-location, #page-chien-dich .report-form-card .upload-box { border-radius: 10px; }
     #page-chien-dich .report-form-card .upload-box { min-height: 118px; display: grid; place-items: center; }
     #page-chien-dich .report-form-card .btn-submit-report { min-height: 48px; border-radius: 10px; }
@@ -874,7 +878,7 @@
       #page-chien-dich .report-form-card { padding: 18px 22px; }
       #page-chien-dich .report-form-card .form-group { margin-bottom: 10px; }
       #page-chien-dich .report-form-card .form-group input { min-height: 40px; padding: 8px 12px; }
-      #page-chien-dich .report-form-card .form-group textarea { min-height: 76px; padding: 8px 12px; }
+      #page-chien-dich .report-form-card .form-group textarea { min-height: 180px; padding: 10px 12px; }
       #page-chien-dich .report-form-card .upload-box { min-height: 76px; }
       #page-chien-dich .report-form-card .btn-pick-location, #page-chien-dich .report-form-card .btn-submit-report { min-height: 40px; }
     }
@@ -1116,7 +1120,7 @@
 
             <div class="form-group">
               <label>Mô tả chi tiết*</label>
-              <textarea id="reportDesc" rows="3" placeholder="Mô tả tình trạng ô nhiễm, loại rác thải..." required></textarea>
+      <textarea id="reportDesc" rows="12" maxlength="20000" placeholder="Mô tả chi tiết tình trạng ô nhiễm, loại rác thải, phạm vi, thời gian quan sát, mức độ ảnh hưởng và các thông tin liên quan..." required></textarea>
             </div>
 
             <div class="form-group">
@@ -1650,6 +1654,7 @@
           <button type="button" class="active" onclick="setDetailCarousel(0)"></button>
           <button type="button" onclick="setDetailCarousel(1)"></button>
           <button type="button" onclick="setDetailCarousel(2)"></button>
+          <button type="button" onclick="setDetailCarousel(3)"></button>
         </div>
       </div>
       <section class="detail-modal-block"><h4>Tình trạng ô nhiễm</h4><p id="mStatus">Mô tả tình trạng rác...</p></section>
@@ -1735,17 +1740,39 @@
       <button type="button" aria-label="Đóng" onclick="closeModal('successModal')" style="position:absolute;right:12px;top:8px;border:0;background:transparent;color:#64748b;font-size:24px;line-height:1;cursor:pointer;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       <div style="width:54px;height:54px;margin:8px auto 14px;border-radius:16px;background:#e9f7ee;color:#168a45;display:grid;place-items:center;font-size:22px;"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
       <h3 id="successModalTitle" style="color: var(--primary); margin-bottom: 10px; font-size: 20px;">Gửi báo cáo thành công!</h3>
-      <p style="font-size: 14px; color: var(--text-sub); margin-bottom: 20px;">Cảm ơn sự đóng góp của bạn! Thông tin điểm đen đã được ghi nhận.</p>
+      <p id="campaignJoinSuccessText" style="font-size: 14px; color: var(--text-sub); margin-bottom: 14px;">Cảm ơn sự đóng góp của bạn! Thông tin điểm đen đã được ghi nhận.</p>
+      <div id="campaignJoinQrWrap" style="display:none; margin: 0 auto 14px; width: 190px; padding: 8px; border: 1px solid #dce9df; border-radius: 12px; background: #fff;"><img id="campaignJoinQr" src="" alt="Mã QR vào nhóm Zalo" style="display:block; width:100%; height:auto; border-radius: 6px;"></div>
+      <a id="campaignJoinZalo" href="#" target="_blank" rel="noopener" style="display:none; margin: 0 auto 18px; color: #087443; font-weight: 800; text-decoration: underline;">Mở nhóm Zalo</a>
       <button type="button" class="btn-pill btn-join" onclick="closeModal('successModal')">Đóng</button>
     </div>
   </div>
 
   <script src="../site-header.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="leaflet/leaflet.js"></script>
   <script>
     let registeredUsers = [];
     let currentUser = null;
     let activeCampaignKey = null;
+    let campaignJoinSettings = { qr_url: '', zalo_url: '' };
+
+    function applyCampaignJoinSettings(value) {
+      const settings = value && typeof value === 'object' ? value : {};
+      campaignJoinSettings = { qr_url: String(settings.qr_url || ''), zalo_url: String(settings.zalo_url || '') };
+      const qrWrap = document.getElementById('campaignJoinQrWrap');
+      const qr = document.getElementById('campaignJoinQr');
+      const zalo = document.getElementById('campaignJoinZalo');
+      if (qr && campaignJoinSettings.qr_url) qr.src = campaignJoinSettings.qr_url;
+      if (qrWrap) qrWrap.style.display = campaignJoinSettings.qr_url ? 'block' : 'none';
+      if (zalo) { zalo.href = campaignJoinSettings.zalo_url || '#'; zalo.style.display = campaignJoinSettings.zalo_url ? 'inline-block' : 'none'; }
+    }
+
+    function openCampaignJoinSuccessModal() {
+      applyCampaignJoinSettings(campaignJoinSettings);
+      document.getElementById('successModalTitle').innerText = 'Chúc mừng bạn đã đăng ký thành công!';
+      document.getElementById('campaignJoinSuccessText').innerText = 'Vui lòng quét mã QR hoặc bấm link Zalo bên dưới để vào nhóm.';
+      const modal = document.getElementById('successModal');
+      if (modal) modal.style.display = 'flex';
+    }
 
     function navigateParent(path) {
       window.parent.postMessage({ type: 'hnx:navigate', path }, '*');
@@ -1968,7 +1995,7 @@
       document.getElementById('impact-before-after')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    const detailCarouselImages = [
+    let detailCarouselImages = [
       'https://picsum.photos/800/450?random=1',
       'https://picsum.photos/800/450?random=2',
       'https://picsum.photos/800/450?random=3'
@@ -1979,7 +2006,8 @@
       detailCarouselIndex = (index + detailCarouselImages.length) % detailCarouselImages.length;
       const image = document.getElementById('mCarouselImage');
       if (image) image.src = detailCarouselImages[detailCarouselIndex];
-      document.querySelectorAll('.detail-modal-carousel-dots button').forEach((dot, dotIndex) => dot.classList.toggle('active', dotIndex === detailCarouselIndex));
+      document.querySelectorAll('.detail-modal-carousel-dots button').forEach((dot, dotIndex) => { dot.style.display = dotIndex < detailCarouselImages.length ? '' : 'none'; dot.classList.toggle('active', dotIndex === detailCarouselIndex); });
+      document.querySelectorAll('.detail-modal-carousel-btn').forEach(button => { button.style.display = detailCarouselImages.length > 1 ? '' : 'none'; });
     }
 
     function changeDetailCarousel(direction) {
@@ -1996,6 +2024,11 @@
         detailModal.scrollTop = 0;
         if (detailContent) detailContent.scrollTop = 0;
         detailModal.querySelector('.detail-modal-scroll')?.scrollTo({ top: 0, behavior: 'auto' });
+        detailCarouselImages = Array.isArray(data.image_urls) && data.image_urls.filter(Boolean).length ? data.image_urls.filter(Boolean).slice(0, 4) : [data.image].filter(Boolean).length ? [data.image] : [
+          'https://picsum.photos/800/450?random=1',
+          'https://picsum.photos/800/450?random=2',
+          'https://picsum.photos/800/450?random=3'
+        ];
         setDetailCarousel(0);
         document.getElementById('mTitle').innerText = data.title;
         const metaParts = String(data.meta || '').split('|').map(part => part.trim()).filter(Boolean);
@@ -2055,7 +2088,7 @@
       applyUserDataToUI();
       document.getElementById('zaloGroupSection').style.display = 'block';
       document.getElementById('mBtnJoin').style.display = 'none';
-      alert('Đăng ký tham gia thành công! Vui lòng quét mã QR hoặc bấm link Zalo bên dưới để vào nhóm.');
+      openCampaignJoinSuccessModal();
     }
 
     function joinCampaign(key) {
@@ -2192,6 +2225,7 @@
 
     function renderImpactMetrics(rows) {
       const metrics = Object.fromEntries((rows || []).map(row => [row.metric_key, row.metric_value]));
+      applyCampaignJoinSettings(metrics.campaign_join_settings);
       const overview = metrics.overview || {};
       const overviewItems = [
         [overview.campaigns, 'Chiến dịch đã thực hiện'],
@@ -2308,11 +2342,11 @@
       }
       if (event.data?.type === 'hnx:registered-campaigns') { window.hnxRegisteredCampaigns = event.data.keys || []; }
       if (event.data?.type === 'hnx:campaign-register-result') {
-        if (event.data.ok) { document.getElementById('zaloGroupSection').style.display = 'block'; document.getElementById('mBtnJoin').style.display = 'none'; alert('Đăng ký tham gia thành công! Vui lòng quét mã QR hoặc bấm link Zalo bên dưới để vào nhóm.'); } else alert(event.data.message || 'Không thể đăng ký chiến dịch.');
+        if (event.data.ok) { document.getElementById('zaloGroupSection').style.display = 'block'; document.getElementById('mBtnJoin').style.display = 'none'; openCampaignJoinSuccessModal(); } else alert(event.data.message || 'Không thể đăng ký chiến dịch.');
       }
       if (event.data?.type === 'hnx:pollution-report-result') {
         if (event.data.ok) { document.getElementById('pollutionForm').reset(); selectedReportImages = []; renderReportImages(); }
-        if (event.data.ok) { document.getElementById('successModal').style.display = 'flex'; } else alert(event.data.message || 'Không thể gửi báo cáo.');
+        if (event.data.ok) { document.getElementById('successModalTitle').innerText = 'Gửi báo cáo thành công!'; document.getElementById('campaignJoinSuccessText').innerText = 'Cảm ơn sự đóng góp của bạn! Thông tin điểm đen đã được ghi nhận.'; document.getElementById('campaignJoinQrWrap').style.display = 'none'; document.getElementById('campaignJoinZalo').style.display = 'none'; document.getElementById('successModal').style.display = 'flex'; } else alert(event.data.message || 'Không thể gửi báo cáo.');
       }
     });
 
@@ -2343,19 +2377,33 @@
       if (event.data?.type !== 'hnx:campaigns-data' || !Array.isArray(event.data.campaigns)) return;
       const groups = { upcoming: document.getElementById('pane-upcoming'), completed: document.getElementById('pane-completed') };
       groups.upcoming.innerHTML = '';
+      groups.completed.innerHTML = '';
       if (typeof renderCampaignLocations === 'function') renderCampaignLocations(event.data.campaigns);
-      event.data.campaigns.forEach(function(c) {
+      const sortedCampaigns = event.data.campaigns.slice().sort(function(a, b) {
+        const aEnded = campaignIsCompleted(a);
+        const bEnded = campaignIsCompleted(b);
+        if (aEnded !== bEnded) return aEnded ? 1 : -1;
+        const aTime = campaignSortTime(a);
+        const bTime = campaignSortTime(b);
+        return aEnded ? bTime - aTime : aTime - bTime;
+      });
+      sortedCampaigns.forEach(function(c) {
         const ended = campaignIsCompleted(c);
-        if (ended) return;
         const pane = ended ? groups.completed : groups.upcoming;
         const card = document.createElement('div'); card.className = 'camp-card'; card.id = 'campaign-card-' + c.id; card.dataset.campaignKey = c.id; card.setAttribute('role', 'button'); card.tabIndex = 0;
-        card.innerHTML = '<div class="card-thumb"><span class="badge-card">' + (ended ? 'Đã diễn ra' : 'Sắp diễn ra') + '</span>' + (c.image_url ? '<img src="' + c.image_url + '" alt="">' : '') + '</div><div class="card-info"><h4></h4><div class="card-meta-line"><i class="fa-solid fa-location-dot ui-icon" aria-hidden="true"></i> ' + (c.location || '') + '</div><div class="card-meta-line"><i class="fa-regular fa-calendar ui-icon" aria-hidden="true"></i> ' + new Date(c.start_at).toLocaleString('vi-VN') + '</div><div class="card-desc"></div><div class="card-bottom"><span class="card-members"><i class="fa-solid fa-user-group ui-icon" aria-hidden="true"></i> ' + (c.capacity || '') + ' người tham gia</span><button class="btn-view">Xem chi tiết →</button></div></div>';
+        const campaignImages = Array.isArray(c.image_urls) && c.image_urls.filter(Boolean).length ? c.image_urls.filter(Boolean).slice(0, 4) : [c.image_url].filter(Boolean);
+        const campaignCapacity = Math.max(0, Number(c.capacity) || 0);
+        const campaignRegistered = Math.max(0, Number(c.registered_count ?? c.volunteers_registered ?? 0));
+        const campaignProgress = campaignCapacity ? Math.min(100, Math.round((campaignRegistered / campaignCapacity) * 100)) : 0;
+        card.innerHTML = '<div class="card-thumb"><span class="badge-card">' + (ended ? 'Đã diễn ra' : 'Sắp diễn ra') + '</span>' + (campaignImages[0] ? '<img src="' + campaignImages[0] + '" alt="">' : '') + '</div><div class="card-info"><h4></h4><div class="card-meta-line"><i class="fa-solid fa-location-dot ui-icon" aria-hidden="true"></i> ' + (c.location || '') + '</div><div class="card-meta-line"><i class="fa-regular fa-calendar ui-icon" aria-hidden="true"></i> ' + formatVietnamDateTime(c.start_at) + '</div><div class="card-desc"></div><div class="card-bottom"><div class="campaign-progress-copy"><strong>' + campaignRegistered.toLocaleString('vi-VN') + '/' + (campaignCapacity || 0).toLocaleString('vi-VN') + ' tình nguyện viên</strong><span>đã đăng ký / quy mô</span></div><div class="campaign-progress" aria-label="Tiến độ đăng ký"><span style="width:' + campaignProgress + '%"></span></div><button class="btn-view">Xem chi tiết →</button></div></div>';
         card.querySelector('h4').textContent = c.title || ''; card.querySelector('.card-desc').textContent = c.description || '';
-        campaignDetails[c.id] = { isCompleted: ended, title: c.title || '', meta: (c.location || '') + ' | ' + new Date(c.start_at).toLocaleString('vi-VN'), status: c.pollution_status || c.description || 'Chưa cập nhật.', action: c.action_plan || 'Chưa cập nhật.', support: c.support_equipment || 'Chưa cập nhật.' };
+        campaignDetails[c.id] = { isCompleted: ended, title: c.title || '', meta: (c.location || '') + ' | ' + formatVietnamDateTime(c.start_at), status: c.pollution_status || c.description || 'Chưa cập nhật.', action: c.action_plan || 'Chưa cập nhật.', support: c.support_equipment || 'Chưa cập nhật.', image: campaignImages[0] || '', image_urls: campaignImages };
         card.onclick = function(event) { if (!event.target.closest('.btn-view, .btn-join-campaign')) focusCampaignOnMap(c.id, event); };
         card.onkeydown = function(event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); focusCampaignOnMap(c.id, event); } };
-        card.querySelector('.btn-view').onclick = function() { openDetailModal(c.id); };
-        const joinButton = document.createElement('button'); joinButton.type = 'button'; joinButton.className = 'btn-join-campaign'; joinButton.innerText = 'Tham gia ngay'; joinButton.onclick = function() { joinCampaign(c.id); }; card.querySelector('.card-bottom').appendChild(joinButton);
+        card.querySelector('.btn-view').onclick = function(event) { event.stopPropagation(); focusCampaignOnMap(c.id); openDetailModal(c.id); };
+        if (!ended) {
+          const joinButton = document.createElement('button'); joinButton.type = 'button'; joinButton.className = 'btn-join-campaign'; joinButton.innerText = 'Tham gia ngay'; joinButton.onclick = function() { joinCampaign(c.id); }; card.querySelector('.card-bottom').appendChild(joinButton);
+        }
         pane.appendChild(card);
       });
         if (currentUser && pendingSharedCampaignKey && campaignDetails[pendingSharedCampaignKey]) {
@@ -2388,10 +2436,56 @@
       zoom: 11,
       minZoom: 9.5,
       maxZoom: 17,
-      zoomControl: false
+      zoomControl: false,
+      zoomAnimation: false,
+      fadeAnimation: false
     });
     L.control.zoom({ position: 'bottomright' }).addTo(bMap);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(bMap);
+    const mapTileOptions = {
+      maxZoom: 19,
+      maxNativeZoom: 19,
+      keepBuffer: 2,
+      attribution: '© OpenStreetMap contributors'
+    };
+    function addMapTiles(map) {
+      const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', mapTileOptions);
+      let usingBackup = false;
+      let stalledRequestTimer;
+      const clearStallTimer = () => window.clearTimeout(stalledRequestTimer);
+      const useBackup = () => {
+        if (usingBackup) return;
+        usingBackup = true;
+        clearStallTimer();
+        map.attributionControl.addAttribution('Tiles © <a href="https://www.openstreetmap.de/">OpenStreetMap Deutschland</a>');
+        tiles.options.maxNativeZoom = 18;
+        tiles.setUrl('https://tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png');
+      };
+      tiles.on('tileerror', useBackup);
+      tiles.on('loading', () => {
+        clearStallTimer();
+        if (!usingBackup) stalledRequestTimer = window.setTimeout(useBackup, 10000);
+      });
+      tiles.on('load', clearStallTimer);
+      return tiles.addTo(map);
+    }
+    addMapTiles(bMap);
+
+    function refreshLeafletMap(map, container) {
+      if (!map || !container || !container.isConnected || !container.offsetWidth || !container.offsetHeight) return;
+      map.invalidateSize({ pan: false, animate: false });
+    }
+
+    function maintainLeafletMap(map, container) {
+      const refresh = () => refreshLeafletMap(map, container);
+      [0, 80, 200, 500, 1000].forEach(delay => window.setTimeout(refresh, delay));
+      window.addEventListener('resize', refresh, { passive: true });
+      window.addEventListener('pageshow', refresh);
+      window.addEventListener('orientationchange', () => window.setTimeout(refresh, 100), { passive: true });
+      document.addEventListener('visibilitychange', refresh);
+      if (window.ResizeObserver) new ResizeObserver(refresh).observe(container);
+    }
+
+    maintainLeafletMap(bMap, document.getElementById('boundaryMap'));
 
     const addressInput = document.getElementById('reportLocation');
     const reportDescInput = document.getElementById('reportDesc');
@@ -2419,11 +2513,32 @@
     let currentActiveMarker = null;
     let campaignMapMarkers = [];
 
+    function campaignTime(value) {
+      if (!value) return NaN;
+      const raw = String(value).trim();
+      const vietnameseValue = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(raw) ? raw : (raw.includes('T') ? `${raw}+07:00` : `${raw}T00:00:00+07:00`);
+      const parsed = new Date(vietnameseValue);
+      return parsed.getTime();
+    }
+
+    function formatVietnamDateTime(value) {
+      const time = campaignTime(value);
+      if (Number.isNaN(time)) return 'Thời gian chưa cập nhật';
+      return new Intl.DateTimeFormat('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', dateStyle: 'short', timeStyle: 'short' }).format(new Date(time));
+    }
+
+    function campaignSortTime(campaign) {
+      const value = campaignIsCompleted(campaign) ? (campaign?.end_at || campaign?.start_at) : (campaign?.start_at || campaign?.end_at);
+      return campaignTime(value) || Number.MAX_SAFE_INTEGER;
+    }
+
     function campaignIsCompleted(campaign) {
       const status = String(campaign?.status || '').toLowerCase();
       if (status === 'completed' || status === 'done' || status === 'finished') return true;
-      const endAt = campaign?.end_at || campaign?.start_at;
-      return Boolean(endAt && new Date(endAt).getTime() < Date.now() && status !== 'upcoming');
+      if (status === 'upcoming' || status === 'active' || status === 'open' || status === 'ongoing') return false;
+      const endAt = campaignTime(campaign?.end_at);
+      const startAt = campaignTime(campaign?.start_at);
+      return Number.isFinite(endAt) ? endAt <= Date.now() : Number.isFinite(startAt) && startAt <= Date.now();
     }
 
     function normalizeMapText(value) {
@@ -2435,6 +2550,12 @@
       return defaultCampaignLocations.find(location => location.keywords.some(keyword => text.includes(normalizeMapText(keyword))));
     }
 
+    function fallbackCampaignCoordinates(index) {
+      const column = index % 4;
+      const row = Math.floor(index / 4);
+      return { lat: 21.0285 + (row - 0.5) * 0.018, lng: 105.8542 + (column - 1.5) * 0.026 };
+    }
+
     function validHanoiCoordinate(latitude, longitude) {
       const lat = Number(latitude);
       const lng = Number(longitude);
@@ -2444,16 +2565,14 @@
     function campaignMapDescription(campaign, fallbackLocation) {
       const description = String(campaign?.description || campaign?.pollution_status || '').trim();
       const location = String(campaign?.location || fallbackLocation || 'Hà Nội').trim();
-      const dateValue = campaign?.start_at ? new Date(campaign.start_at) : null;
-      const dateText = dateValue && !Number.isNaN(dateValue.getTime()) ? dateValue.toLocaleString('vi-VN') : '';
+      const dateText = campaign?.start_at ? formatVietnamDateTime(campaign.start_at) : '';
       return [location, dateText, description || 'Hoạt động làm sạch môi trường cùng Hà Nội Xanh.'].filter(Boolean).join(' • ');
     }
 
     function mapCampaignDate(campaign) {
       const value = campaign?.end_at || campaign?.start_at;
       if (!value) return 'Đang cập nhật';
-      const date = new Date(value);
-      return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString('vi-VN');
+      return Number.isNaN(campaignTime(value)) ? String(value) : new Intl.DateTimeFormat('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', dateStyle: 'short' }).format(new Date(campaignTime(value)));
     }
 
     function mapCampaignResult(campaign, completed) {
@@ -2468,8 +2587,9 @@
 
     function renderCampaignLocations(campaigns) {
       const rows = Array.isArray(campaigns) ? campaigns : [];
-      const mapped = rows.map(campaign => {
+      const mapped = rows.map((campaign, index) => {
         const fallback = fallbackLocationForCampaign(campaign);
+        const generated = fallbackCampaignCoordinates(index);
         const lat = Number(campaign.latitude);
         const lng = Number(campaign.longitude);
         const hasValidCoordinate = validHanoiCoordinate(lat, lng);
@@ -2477,8 +2597,8 @@
         return {
           name: campaign.title || 'Chiến dịch Hà Nội Xanh',
           keywords: [campaign.title, campaign.location].filter(Boolean),
-          lat: hasValidCoordinate ? lat : fallback?.lat,
-          lng: hasValidCoordinate ? lng : fallback?.lng,
+          lat: hasValidCoordinate ? lat : (fallback?.lat ?? generated.lat),
+          lng: hasValidCoordinate ? lng : (fallback?.lng ?? generated.lng),
           location: campaign.location || fallback?.location || 'Hà Nội',
           image: campaign.image_url || fallback?.image,
           status: completed ? 'Đã hoàn thành' : 'Sắp ra quân',
@@ -2493,9 +2613,10 @@
           count: 1
         };
       }).filter(item => Number.isFinite(item.lat) && Number.isFinite(item.lng));
-      const mappedKeys = new Set(mapped.map(item => String(item.campaignKey || '')));
-      const fallbackLocations = defaultCampaignLocations.filter(item => !mappedKeys.has(String(item.campaignKey)));
-      knownCampaignLocations = mapped.length ? mapped.concat(fallbackLocations) : defaultCampaignLocations;
+      // When the database returns campaigns, it is the complete source of truth.
+      // Do not append the old hard-coded map points, otherwise the map can show
+      // stale campaigns or duplicate entries beside the Admin data.
+      knownCampaignLocations = mapped.length ? mapped : defaultCampaignLocations;
 
       campaignMapMarkers.forEach(marker => bMap.removeLayer(marker));
       campaignMapMarkers = [];
@@ -2612,14 +2733,15 @@
     function openLocationPicker() {
       document.getElementById('pickerModal').style.display = 'flex';
       if (!pMap) {
-        pMap = L.map('pickerMap').setView([21.0285, 105.8048], 14);
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(pMap);
+        pMap = L.map('pickerMap', { zoomAnimation: false, fadeAnimation: false }).setView([21.0285, 105.8048], 14);
+        addMapTiles(pMap);
         pMarker = L.marker([21.0285, 105.8048], { draggable: true, icon: createMapMarkerIcon('fa-location-crosshairs', '#168a45') }).addTo(pMap);
         pMarker.on('dragend', e => fetchRealAddress(e.target.getLatLng().lat, e.target.getLatLng().lng));
         pMap.on('click', e => { pMarker.setLatLng(e.latlng); fetchRealAddress(e.latlng.lat, e.latlng.lng); });
         fetchRealAddress(21.0285, 105.8048);
+        maintainLeafletMap(pMap, document.getElementById('pickerMap'));
       }
-      setTimeout(() => { pMap.invalidateSize(); }, 200);
+      [0, 100, 250, 500].forEach(delay => window.setTimeout(() => refreshLeafletMap(pMap, document.getElementById('pickerMap')), delay));
     }
 
     function fetchRealAddress(lat, lng) {

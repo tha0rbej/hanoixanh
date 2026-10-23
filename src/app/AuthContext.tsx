@@ -5,6 +5,7 @@ import {
   requestPasswordReset,
   updatePassword as apiUpdatePassword,
   refreshSession,
+  recordProfileLogin,
   signIn as apiSignIn,
   signOut as apiSignOut,
   signUp as apiSignUp,
@@ -55,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const ensureSession = session.expires_at && session.expires_at < Math.floor(Date.now() / 1000) + 60 ? refreshSession(session) : Promise.resolve(session)
     ensureSession
       .then((nextSession) => { if (active && nextSession.access_token !== session.access_token) setSession(nextSession); return getProfile(nextSession.user.id, nextSession.access_token) })
-      .then((next) => { if (active) setProfile(next) })
+      .then(async (next) => { if (active) { setProfile(next); try { const lastLoginAt = await recordProfileLogin(next.id, (await getStoredSession())?.access_token || session.access_token); setProfile(current => current ? { ...current, last_login_at: lastLoginAt } : current) } catch { /* Older databases may not have the new tracking column yet. */ } } })
       .catch(() => { if (active) { setProfile(null); setSession(null) } })
       .finally(() => { if (active) setLoading(false) })
     return () => { active = false }
