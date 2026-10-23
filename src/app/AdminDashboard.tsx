@@ -57,6 +57,24 @@ export function AdminDashboard({ onLogin }: { onLogin?: () => void }) {
 
   useEffect(() => { void load() }, [load])
 
+  useEffect(() => {
+    if (tab !== "reports") return
+    const domRows = Array.from(document.querySelectorAll(".admin-panel table tbody tr"))
+    domRows.forEach((row, index) => {
+      if (row.querySelector("[data-report-delete]")) return
+      const report = rows.reports[index]
+      const cell = document.createElement("td")
+      const button = document.createElement("button")
+      button.type = "button"
+      button.className = "link-danger"
+      button.dataset.reportDelete = "true"
+      button.textContent = "Xóa"
+      button.addEventListener("click", () => { if (report) void remove("pollution_reports", report.id) })
+      cell.appendChild(button)
+      row.appendChild(cell)
+    })
+  }, [tab, rows.reports])
+
   async function createCampaign(event: FormEvent) {
     event.preventDefault(); if (!session) return
     try { const { latitude, longitude, ...rest } = campaign; const payload = { ...rest, capacity: campaign.capacity ? Number(campaign.capacity) : null }; if (editingCampaignId) await tableUpdate("campaigns", `id=eq.${editingCampaignId}`, payload, session.access_token); else await tableInsert("campaigns", payload, session.access_token); setCampaign(emptyCampaign); setEditingCampaignId(null); await load() }
