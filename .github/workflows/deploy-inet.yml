@@ -1,0 +1,57 @@
+name: Deploy to iNET hosting
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-inet
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+        env:
+          VITE_SUPABASE_URL: https://insdsjxaekwsjqzonqgo.supabase.co
+          VITE_SUPABASE_ANON_KEY: sb_publishable_-B0wcZidFhnLGEiEDDufmQ_W29HaI6i
+
+      - name: Add .htaccess and robots.txt
+        run: |
+          cat > dist/.htaccess <<'HT'
+          Options -MultiViews
+          RewriteEngine On
+          RewriteBase /
+          RewriteCond %{REQUEST_FILENAME} -f [OR]
+          RewriteCond %{REQUEST_FILENAME} -d
+          RewriteRule ^ - [L]
+          RewriteRule ^ index.html [L]
+          HT
+          printf 'User-agent: *\nAllow: /\n' > dist/robots.txt
+
+      - name: Upload to hosting via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: 103.75.186.15
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./dist/
+          server-dir: ${{ vars.FTP_SERVER_DIR || 'public_html/' }}
