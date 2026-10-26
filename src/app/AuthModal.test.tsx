@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   signIn: vi.fn(),
   signUp: vi.fn(),
   resetPassword: vi.fn(),
+  signInWithGoogle: vi.fn(),
   tableInsertMinimal: vi.fn(),
 }))
 
@@ -20,7 +21,8 @@ vi.mock("./AuthContext", () => ({
 }))
 
 vi.mock("../lib/supabase", () => ({
-  signInWithGoogle: vi.fn(),
+  signInWithGoogle: mocks.signInWithGoogle,
+  formatOAuthError: () => "Không thể đăng nhập bằng Google. Vui lòng thử lại.",
   tableInsertMinimal: mocks.tableInsertMinimal,
 }))
 
@@ -28,7 +30,19 @@ describe("AuthModal registration", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mocks.signUp.mockResolvedValue(false)
+    mocks.signInWithGoogle.mockResolvedValue(undefined)
     mocks.tableInsertMinimal.mockResolvedValue(undefined)
+  })
+
+  it("shows a recoverable error when Google sign-in cannot start", async () => {
+    const user = userEvent.setup()
+    mocks.signInWithGoogle.mockRejectedValueOnce(new Error("network error"))
+    render(<AuthModal initialTab="login" onClose={() => {}} onAdmin={() => {}} />)
+
+    await user.click(screen.getByRole("button", { name: "Tiếp tục với Google" }))
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Không thể đăng nhập bằng Google")
+    expect(screen.getByRole("button", { name: "Tiếp tục với Google" })).toBeEnabled()
   })
 
   it("shows email confirmation only after an individual account is created", async () => {

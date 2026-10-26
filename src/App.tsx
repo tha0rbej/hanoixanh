@@ -13,7 +13,7 @@ import { AuthModal } from "./app/AuthModal"
 import { AuthProvider, useAuth } from "./app/AuthContext"
 import { ResetPasswordPage } from "./app/ResetPasswordPage"
 import { DEFAULT_REWARD_PROGRAM, earnedBadges, monthsSince, normalizeRewardProgram } from "./app/rewards"
-import { consumeOAuthSession, rpc, tableInsert, tableInsertMinimal, tableSelect, updateProfile, uploadPublicFile } from "./lib/supabase"
+import { consumeOAuthSession, formatOAuthError, isOAuthCallback, rpc, tableInsert, tableInsertMinimal, tableSelect, takeOAuthReturnTo, updateProfile, uploadPublicFile } from "./lib/supabase"
 import { trackEvent, trackPageView } from "./lib/analytics"
 
 type SourcePage = "home" | "about" | "remaining" | "profile"
@@ -415,6 +415,7 @@ function SourceFrame({
 
 function AppRoutes() {
   const [authTab, setAuthTab] = useState<("login" | "register" | "reset") | null>(null)
+  const [authError, setAuthError] = useState("")
   const navigate = useNavigate()
   const location = useLocation()
   const { session } = useAuth()
@@ -425,22 +426,29 @@ function AppRoutes() {
     const params = new URLSearchParams(window.location.search)
     const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""))
     const isRecovery = hash.get("type") === "recovery"
-    const isOAuthCallback = Boolean(params.get("code")) || (Boolean(hash.get("access_token")) && !isRecovery)
-    if (isOAuthCallback) {
+    if (isOAuthCallback()) {
+      const returnTo = takeOAuthReturnTo()
       void consumeOAuthSession()
         .then(session => {
-          if (session) window.location.replace(window.location.pathname)
+          if (!session) throw new Error("OAuth callback did not contain a session.")
+          window.location.replace(returnTo)
         })
         .catch(error => {
           console.error("Không thể hoàn tất đăng nhập Google", error)
-          window.history.replaceState({}, "", `${window.location.pathname}?auth=login`)
-          setAuthTab("login")
+          const destination = new URL(returnTo, window.location.origin)
+          destination.searchParams.set("auth", "login")
+          destination.searchParams.set("auth_error", formatOAuthError(error))
+          window.location.replace(`${destination.pathname}${destination.search}${destination.hash}`)
         })
       return
     }
     if (params.get("auth") === "login") {
+      setAuthError(params.get("auth_error") || "")
       setAuthTab("login")
-      window.history.replaceState({}, "", window.location.pathname)
+      params.delete("auth")
+      params.delete("auth_error")
+      const cleanSearch = params.toString()
+      window.history.replaceState({}, "", `${window.location.pathname}${cleanSearch ? `?${cleanSearch}` : ""}${window.location.hash}`)
     }
     if (isRecovery && window.location.pathname !== "/dat-lai-mat-khau") {
       navigate(`/dat-lai-mat-khau${window.location.hash}`, { replace: true })
@@ -450,8 +458,8 @@ function AppRoutes() {
     const sharedCampaign = new URLSearchParams(location.search).get("campaign")
     if (sharedCampaign && location.pathname === "/chien-dich" && !session) setAuthTab("login")
   }, [location.pathname, location.search, session])
-  const openAuth = (tab: "login" | "register" | "reset") => setAuthTab(tab)
-  const closeAuth = () => setAuthTab(null)
+  const openAuth = (tab: "login" | "register" | "reset") => { setAuthError(""); setAuthTab(tab) }
+  const closeAuth = () => { setAuthError(""); setAuthTab(null) }
   return (
     <>
     <Routes>
@@ -547,7 +555,7 @@ function AppRoutes() {
       <Route path="lien-he" element={<Navigate to="/" replace />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-    {authTab && <AuthModal initialTab={authTab} onClose={closeAuth} onAdmin={() => navigate("/admin")} />}
+    {authTab && <AuthModal initialTab={authTab} initialError={authError} onClose={closeAuth} onAdmin={() => navigate("/admin")} />}
     </>
   )
 }

@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useState, type FormEvent } from "react"
 import { useAuth } from "./AuthContext"
-import { signInWithGoogle, tableInsertMinimal } from "../lib/supabase"
+import { formatOAuthError, signInWithGoogle, tableInsertMinimal } from "../lib/supabase"
 
 type AuthTab = "login" | "register" | "reset"
 type RegistrationType = "individual" | "organization"
@@ -32,14 +32,15 @@ const emptyValues = {
   confirm: "",
 }
 
-export function AuthModal({ initialTab, onClose, onAdmin }: { initialTab: AuthTab; onClose: () => void; onAdmin: () => void }) {
+export function AuthModal({ initialTab, initialError = "", onClose, onAdmin }: { initialTab: AuthTab; initialError?: string; onClose: () => void; onAdmin: () => void }) {
   const { configured, signIn, signUp, resetPassword } = useAuth()
   const [tab, setTab] = useState<AuthTab>(initialTab)
   const [registrationType, setRegistrationType] = useState<RegistrationType>("individual")
   const [preferredRole, setPreferredRole] = useState<PreferredRole>("cleanup")
   const [completion, setCompletion] = useState<CompletionType>(null)
   const [busy, setBusy] = useState(false)
-  const [error, setError] = useState("")
+  const [oauthBusy, setOAuthBusy] = useState(false)
+  const [error, setError] = useState(initialError)
   const [notice, setNotice] = useState("")
   const [values, setValues] = useState(emptyValues)
   const [passwordVisible, setPasswordVisible] = useState({ password: false, confirm: false })
@@ -58,6 +59,19 @@ export function AuthModal({ initialTab, onClose, onAdmin }: { initialTab: AuthTa
 
   const togglePassword = (field: "password" | "confirm") => {
     setPasswordVisible(current => ({ ...current, [field]: !current[field] }))
+  }
+
+  const handleGoogleSignIn = async () => {
+    setError("")
+    setNotice("")
+    setOAuthBusy(true)
+    try {
+      await signInWithGoogle()
+    } catch (cause) {
+      console.error("Không thể bắt đầu đăng nhập Google", cause)
+      setError(formatOAuthError(cause))
+      setOAuthBusy(false)
+    }
   }
 
   if (!configured) {
@@ -166,7 +180,7 @@ export function AuthModal({ initialTab, onClose, onAdmin }: { initialTab: AuthTa
         {error && <div className="auth-error" role="alert">{error}</div>}
         {notice && <div className="auth-success">{notice}</div>}
 
-        {tab === "login" && <button type="button" className="auth-google" onClick={signInWithGoogle}>Tiếp tục với Google</button>}
+        {tab === "login" && <button type="button" className="auth-google" onClick={handleGoogleSignIn} disabled={busy || oauthBusy}>{oauthBusy ? "Đang chuyển đến Google…" : "Tiếp tục với Google"}</button>}
         {tab === "login" && <div className="auth-divider"><span>hoặc</span></div>}
 
         <form className={tab === "register" ? "auth-register-form" : ""} onSubmit={submit}>
@@ -224,7 +238,7 @@ export function AuthModal({ initialTab, onClose, onAdmin }: { initialTab: AuthTa
             <>
               <label>Email<input type="email" value={values.email} onChange={update("email")} required /></label>
               {tab !== "reset" && <label>Mật khẩu<div className="auth-input-wrap"><i className="fa-solid fa-lock" aria-hidden="true" /><input type={passwordVisible.password ? "text" : "password"} value={values.password} onChange={update("password")} minLength={8} required /><button type="button" className="auth-password-toggle" onClick={() => togglePassword("password")} aria-label={passwordVisible.password ? "Ẩn mật khẩu" : "Hiện mật khẩu"}><i className={`fa-solid ${passwordVisible.password ? "fa-eye-slash" : "fa-eye"}`} aria-hidden="true" /></button></div></label>}
-              <button className="auth-primary" disabled={busy}>{busy ? "Đang xử lý…" : tab === "login" ? "ĐĂNG NHẬP" : "GỬI LINK ĐẶT LẠI"}</button>
+              <button className="auth-primary" disabled={busy || oauthBusy}>{busy ? "Đang xử lý…" : tab === "login" ? "ĐĂNG NHẬP" : "GỬI LINK ĐẶT LẠI"}</button>
             </>
           )}
         </form>

@@ -49,6 +49,9 @@ type SupabaseError = { message?: string; error_description?: string }
 const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.replace(/\/$/, "")
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
 const sessionKey = "hnx:supabase-session"
+const oauthReturnToKey = "hnx:oauth-return-to"
+const oauthExchangePromises = new Map<string, Promise<HnxSession | null>>()
+let consumedOAuthReturnTo: string | null = null
 
 export const supabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
 const oauthClient = supabaseConfigured ? createClient(supabaseUrl!, supabaseAnonKey!, {
@@ -94,11 +97,60 @@ export function getStoredSession(): HnxSession | null {
 
 export async function signInWithGoogle() {
   requireConfig()
+  try {
+    const returnTo = `${window.location.pathname}${window.location.search}${window.location.hash}`
+    window.sessionStorage.setItem(oauthReturnToKey, returnTo)
+  } catch { /* OAuth can still continue when sessionStorage is unavailable. */ }
+
   const { error } = await oauthClient!.auth.signInWithOAuth({
     provider: "google",
-    options: { redirectTo: `${window.location.origin}/` },
+    options: {
+      redirectTo: new URL(import.meta.env.BASE_URL || "/", window.location.origin).toString(),
+      queryParams: { prompt: "select_account" },
+    },
   })
   if (error) throw error
+}
+
+export function isOAuthCallback() {
+  const query = new URLSearchParams(window.location.search)
+  const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""))
+  const isRecovery = hash.get("type") === "recovery"
+  if (isRecovery) return false
+  return query.has("code") || query.has("error") || query.has("error_code")
+    || hash.has("access_token") || hash.has("error") || hash.has("error_code")
+}
+
+export function takeOAuthReturnTo() {
+  if (consumedOAuthReturnTo) return consumedOAuthReturnTo
+  const fallback = import.meta.env.BASE_URL || "/"
+  try {
+    const returnTo = window.sessionStorage.getItem(oauthReturnToKey)
+    window.sessionStorage.removeItem(oauthReturnToKey)
+    if (returnTo?.startsWith("/") && !returnTo.startsWith("//")) {
+      consumedOAuthReturnTo = returnTo
+      return returnTo
+    }
+  } catch { /* Use the application root when sessionStorage is unavailable. */ }
+  consumedOAuthReturnTo = fallback
+  return consumedOAuthReturnTo
+}
+
+export function formatOAuthError(cause: unknown) {
+  const message = cause instanceof Error ? cause.message : String(cause || "")
+  if (/access_denied|cancel(?:led|ed)|user denied/i.test(message)) {
+    return "Bạn đã hủy đăng nhập bằng Google."
+  }
+  if (/code verifier|pkce|grant code|invalid.*code|expired/i.test(message)) {
+    return "Phiên đăng nhập Google đã hết hạn hoặc đã được sử dụng. Vui lòng thử lại."
+  }
+  if (/provider.*not enabled|unsupported provider/i.test(message)) {
+    return "Đăng nhập Google chưa được bật trên hệ thống."
+  }
+  if (/redirect/i.test(message)) {
+    return "Địa chỉ quay lại sau đăng nhập Google chưa được cấu hình hợp lệ."
+  }
+  return "Không thể đăng nhập bằng Google. Vui lòng thử lại."
 }
 
 function fromSupabaseSession(source: SupabaseSession): HnxSession {
@@ -114,17 +166,30 @@ function fromSupabaseSession(source: SupabaseSession): HnxSession {
 export async function consumeOAuthSession(): Promise<HnxSession | null> {
   requireConfig()
   const query = new URLSearchParams(window.location.search)
+  const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""))
+  const oauthError = query.get("error_description") || query.get("error")
+    || hash.get("error_description") || hash.get("error")
+  if (oauthError) throw new Error(oauthError)
+
   const code = query.get("code")
   if (code) {
-    const { data, error } = await oauthClient!.auth.exchangeCodeForSession(code)
-    if (error) throw error
-    if (!data.session) return null
-    const session = fromSupabaseSession(data.session)
-    storeSession(session)
-    return session
+    const flowId = query.get("sb_flow_id") || undefined
+    const exchangeKey = `${code}:${flowId || ""}`
+    const existingExchange = oauthExchangePromises.get(exchangeKey)
+    if (existingExchange) return existingExchange
+
+    const exchange = (async () => {
+      const { data, error } = await oauthClient!.auth.exchangeCodeForSession(code, flowId ? { flowId } : undefined)
+      if (error) throw error
+      if (!data.session) return null
+      const session = fromSupabaseSession(data.session)
+      storeSession(session)
+      return session
+    })()
+    oauthExchangePromises.set(exchangeKey, exchange)
+    return exchange
   }
 
-  const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""))
   const accessToken = hash.get("access_token")
   const refreshToken = hash.get("refresh_token")
   if (!accessToken || !refreshToken) {
