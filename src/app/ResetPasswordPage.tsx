@@ -13,6 +13,8 @@ export function ResetPasswordPage() {
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
   const [busy, setBusy] = useState(false)
+  const [passwordVisible, setPasswordVisible] = useState(true)
+  const [confirmVisible, setConfirmVisible] = useState(false)
 
   async function submit(event: FormEvent) {
     event.preventDefault()
@@ -39,8 +41,8 @@ export function ResetPasswordPage() {
       <button className="auth-primary" type="button" onClick={() => { window.location.href = "/?auth=login" }}>QUAY LẠI ĐĂNG NHẬP</button>
     </>}
     {!message && <form onSubmit={submit}>
-      <label>Mật khẩu mới<input type="password" minLength={8} value={password} onChange={e => setPassword(e.target.value)} required /></label>
-      <label>Nhập lại mật khẩu<input type="password" minLength={8} value={confirm} onChange={e => setConfirm(e.target.value)} required /></label>
+      <label>Mật khẩu mới<div className="auth-input-wrap"><i className="fa-solid fa-lock" aria-hidden="true" /><input type={passwordVisible ? "text" : "password"} minLength={8} value={password} onChange={e => setPassword(e.target.value)} autoComplete="new-password" required /><button type="button" className="auth-password-toggle" onClick={() => setPasswordVisible(visible => !visible)} aria-label={passwordVisible ? "Ẩn mật khẩu mới" : "Hiện mật khẩu mới"} aria-pressed={passwordVisible}><i className={`fa-solid ${passwordVisible ? "fa-eye-slash" : "fa-eye"}`} aria-hidden="true" /></button></div></label>
+      <label>Nhập lại mật khẩu<div className="auth-input-wrap"><i className="fa-solid fa-lock" aria-hidden="true" /><input type={confirmVisible ? "text" : "password"} minLength={8} value={confirm} onChange={e => setConfirm(e.target.value)} autoComplete="new-password" required /><button type="button" className="auth-password-toggle" onClick={() => setConfirmVisible(visible => !visible)} aria-label={confirmVisible ? "Ẩn mật khẩu nhập lại" : "Hiện mật khẩu nhập lại"} aria-pressed={confirmVisible}><i className={`fa-solid ${confirmVisible ? "fa-eye-slash" : "fa-eye"}`} aria-hidden="true" /></button></div></label>
       <button className="auth-primary" disabled={busy}>{busy ? "Đang cập nhật…" : "ĐỔI MẬT KHẨU"}</button>
     </form>}
   </section></main>
