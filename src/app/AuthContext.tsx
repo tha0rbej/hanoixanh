@@ -106,7 +106,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await apiUpdatePassword(currentPassword, newPassword, session.access_token)
     },
     async signOut() {
-      try { if (session) await apiSignOut(session.access_token) } finally { setSession(null); setProfile(null) }
+      const accessToken = session?.access_token
+      setSession(null)
+      setProfile(null)
+      try { if (accessToken) await apiSignOut(accessToken) } catch { /* Local logout already succeeded. */ }
     },
     refreshProfile,
   }), [loading, profile, refreshProfile, session])

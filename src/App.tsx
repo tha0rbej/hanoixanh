@@ -68,6 +68,7 @@ function SourceFrame({
   const navigate = useNavigate()
   const { session, profile, refreshProfile, signOut, changePassword } = useAuth()
   const frameRef = useRef<HTMLIFrameElement>(null)
+  const authStateRequestRef = useRef(0)
   const pendingReportRef = useRef<{ location?: string; description?: string; latitude?: number; longitude?: number; image?: File | null; images?: File[] } | null>(null)
   const baseUrl = import.meta.env.BASE_URL.endsWith("/")
     ? import.meta.env.BASE_URL
@@ -75,6 +76,7 @@ function SourceFrame({
   const source = `${baseUrl}source/${page}/index.html${view ? `#${view}` : ""}`
 
   const sendAuthState = async () => {
+    const requestId = ++authStateRequestRef.current
     if (!profile || !session) {
       frameRef.current?.contentWindow?.postMessage({ type: "hnx:auth-state", user: null }, window.location.origin)
       return
@@ -123,6 +125,7 @@ function SourceFrame({
     } catch {
       // Keep the profile available even before the participation migration is applied.
     }
+    if (requestId !== authStateRequestRef.current) return
     frameRef.current?.contentWindow?.postMessage({
       type: "hnx:auth-state",
       user: {
@@ -276,6 +279,8 @@ function SourceFrame({
         return
       }
       if (message?.type === "hnx:signout") {
+        authStateRequestRef.current += 1
+        frameRef.current?.contentWindow?.postMessage({ type: "hnx:auth-state", user: null }, window.location.origin)
         void signOut().finally(() => navigate("/"))
         return
       }

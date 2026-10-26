@@ -267,10 +267,12 @@ export async function refreshSession(session: HnxSession): Promise<HnxSession> {
 }
 
 export async function signOut(token: string) {
-  if (supabaseConfigured) {
-    await fetch(`${supabaseUrl}/auth/v1/logout`, { method: "POST", headers: authHeaders(token) })
-  }
   storeSession(null)
+  if (!supabaseConfigured) return
+  await Promise.allSettled([
+    fetch(`${supabaseUrl}/auth/v1/logout`, { method: "POST", headers: authHeaders(token) }),
+    oauthClient!.auth.signOut({ scope: "local" }),
+  ])
 }
 
 export async function requestPasswordReset(email: string) {

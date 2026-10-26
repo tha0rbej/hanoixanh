@@ -1457,6 +1457,7 @@
         homeCurrentUser = event.data.user || null;
         const actions = document.querySelector('.header-actions');
         if (!actions) return;
+        if (!event.data.user) document.getElementById('homeAccountMenu')?.remove();
         const loginButton = actions.querySelector('.btn-login');
         if (loginButton) {
             const accountName = document.getElementById('homeAccountName');
