@@ -1,0 +1,32 @@
+.hnx-vietnam-territory-label {
+  background: transparent;
+  border: 0;
+}
+
+.hnx-vietnam-territory-label__content {
+  display: grid;
+  min-width: 160px;
+  gap: 2px;
+  padding: 7px 10px;
+  border: 1px solid rgba(185, 28, 28, 0.78);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.22);
+  color: #991b1b;
+  font: 800 11px/1.25 "Inter", Arial, sans-serif;
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.hnx-vietnam-territory-label__content strong {
+  color: #b91c1c;
+  font-size: 12px;
+}
+
+.hnx-vietnam-territory-label__content span {
+  color: #0f6b3c;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}

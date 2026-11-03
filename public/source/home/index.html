@@ -13,6 +13,7 @@
     
     <!-- Thư viện bản đồ Leaflet CSS -->
     <link rel="stylesheet" href="../remaining/leaflet/leaflet.css" />
+    <link rel="stylesheet" href="../vietnam-map-labels.css" />
 
     <style>
         * {
@@ -1273,6 +1274,7 @@
 <!-- Thư viện bản đồ Leaflet JS -->
 <script src="../site-header.js"></script>
 <script src="../remaining/leaflet/leaflet.js"></script>
+<script src="../vietnam-map-labels.js"></script>
 
 <!-- Script khởi tạo Bản đồ thực và gán tương tác -->
 <script>
@@ -1566,6 +1568,7 @@
         }
 
         addHomeMapTiles();
+        window.HanoiXanhVietnamMap?.addTo(map);
 
         const homeMapContainer = document.getElementById('real-map');
         function refreshHomeMap() {

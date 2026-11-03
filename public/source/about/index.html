@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="../vietnam-map-labels.css" />
   <style>
     :root {
       --primary: #168A45;
@@ -4314,6 +4315,7 @@
 
   <script src="../site-header.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="../vietnam-map-labels.js"></script>
   <script>
     let registeredUsers = [];
     let currentUser = null;
@@ -4751,6 +4753,7 @@
     }) : null;
     if (bMap) L.control.zoom({ position: 'bottomright' }).addTo(bMap);
     if (bMap) L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(bMap);
+    if (bMap) window.HanoiXanhVietnamMap?.addTo(bMap);
 
     let currentActiveMarker = null;
     if (bMap) knownCampaignLocations.forEach(loc => {

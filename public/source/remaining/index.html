@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="leaflet/leaflet.css" />
+  <link rel="stylesheet" href="../vietnam-map-labels.css" />
   <style>
     :root {
       --primary: #168A45;
@@ -1750,6 +1751,7 @@
 
   <script src="../site-header.js"></script>
   <script src="leaflet/leaflet.js"></script>
+  <script src="../vietnam-map-labels.js"></script>
   <script>
     let registeredUsers = [];
     let currentUser = null;
@@ -2470,6 +2472,7 @@
       return tiles.addTo(map);
     }
     addMapTiles(bMap);
+    window.HanoiXanhVietnamMap?.addTo(bMap);
 
     function refreshLeafletMap(map, container) {
       if (!map || !container || !container.isConnected || !container.offsetWidth || !container.offsetHeight) return;
