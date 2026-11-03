@@ -1571,6 +1571,9 @@
         window.HanoiXanhVietnamMap?.addTo(map);
 
         const homeMapContainer = document.getElementById('real-map');
+        let homeMapUserHasMoved = false;
+        let homeMapViewportInitialized = false;
+        map.on('dragstart zoomstart', () => { homeMapUserHasMoved = true; });
         function refreshHomeMap() {
             if (!homeMapContainer?.isConnected || !homeMapContainer.offsetWidth || !homeMapContainer.offsetHeight) return;
             map.invalidateSize({ pan: false, animate: false });
@@ -1604,7 +1607,7 @@
             });
         }
 
-        function renderMapCardsAndMarkers() {
+        function renderMapCardsAndMarkers(initializeViewport = false) {
             clearMapMarkers();
             const entries = Object.entries(locations);
             if (sidebarHeaderCount) sidebarHeaderCount.textContent = `DANH SÁCH CHIẾN DỊCH (${entries.length})`;
@@ -1621,7 +1624,10 @@
             });
 
             cards.forEach(card => card.addEventListener('click', function() { activateLocation(this.dataset.id); }));
-            if (entries.length > 1) map.fitBounds(L.latLngBounds(entries.map(([, loc]) => loc.coords)), { padding: [28, 28], maxZoom: 12 });
+            if (initializeViewport && !homeMapViewportInitialized && !homeMapUserHasMoved && entries.length > 1) {
+                map.fitBounds(L.latLngBounds(entries.map(([, loc]) => loc.coords)), { padding: [28, 28], maxZoom: 12 });
+            }
+            if (initializeViewport) homeMapViewportInitialized = true;
             if (entries.length) activateLocation(entries[0][0], false, false);
         }
 
@@ -1735,10 +1741,10 @@
                 };
             });
             locations = Object.keys(nextLocations).length ? nextLocations : { ...defaultHomeMapLocations };
-            renderMapCardsAndMarkers();
+            renderMapCardsAndMarkers(true);
         };
 
-        renderMapCardsAndMarkers();
+        renderMapCardsAndMarkers(false);
 
         const normalize = value => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const districtSelect = document.getElementById('mapDistrictSelect');

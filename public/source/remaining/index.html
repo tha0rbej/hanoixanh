@@ -2473,6 +2473,9 @@
     }
     addMapTiles(bMap);
     window.HanoiXanhVietnamMap?.addTo(bMap);
+    let campaignMapUserHasMoved = false;
+    let campaignMapViewportInitialized = false;
+    bMap.on('dragstart zoomstart', () => { campaignMapUserHasMoved = true; });
 
     function refreshLeafletMap(map, container) {
       if (!map || !container || !container.isConnected || !container.offsetWidth || !container.offsetHeight) return;
@@ -2591,6 +2594,7 @@
 
     function renderCampaignLocations(campaigns) {
       const rows = Array.isArray(campaigns) ? campaigns : [];
+      const initializeViewport = rows.length > 0 && !campaignMapViewportInitialized;
       const mapped = rows.map((campaign, index) => {
         const fallback = fallbackLocationForCampaign(campaign);
         const generated = fallbackCampaignCoordinates(index);
@@ -2633,11 +2637,12 @@
         });
         campaignMapMarkers.push(marker);
       });
-      if (campaignMapMarkers.length > 1) {
+      if (initializeViewport && !campaignMapUserHasMoved && campaignMapMarkers.length > 1) {
         bMap.fitBounds(L.latLngBounds(knownCampaignLocations.map(loc => [loc.lat, loc.lng])), { padding: [28, 28], maxZoom: 12 });
-      } else if (campaignMapMarkers.length === 1) {
+      } else if (initializeViewport && !campaignMapUserHasMoved && campaignMapMarkers.length === 1) {
         bMap.setView([knownCampaignLocations[0].lat, knownCampaignLocations[0].lng], 14);
       }
+      if (initializeViewport) campaignMapViewportInitialized = true;
     }
 
     renderCampaignLocations([]);

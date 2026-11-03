@@ -12,8 +12,8 @@
       const icon = leaflet.divIcon({
         className: "hnx-vietnam-territory-label",
         html: `<div class="hnx-vietnam-territory-label__content"><strong>${territory.name}</strong><span>Việt Nam</span></div>`,
-        iconSize: [180, 48],
-        iconAnchor: [90, 24]
+        iconSize: [140, 30],
+        iconAnchor: [70, 15]
       });
 
       return leaflet.marker([territory.latitude, territory.longitude], {
@@ -23,6 +23,13 @@
         zIndexOffset: 1000
       }).addTo(map);
     });
+
+    const updateVisibility = () => {
+      const visible = typeof map.getZoom !== "function" || map.getZoom() <= 11;
+      markers.forEach((marker) => marker.setOpacity?.(visible ? 1 : 0));
+    };
+    map.on?.("zoomend", updateVisibility);
+    updateVisibility();
 
     map.attributionControl?.addAttribution("Hoàng Sa, Trường Sa — Việt Nam");
     return markers;
