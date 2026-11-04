@@ -889,16 +889,15 @@
     <div class="section-header">
         <span class="section-eyebrow">DẤU CHÂN HÀ NỘI XANH</span>
         <h2>CÁC CHIẾN DỊCH NỔI BẬT</h2>
-        <p>Những hoạt động đã hoàn thành — từ một điểm rác được dọn đến một mầm xanh được gieo.</p>
+        <p id="featuredCampaignDescription">Những hoạt động đã hoàn thành — mỗi chiến dịch là một điểm rác được dọn sạch.</p>
     </div>
-    <div class="cards-grid">
+    <div class="cards-grid" id="featuredCampaignGrid">
         <article class="activity-card-mission">
             <img class="impact-card-image" src="figma-impact-1.png" alt="Tình nguyện viên thu gom rác tại sông Lừ">
             <div class="impact-meta"><span>Sông Lừ · 27/09/2026</span><b>Hoàn thành</b></div>
             <h3 class="impact-card-title">Trả lại khoảng xanh bên sông Lừ</h3>
             <p class="impact-card-copy">Thu gom rác ven bờ, phân loại và tập kết để chuyển đi xử lý.</p>
             <div class="impact-results"><span><strong>600 kg</strong><small>rác được thu gom</small></span><span><strong>45</strong><small>tình nguyện viên đồng hành</small></span></div>
-            <a href="../../chien-dich" target="_parent" class="impact-card-link">Xem hành trình →</a>
         </article>
         <article class="activity-card-mission">
             <img class="impact-card-image" src="figma-impact-2.png" alt="Tình nguyện viên làm sạch ven sông Nhuệ">
@@ -906,15 +905,13 @@
             <h3 class="impact-card-title">Chung tay làm sạch sông Nhuệ</h3>
             <p class="impact-card-copy">Làm sạch điểm tồn đọng rác và kết nối người dân cùng giữ gìn.</p>
             <div class="impact-results"><span><strong>800 kg</strong><small>rác được thu gom</small></span><span><strong>52</strong><small>tình nguyện viên đồng hành</small></span></div>
-            <a href="../../chien-dich" target="_parent" class="impact-card-link">Xem hành trình →</a>
         </article>
         <article class="activity-card-mission">
-            <img class="impact-card-image" src="figma-impact-3.png" alt="Tình nguyện viên trồng cây bên sông Sét">
+            <img class="impact-card-image" src="figma-impact-3.png" alt="Tình nguyện viên thu gom rác bên sông Sét">
             <div class="impact-meta"><span>Sông Sét · 13/09/2026</span><b>Hoàn thành</b></div>
-            <h3 class="impact-card-title">Gieo mầm xanh bên sông Sét</h3>
-            <p class="impact-card-copy">Dọn rác nhựa, bổ sung cây xanh và chăm sóc khu vực ven bờ.</p>
-            <div class="impact-results"><span><strong>30 cây</strong><small>được trồng mới</small></span><span><strong>28</strong><small>tình nguyện viên đồng hành</small></span></div>
-            <a href="../../chien-dich" target="_parent" class="impact-card-link">Xem hành trình →</a>
+            <h3 class="impact-card-title">Làm sạch rác ven sông Sét</h3>
+            <p class="impact-card-copy">Thu gom rác nhựa, phân loại và làm sạch khu vực ven bờ.</p>
+            <div class="impact-results"><span><strong>500 kg</strong><small>rác được thu gom</small></span><span><strong>28</strong><small>tình nguyện viên đồng hành</small></span></div>
         </article>
     </div>
 </section>
@@ -1417,6 +1414,23 @@
             if (typeof window.focusHomeCampaignOnMap === 'function') window.focusHomeCampaignOnMap(card.querySelector('.home-campaign-open')?.dataset.campaignId);
         }));
     }
+    function renderFeaturedCampaigns(content) {
+        if (!content || typeof content !== 'object' || !Array.isArray(content.items)) return;
+        const description = document.getElementById('featuredCampaignDescription');
+        const grid = document.getElementById('featuredCampaignGrid');
+        if (!grid) return;
+        if (description && content.description) description.textContent = String(content.description);
+        const items = content.items.slice(0, 3);
+        if (!items.length) return;
+        grid.innerHTML = items.map((item, index) => {
+            const dateParts = String(item.completed_at || '').split('-');
+            const date = dateParts.length === 3 ? `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}` : String(item.completed_at || '');
+            const trash = Math.max(0, Number(item.trash_kg) || 0).toLocaleString('vi-VN');
+            const volunteers = Math.max(0, Number(item.volunteers) || 0).toLocaleString('vi-VN');
+            const image = item.image_url || `figma-impact-${index + 1}.png`;
+            return `<article class="activity-card-mission"><img class="impact-card-image" src="${escapeNewsHtml(image)}" alt="${escapeNewsHtml(`Tình nguyện viên thu gom rác tại ${item.location || 'Hà Nội'}`)}"><div class="impact-meta"><span>${escapeNewsHtml(item.location || '')}${date ? ` · ${escapeNewsHtml(date)}` : ''}</span><b>Hoàn thành</b></div><h3 class="impact-card-title">${escapeNewsHtml(item.title || '')}</h3><p class="impact-card-copy">${escapeNewsHtml(item.description || '')}</p><div class="impact-results"><span><strong>${trash} kg</strong><small>rác được thu gom</small></span><span><strong>${volunteers}</strong><small>tình nguyện viên đồng hành</small></span></div></article>`;
+        }).join('');
+    }
     window.addEventListener('message', function(event) {
         if (event.data?.type === 'hnx:posts-data') { renderHomeNews(event.data.posts || []); return; }
         if (event.data?.type === 'hnx:contact-message-result') { if (event.data.ok) { alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!'); document.getElementById('userMsgInput').value = ''; } else alert(event.data.message || 'Không thể gửi lời nhắn.'); return; }
@@ -1453,6 +1467,7 @@
                 const value = key === 'cleanup_points' && overview[key] === undefined ? overview.cleaned_km : overview[key];
                 if (value !== undefined) el.textContent = Number(value).toLocaleString('vi-VN') + '+';
             });
+            renderFeaturedCampaigns(metrics.featured_campaigns);
             return;
         }
         if (event.data?.type !== 'hnx:auth-state') return;
