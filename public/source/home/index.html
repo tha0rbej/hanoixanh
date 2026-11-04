@@ -1377,6 +1377,14 @@
         return new Intl.DateTimeFormat('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', dateStyle: 'short', ...(withTime ? { timeStyle: 'short' } : {}) }).format(new Date(time));
     }
 
+    function resolveHomeCampaignImage(value, index) {
+        const image = String(value || '').trim();
+        if (!image) return homeCampaignImages[index % homeCampaignImages.length];
+        if (/^(https?:|data:|blob:|\/)/i.test(image)) return image;
+        if (homeCampaignImages.includes(image)) return image;
+        return `/source/remaining/${image}`;
+    }
+
     function renderHomeCampaigns(campaigns) {
         const grid = document.querySelector('.schedule-grid');
         if (!grid || !Array.isArray(campaigns)) return;
@@ -1401,12 +1409,12 @@
             const joined = Math.max(0, Number(c.registered_count ?? c.volunteers_registered ?? 0));
             const progress = capacity ? Math.min(100, Math.round((joined / capacity) * 100)) : 0;
             const imageList = Array.isArray(c.image_urls) ? c.image_urls.filter(Boolean) : [];
-            const image = imageList[0] || c.image_url || homeCampaignImages[index % homeCampaignImages.length];
+            const image = resolveHomeCampaignImage(imageList[0] || c.image_url, index);
             const safeId = escapeNewsHtml(String(c.id || ''));
             const action = isUpcoming
                 ? `<button type="button" class="schedule-register home-campaign-open" data-campaign-id="${safeId}">${registeredHomeCampaigns.has(String(c.id)) ? 'Đã đăng ký' : 'Đăng ký'}</button>`
                 : '<span class="schedule-ended">Đã kết thúc</span>';
-            return `<article class="schedule-card"><img class="schedule-card-image" src="${image}" alt="${escapeNewsHtml(c.title || 'Chiến dịch Hà Nội Xanh')}"><div class="schedule-card-body"><div class="schedule-status"><span class="status-tag ${isUpcoming ? 'upcoming' : 'completed'}">${isUpcoming ? 'Sắp diễn ra' : 'Đã kết thúc'}</span><span class="schedule-card-type">Hoạt động cộng đồng</span></div><h3>${escapeNewsHtml(c.title || '')}</h3><ul class="schedule-info"><li><i class="fa-solid fa-location-dot"></i> ${escapeNewsHtml(c.location || 'Địa điểm đang cập nhật')}</li><li><i class="fa-regular fa-calendar"></i> ${isUpcoming ? `${date} · ${time}` : `Hoàn thành ngày ${date}`}</li></ul><div class="schedule-progress-copy"><strong>${joined}/${capacity} tình nguyện viên</strong><span>${isUpcoming ? 'đã đăng ký / quy mô' : 'đã tham gia / quy mô'}</span></div><div class="schedule-progress"><span style="width:${progress}%"></span></div><div class="schedule-card-actions"><a href="../../chien-dich" target="_parent" class="schedule-detail-link">Xem chi tiết →</a>${action}</div></div></article>`;
+            return `<article class="schedule-card"><img class="schedule-card-image" src="${escapeNewsHtml(image)}" alt="${escapeNewsHtml(c.title || 'Chiến dịch Hà Nội Xanh')}"><div class="schedule-card-body"><div class="schedule-status"><span class="status-tag ${isUpcoming ? 'upcoming' : 'completed'}">${isUpcoming ? 'Sắp diễn ra' : 'Đã kết thúc'}</span><span class="schedule-card-type">Hoạt động cộng đồng</span></div><h3>${escapeNewsHtml(c.title || '')}</h3><ul class="schedule-info"><li><i class="fa-solid fa-location-dot"></i> ${escapeNewsHtml(c.location || 'Địa điểm đang cập nhật')}</li><li><i class="fa-regular fa-calendar"></i> ${isUpcoming ? `${date} · ${time}` : `Hoàn thành ngày ${date}`}</li></ul><div class="schedule-progress-copy"><strong>${joined}/${capacity} tình nguyện viên</strong><span>${isUpcoming ? 'đã đăng ký / quy mô' : 'đã tham gia / quy mô'}</span></div><div class="schedule-progress"><span style="width:${progress}%"></span></div><div class="schedule-card-actions"><a href="../../chien-dich" target="_parent" class="schedule-detail-link">Xem chi tiết →</a>${action}</div></div></article>`;
         }).join('') : '<p class="schedule-empty">Hiện chưa có chiến dịch đang diễn ra.</p>';
         grid.querySelectorAll('.home-campaign-open').forEach(button => button.addEventListener('click', () => openHomeCampaignModal(button.dataset.campaignId)));
         grid.querySelectorAll('.schedule-card').forEach(card => card.addEventListener('click', event => {
