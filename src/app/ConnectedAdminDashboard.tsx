@@ -281,9 +281,8 @@ export function ConnectedAdminDashboard({ onLogin }: { onLogin?: () => void }) {
       if (!win.HanoiXanhVietnamMap) await new Promise<void>((resolve) => { const existing = document.getElementById("hnx-vietnam-map-labels-script") as HTMLScriptElement | null; if (existing) { existing.addEventListener("load", () => resolve(), { once: true }); existing.addEventListener("error", () => resolve(), { once: true }); return } const script = document.createElement("script"); script.id = "hnx-vietnam-map-labels-script"; script.src = "/source/vietnam-map-labels.js?v=20261104-3"; script.onload = () => resolve(); script.onerror = () => resolve(); document.body.appendChild(script) })
       if (disposed || !host) return
       const initialLat = Number(form.latitude) || 21.0285; const initialLng = Number(form.longitude) || 105.8048
-      map = win.L.map(host).setView([initialLat, initialLng], form.latitude && form.longitude ? 16 : 11)
-      win.L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, attribution: "Tiles © Esri" }).addTo(map)
-      win.HanoiXanhVietnamMap?.addTo(map)
+      map = win.L.map(host, { minZoom: 10, maxZoom: 18, zoomAnimation: true, fadeAnimation: true, markerZoomAnimation: true, inertia: true, maxBounds: [[20.45, 104.8], [21.55, 106.4]], maxBoundsViscosity: 1 }).setView([initialLat, initialLng], form.latitude && form.longitude ? 16 : 11)
+      win.L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, keepBuffer: 3, updateWhenIdle: false, updateWhenZooming: true, attribution: "Tiles © Esri" }).addTo(map)
       map.on("click", (event: any) => setPoint(event.latlng.lat, event.latlng.lng))
       if (form.latitude && form.longitude) setPoint(initialLat, initialLng, 16)
     }

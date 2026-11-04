@@ -1557,15 +1557,23 @@
 
         const map = L.map('real-map', {
             zoomControl: false,
-            zoomAnimation: false,
-            fadeAnimation: false
+            minZoom: 10,
+            maxZoom: 18,
+            zoomAnimation: true,
+            fadeAnimation: true,
+            markerZoomAnimation: true,
+            inertia: true,
+            maxBounds: [[20.45, 104.8], [21.55, 106.4]],
+            maxBoundsViscosity: 1
         }).setView([21.015, 105.805], 12);
 
         const homeMapTileOptions = {
             attribution: 'Tiles © Esri',
             maxZoom: 19,
             maxNativeZoom: 19,
-            keepBuffer: 2
+            keepBuffer: 3,
+            updateWhenIdle: false,
+            updateWhenZooming: true
         };
 
         function addHomeMapTiles() {
@@ -1573,7 +1581,6 @@
         }
 
         addHomeMapTiles();
-        window.HanoiXanhVietnamMap?.addTo(map);
 
         const homeMapContainer = document.getElementById('real-map');
         let homeMapUserHasMoved = false;

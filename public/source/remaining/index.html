@@ -2437,24 +2437,29 @@
     const bMap = L.map('boundaryMap', {
       center: [21.0285, 105.8048],
       zoom: 11,
-      minZoom: 9.5,
+      minZoom: 10,
       maxZoom: 17,
       zoomControl: false,
-      zoomAnimation: false,
-      fadeAnimation: false
+      zoomAnimation: true,
+      fadeAnimation: true,
+      markerZoomAnimation: true,
+      inertia: true,
+      maxBounds: [[20.45, 104.8], [21.55, 106.4]],
+      maxBoundsViscosity: 1
     });
     L.control.zoom({ position: 'bottomright' }).addTo(bMap);
     const mapTileOptions = {
       maxZoom: 19,
       maxNativeZoom: 19,
-      keepBuffer: 2,
+      keepBuffer: 3,
+      updateWhenIdle: false,
+      updateWhenZooming: true,
       attribution: 'Tiles © Esri'
     };
     function addMapTiles(map) {
       return L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', mapTileOptions).addTo(map);
     }
     addMapTiles(bMap);
-    window.HanoiXanhVietnamMap?.addTo(bMap);
     let campaignMapUserHasMoved = false;
     let campaignMapViewportInitialized = false;
     bMap.on('dragstart zoomstart', () => { campaignMapUserHasMoved = true; });
@@ -2724,7 +2729,7 @@
     function openLocationPicker() {
       document.getElementById('pickerModal').style.display = 'flex';
       if (!pMap) {
-        pMap = L.map('pickerMap', { zoomAnimation: false, fadeAnimation: false }).setView([21.0285, 105.8048], 14);
+        pMap = L.map('pickerMap', { zoomAnimation: true, fadeAnimation: true, inertia: true, maxBounds: [[20.45, 104.8], [21.55, 106.4]], maxBoundsViscosity: 1 }).setView([21.0285, 105.8048], 14);
         addMapTiles(pMap);
         pMarker = L.marker([21.0285, 105.8048], { draggable: true, icon: createMapMarkerIcon('fa-location-crosshairs', '#168a45') }).addTo(pMap);
         pMarker.on('dragend', e => fetchRealAddress(e.target.getLatLng().lat, e.target.getLatLng().lng));
