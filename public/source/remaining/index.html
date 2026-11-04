@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="leaflet/leaflet.css" />
-  <link rel="stylesheet" href="../vietnam-map-labels.css?v=20261104-2" />
+  <link rel="stylesheet" href="../vietnam-map-labels.css?v=20261104-3" />
   <style>
     :root {
       --primary: #168A45;
@@ -1751,7 +1751,7 @@
 
   <script src="../site-header.js"></script>
   <script src="leaflet/leaflet.js"></script>
-  <script src="../vietnam-map-labels.js?v=20261104-2"></script>
+  <script src="../vietnam-map-labels.js?v=20261104-3"></script>
   <script>
     let registeredUsers = [];
     let currentUser = null;
@@ -2448,28 +2448,10 @@
       maxZoom: 19,
       maxNativeZoom: 19,
       keepBuffer: 2,
-      attribution: '© OpenStreetMap contributors'
+      attribution: 'Tiles © Esri'
     };
     function addMapTiles(map) {
-      const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', mapTileOptions);
-      let usingBackup = false;
-      let stalledRequestTimer;
-      const clearStallTimer = () => window.clearTimeout(stalledRequestTimer);
-      const useBackup = () => {
-        if (usingBackup) return;
-        usingBackup = true;
-        clearStallTimer();
-        map.attributionControl.addAttribution('Tiles © <a href="https://www.openstreetmap.de/">OpenStreetMap Deutschland</a>');
-        tiles.options.maxNativeZoom = 18;
-        tiles.setUrl('https://tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png');
-      };
-      tiles.on('tileerror', useBackup);
-      tiles.on('loading', () => {
-        clearStallTimer();
-        if (!usingBackup) stalledRequestTimer = window.setTimeout(useBackup, 10000);
-      });
-      tiles.on('load', clearStallTimer);
-      return tiles.addTo(map);
+      return L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', mapTileOptions).addTo(map);
     }
     addMapTiles(bMap);
     window.HanoiXanhVietnamMap?.addTo(bMap);

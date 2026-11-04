@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="../vietnam-map-labels.css?v=20261104-2" />
+  <link rel="stylesheet" href="../vietnam-map-labels.css?v=20261104-3" />
   <style>
     :root {
       --primary: #168A45;
@@ -4315,7 +4315,7 @@
 
   <script src="../site-header.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="../vietnam-map-labels.js?v=20261104-2"></script>
+  <script src="../vietnam-map-labels.js?v=20261104-3"></script>
   <script>
     let registeredUsers = [];
     let currentUser = null;
@@ -4752,7 +4752,7 @@
       zoomControl: false
     }) : null;
     if (bMap) L.control.zoom({ position: 'bottomright' }).addTo(bMap);
-    if (bMap) L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(bMap);
+    if (bMap) L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles © Esri' }).addTo(bMap);
     if (bMap) window.HanoiXanhVietnamMap?.addTo(bMap);
 
     let currentActiveMarker = null;
@@ -4847,7 +4847,7 @@
       document.getElementById('pickerModal').style.display = 'flex';
       if (!pMap) {
         pMap = L.map('pickerMap').setView([21.0285, 105.8048], 14);
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(pMap);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles © Esri' }).addTo(pMap);
         pMarker = L.marker([21.0285, 105.8048], { draggable: true }).addTo(pMap);
         pMarker.on('dragend', e => fetchRealAddress(e.target.getLatLng().lat, e.target.getLatLng().lng));
         pMap.on('click', e => { pMarker.setLatLng(e.latlng); fetchRealAddress(e.latlng.lat, e.latlng.lng); });
