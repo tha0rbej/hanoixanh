@@ -11,9 +11,9 @@
     const markers = territories.map((territory) => {
       const icon = leaflet.divIcon({
         className: "hnx-vietnam-territory-label",
-        html: `<div class="hnx-vietnam-territory-label__content"><strong>${territory.name}</strong><span>Việt Nam</span></div>`,
-        iconSize: [140, 30],
-        iconAnchor: [70, 15]
+        html: `<span class="hnx-vietnam-territory-label__content">${territory.name}</span>`,
+        iconSize: [156, 34],
+        iconAnchor: [78, 17]
       });
 
       return leaflet.marker([territory.latitude, territory.longitude], {
@@ -31,7 +31,6 @@
     map.on?.("zoomend", updateVisibility);
     updateVisibility();
 
-    map.attributionControl?.addAttribution("Hoàng Sa, Trường Sa — Việt Nam");
     return markers;
   }
 

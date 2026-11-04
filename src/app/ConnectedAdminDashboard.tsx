@@ -276,11 +276,14 @@ export function ConnectedAdminDashboard({ onLogin }: { onLogin?: () => void }) {
     }
     const loadLeaflet = async () => {
       if (!document.getElementById("hnx-leaflet-css")) { const link = document.createElement("link"); link.id = "hnx-leaflet-css"; link.rel = "stylesheet"; link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"; document.head.appendChild(link) }
+      if (!document.getElementById("hnx-vietnam-map-labels-css")) { const link = document.createElement("link"); link.id = "hnx-vietnam-map-labels-css"; link.rel = "stylesheet"; link.href = "/source/vietnam-map-labels.css?v=20261104-2"; document.head.appendChild(link) }
       if (!win.L) await new Promise<void>((resolve, reject) => { const existing = document.getElementById("hnx-leaflet-script") as HTMLScriptElement | null; if (existing) { existing.addEventListener("load", () => resolve(), { once: true }); existing.addEventListener("error", () => reject(new Error("leaflet")), { once: true }); return } const script = document.createElement("script"); script.id = "hnx-leaflet-script"; script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"; script.onload = () => resolve(); script.onerror = () => reject(new Error("leaflet")); document.body.appendChild(script) })
+      if (!win.HanoiXanhVietnamMap) await new Promise<void>((resolve) => { const existing = document.getElementById("hnx-vietnam-map-labels-script") as HTMLScriptElement | null; if (existing) { existing.addEventListener("load", () => resolve(), { once: true }); existing.addEventListener("error", () => resolve(), { once: true }); return } const script = document.createElement("script"); script.id = "hnx-vietnam-map-labels-script"; script.src = "/source/vietnam-map-labels.js?v=20261104-2"; script.onload = () => resolve(); script.onerror = () => resolve(); document.body.appendChild(script) })
       if (disposed || !host) return
       const initialLat = Number(form.latitude) || 21.0285; const initialLng = Number(form.longitude) || 105.8048
       map = win.L.map(host).setView([initialLat, initialLng], form.latitude && form.longitude ? 16 : 11)
       win.L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap" }).addTo(map)
+      win.HanoiXanhVietnamMap?.addTo(map)
       map.on("click", (event: any) => setPoint(event.latlng.lat, event.latlng.lng))
       if (form.latitude && form.longitude) setPoint(initialLat, initialLng, 16)
     }
