@@ -45,6 +45,8 @@ type ParticipationSummaryRow = {
 type CampaignSummaryRow = { id: string; title?: string; location?: string; start_at?: string; reward_points?: number }
 type RewardMetricRow = { metric_key: string; metric_value: unknown }
 
+const campaignRegistrationWebhookUrl = "https://hanoixanh.app.n8n.cloud/webhook/3a99fa36-f158-4b77-8b52-f6b30a52c044"
+
 function volunteerLevel(campaigns: number, hours: number) {
   if (campaigns >= 15 && hours >= 100) return "Đại sứ Xanh"
   if (campaigns >= 8 && hours >= 40) return "Thành viên nòng cốt"
@@ -199,6 +201,21 @@ function SourceFrame({
         void tableSelect<{ id: string }>("campaign_registrations", "id", session.access_token, `&user_id=eq.${encodeURIComponent(session.user.id)}&campaign_key=eq.${encodeURIComponent(message.campaignKey || "")}&limit=1`)
           .then((existing) => { if (existing.length) throw new Error("Bạn đã đăng ký tham gia chiến dịch này rồi."); return tableInsert("campaign_registrations", { user_id: session.user.id, campaign_key: message.campaignKey, status: "registered" }, session.access_token) })
           .then(async () => {
+            const campaignKey = message.campaignKey || ""
+            void tableSelect<{ title?: string }>("campaigns", "title", session.access_token, `&id=eq.${encodeURIComponent(campaignKey)}&limit=1`)
+              .then(([campaign]) => fetch(campaignRegistrationWebhookUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  ten: profile?.full_name || "",
+                  email: profile?.email || session.user.email || "",
+                  chien_dich: campaign?.title || campaignKey,
+                }),
+              }))
+              .then((response) => {
+                if (!response.ok) throw new Error(`Webhook n8n trả về HTTP ${response.status}.`)
+              })
+              .catch((error) => console.error("Không thể gửi đăng ký chiến dịch sang n8n:", error))
             frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaign-register-result", ok: true }, window.location.origin)
             trackEvent("volunteer_registration_success", { campaign_id: message.campaignKey || "unknown" })
             await sendCampaignsState()
