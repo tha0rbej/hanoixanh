@@ -308,8 +308,9 @@ export function ConnectedAdminDashboard({ onLogin }: { onLogin?: () => void }) {
     setError("")
     setNotice("")
     const registration = registrations.find(item => String(item.id) === id)
-    const deleted = await tableDelete<Row>("campaign_registrations", `id=eq.${encodeURIComponent(id)}`, session.access_token)
-    if (!deleted.some(item => String(item.id) === id)) throw new Error("Supabase chưa xác nhận xóa lượt đăng ký. Vui lòng tải lại trang và thử lại.")
+    await tableDelete<Row>("campaign_registrations", `id=eq.${encodeURIComponent(id)}`, session.access_token)
+    const remaining = await tableSelect<Row>("campaign_registrations", "id", session.access_token, `&id=eq.${encodeURIComponent(id)}&limit=1`)
+    if (remaining.length) throw new Error("Supabase chưa xóa lượt đăng ký. Vui lòng tải lại trang và thử lại.")
     const removedPoints = registration?.status === "attended" ? Number(registration.awarded_points || 0) : 0
     const userId = String(registration?.user_id || "")
     setRegistrations(items => items.filter(item => String(item.id) !== id))
