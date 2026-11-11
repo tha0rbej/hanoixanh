@@ -10,6 +10,7 @@ import {
 import { AdminDashboard } from "./app/AdminDashboard"
 import { ConnectedAdminDashboard } from "./app/ConnectedAdminDashboard"
 import { AuthModal } from "./app/AuthModal"
+import { VoteCampaignPopup } from "./components/VoteCampaignPopup"
 import { AuthProvider, useAuth } from "./app/AuthContext"
 import { ResetPasswordPage } from "./app/ResetPasswordPage"
 import { DEFAULT_REWARD_PROGRAM, earnedBadges, monthsSince, normalizeRewardProgram } from "./app/rewards"
@@ -592,6 +593,7 @@ function AppRoutes() {
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
     {authTab && <AuthModal initialTab={authTab} initialError={authError} onClose={closeAuth} onAdmin={() => navigate("/admin")} />}
+    {!authTab && <VoteCampaignPopup />}
     </>
   )
 }
