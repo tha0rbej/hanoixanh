@@ -193,7 +193,7 @@ function SourceFrame({
           .then((existing) => { if (existing.length) throw new Error("Bạn đã đăng ký tham gia chiến dịch này rồi."); return tableInsert("campaign_registrations", { user_id: session.user.id, campaign_key: message.campaignKey, status: "registered" }, session.access_token) })
           .then(async () => {
             const campaignKey = message.campaignKey || ""
-            void tableSelect<{ title?: string; start_at?: string }>("campaigns", "title,start_at", session.access_token, `&id=eq.${encodeURIComponent(campaignKey)}&limit=1`)
+            void tableSelect<{ title?: string; start_at?: string; end_at?: string }>("campaigns", "title,start_at,end_at", session.access_token, `&id=eq.${encodeURIComponent(campaignKey)}&limit=1`)
               .then(([campaign]) => fetch(campaignRegistrationWebhookUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -201,7 +201,8 @@ function SourceFrame({
                   ten: profile?.full_name || "",
                   email: profile?.email || session.user.email || "",
                   chien_dich: campaign?.title || campaignKey,
-                  thoi_gian: campaign?.start_at || "",
+                  thoi_gian_bat_dau: campaign?.start_at || "",
+                  thoi_gian_ket_thuc: campaign?.end_at || "",
                 }),
               }))
               .then((response) => {
