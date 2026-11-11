@@ -46,6 +46,18 @@ type RewardMetricRow = { metric_key: string; metric_value: unknown }
 
 const campaignRegistrationWebhookUrl = "https://hanoixanh.app.n8n.cloud/webhook/3a99fa36-f158-4b77-8b52-f6b30a52c044"
 
+function formatCampaignDateTime(value?: string) {
+  if (!value) return ""
+  const date = new Date(value)
+  if (Number.isNaN(date.valueOf())) return ""
+  const day = String(date.getDate()).padStart(2, "0")
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const hour24 = date.getHours()
+  const hour12 = hour24 % 12 || 12
+  const period = hour24 >= 12 ? "CH" : "SA"
+  return `${day}/${month}/${date.getFullYear()} ${String(hour12).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")} ${period}`
+}
+
 function volunteerLevel(campaigns: number, hours: number) {
   if (campaigns >= 15 && hours >= 100) return "Đại sứ Xanh"
   if (campaigns >= 8 && hours >= 40) return "Thành viên nòng cốt"
@@ -201,8 +213,8 @@ function SourceFrame({
                   ten: profile?.full_name || "",
                   email: profile?.email || session.user.email || "",
                   chien_dich: campaign?.title || campaignKey,
-                  thoi_gian_bat_dau: campaign?.start_at || "",
-                  thoi_gian_ket_thuc: campaign?.end_at || "",
+                  thoi_gian_bat_dau: formatCampaignDateTime(campaign?.start_at),
+                  thoi_gian_ket_thuc: formatCampaignDateTime(campaign?.end_at),
                 }),
               }))
               .then((response) => {
