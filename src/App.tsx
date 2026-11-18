@@ -50,12 +50,16 @@ function formatCampaignDateTime(value?: string) {
   if (!value) return ""
   const date = new Date(value)
   if (Number.isNaN(date.valueOf())) return ""
-  const day = String(date.getDate()).padStart(2, "0")
-  const month = String(date.getMonth() + 1).padStart(2, "0")
-  const hour24 = date.getHours()
-  const hour12 = hour24 % 12 || 12
-  const period = hour24 >= 12 ? "CH" : "SA"
-  return `${day}/${month}/${date.getFullYear()} ${String(hour12).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")} ${period}`
+  const parts = new Intl.DateTimeFormat("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  }).formatToParts(date)
+  const getPart = (type: Intl.DateTimeFormatPartTypes) => parts.find(part => part.type === type)?.value || ""
+  return `${getPart("day")}/${getPart("month")}/${getPart("year")} ${getPart("hour")}:${getPart("minute")} ${getPart("dayPeriod")}`
 }
 
 function volunteerLevel(campaigns: number, hours: number) {
