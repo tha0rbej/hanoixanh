@@ -1,8 +1,8 @@
 interface:
   display_name: "Hà Nội Xanh Campaign Email"
-  short_description: "Soạn email chiến dịch an toàn, đúng thương hiệu"
+  short_description: "5 kỹ năng email cốt lõi cho AI Agent n8n"
   brand_color: "#0F7A4F"
-  default_prompt: "Use $hnx-campaign-email to draft a safe campaign email from the supplied n8n payload."
+  default_prompt: "Use $hnx-campaign-email to process a campaign email with its five core skills and return n8n-ready JSON."
 
 policy:
   allow_implicit_invocation: true
