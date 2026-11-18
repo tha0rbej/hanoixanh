@@ -1,0 +1,8 @@
+interface:
+  display_name: "Hà Nội Xanh Campaign Email"
+  short_description: "Soạn email chiến dịch an toàn, đúng thương hiệu"
+  brand_color: "#0F7A4F"
+  default_prompt: "Use $hnx-campaign-email to draft a safe campaign email from the supplied n8n payload."
+
+policy:
+  allow_implicit_invocation: true

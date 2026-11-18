@@ -1,0 +1,10 @@
+{
+  "event_type": "registration_confirmation",
+  "registration_id": "sample-registration-id",
+  "ten": "Nguyễn An",
+  "email": "an@example.com",
+  "chien_dich": "Làm sạch sông Tô Lịch",
+  "thoi_gian_bat_dau": "22/11/2026 07:30 SA",
+  "thoi_gian_ket_thuc": "22/11/2026 11:30 SA",
+  "dia_diem": "Được cung cấp bởi dữ liệu chiến dịch"
+}
