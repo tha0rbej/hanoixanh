@@ -1,0 +1,53 @@
+{
+  "skill": {
+    "name": "pollution-campaign-post",
+    "source": "skills/pollution-campaign-post/SKILL.md"
+  },
+  "tools": [
+    {
+      "name": "load_skill",
+      "description": "Tải nội dung đầy đủ của một skill đã được hệ thống cho phép khi metadata cho thấy skill phù hợp. Tool này cung cấp hướng dẫn nghiệp vụ, không cấp quyền thực thi.",
+      "required": ["skill_name"]
+    },
+    {
+      "name": "search_pollution_locations",
+      "description": "Tìm và lưu các địa điểm có bằng chứng ô nhiễm gần đây trong phạm vi Hà Nội, kèm ngày nguồn, URL nguồn, ảnh, nguồn ảnh, trạng thái quyền sử dụng và mức tin cậy. Không khẳng định trạng thái hiện tại từ nguồn cũ. Trả finding_id cho mỗi kết quả.",
+      "required": ["thread_id", "query"]
+    },
+    {
+      "name": "get_pollution_finding",
+      "description": "Đọc một finding đã lưu và thuộc thread của admin hiện tại.",
+      "required": ["thread_id", "finding_id"]
+    },
+    {
+      "name": "create_cleanup_post_draft",
+      "description": "Tạo draft website và Threads từ finding đã chọn. cleanup_start_at là bắt buộc; nếu thiếu phải trả missing_information. Tạo ảnh, nguồn, file HTML và preview nhưng không xuất bản.",
+      "required": ["thread_id", "finding_id", "cleanup_start_at", "website_payload", "threads_payload", "images", "sources"]
+    },
+    {
+      "name": "get_post_draft",
+      "description": "Đọc draft và version mới nhất thuộc thread hiện tại.",
+      "required": ["thread_id", "draft_id"]
+    },
+    {
+      "name": "revise_post_draft",
+      "description": "Áp dụng feedback vào base_version, giữ draft_id, tạo version mới và render lại preview. Không xuất bản.",
+      "required": ["thread_id", "draft_id", "base_version", "feedback", "website_payload", "threads_payload", "images", "sources"]
+    },
+    {
+      "name": "approve_post_draft",
+      "description": "Duyệt chính xác version mới nhất sau xác nhận rõ của admin. Từ chối version cũ hoặc thiếu confirmation_text.",
+      "required": ["thread_id", "draft_id", "version", "confirmation_text"]
+    },
+    {
+      "name": "publish_website_post",
+      "description": "Đăng hoặc lên lịch version đã duyệt vào bảng posts. Kiểm tra admin, version, confirmation và idempotency. publish_at null chỉ hợp lệ với publish_now true.",
+      "required": ["thread_id", "draft_id", "approved_version", "publish_now", "confirmation_text"]
+    },
+    {
+      "name": "publish_threads_post",
+      "description": "Đăng hoặc lên lịch version đã duyệt lên Threads bằng credential server-side. Kiểm tra độc lập quyền, version, media, confirmation và idempotency.",
+      "required": ["thread_id", "draft_id", "approved_version", "publish_now", "confirmation_text"]
+    }
+  ]
+}

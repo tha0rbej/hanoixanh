@@ -1,0 +1,287 @@
+{
+  "name": "Hà Nội Xanh - Admin Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.HNX_SUPABASE_URL + '/rest/v1/rpc/prepare_admin_agent_turn' }}",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [
+          { "name": "apikey", "value": "={{ $vars.HNX_SUPABASE_SECRET_KEY || $vars.HNX_SUPABASE_SERVICE_ROLE_KEY }}" },
+          { "name": "Authorization", "value": "={{ 'Bearer ' + ($vars.HNX_SUPABASE_SECRET_KEY || $vars.HNX_SUPABASE_SERVICE_ROLE_KEY) }}" },
+          { "name": "Content-Type", "value": "application/json" }
+        ] },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ requested_user_id: $('Verify Supabase User').item.json.id, requested_thread_id: $('Admin Chat Webhook').item.json.body.thread_id || null, requested_message: $('Admin Chat Webhook').item.json.body.message, requested_client_message_id: $('Admin Chat Webhook').item.json.body.client_message_id || null }) }}",
+        "options": {}
+      },
+      "id": "7485b01a-7596-4dbd-b0e9-f4d1d69bf373",
+      "name": "Prepare Agent Turn",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [176, -96]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "hnx-admin-agent",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "e98c533f-cf26-4e6f-a61d-1d17009cc4d1",
+      "name": "Admin Chat Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-720, 0],
+      "webhookId": "replace-after-import"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $vars.HNX_SUPABASE_URL + '/auth/v1/user' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $vars.HNX_SUPABASE_SECRET_KEY || $vars.HNX_SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Authorization", "value": "={{ $json.headers.authorization }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e3d25913-ff4a-49b6-93f4-f70bcbde9c60",
+      "name": "Verify Supabase User",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [-496, 0]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $vars.HNX_SUPABASE_URL + '/rest/v1/profiles?id=eq.' + $json.id + '&select=id,role&limit=1' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $vars.HNX_SUPABASE_SECRET_KEY || $vars.HNX_SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Authorization", "value": "={{ 'Bearer ' + ($vars.HNX_SUPABASE_SECRET_KEY || $vars.HNX_SUPABASE_SERVICE_ROLE_KEY) }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ab91ace5-abf6-4aeb-bc2c-a820a868a3c6",
+      "name": "Check Admin Role",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [-272, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            { "leftValue": "={{ $json[0].role }}", "rightValue": "admin", "operator": { "type": "string", "operation": "equals" } }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2d5da77d-c1f5-47d2-94a1-87d0e7b296c8",
+      "name": "Is Admin",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [-48, 0]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Admin Chat Webhook').item.json.body.message + '\n\nCONTEXT JSON:\n' + JSON.stringify($json) }}",
+        "options": {
+          "systemMessage": "Bạn là trợ lý vận hành dành cho quản trị viên Hà Nội Xanh. Hiểu mục tiêu, sử dụng skill và tools phù hợp, và duy trì trạng thái công việc. Skill metadata: pollution-campaign-post — tìm địa điểm ô nhiễm tại Hà Nội, tạo, chỉnh sửa, duyệt và xuất bản bài lên website và Threads. Dùng load_skill khi cần quy trình chi tiết. Tool descriptions là hợp đồng kỹ thuật. Chỉ hỏi thông tin bắt buộc còn thiếu. Không bịa dữ kiện hoặc kết quả tool. Trước khi xuất bản phải có xác nhận rõ của admin. Báo riêng kết quả từng kênh."
+        }
+      },
+      "id": "5f53bf2c-b1e0-4050-ae0d-3670e445a4c3",
+      "name": "Admin Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [400, -96]
+    },
+    {
+      "parameters": { "options": {} },
+      "id": "72d9eefa-eb50-4e93-9a8e-705189352f55",
+      "name": "Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [160, 176]
+    },
+    {
+      "parameters": {
+        "description": "Tải nội dung đầy đủ của skill pollution-campaign-post khi cần hướng dẫn nghiệp vụ. Đây không phải cơ chế cấp quyền.",
+        "jsCode": "return JSON.stringify({ name: 'pollution-campaign-post', content: $vars.HNX_SKILL_CONTENT });"
+      },
+      "id": "8f0c92ea-7212-4b2f-a2cb-bab74347d279",
+      "name": "load_skill",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [384, 176]
+    },
+    {
+      "parameters": {
+        "description": "Tìm và lưu địa điểm có bằng chứng ô nhiễm gần đây tại Hà Nội qua Tavily. Phải dùng include_images và include_image_descriptions, trả ngày nguồn, URL, ảnh, nguồn ảnh, trạng thái quyền sử dụng, confidence và finding_id. Không khẳng định hiện tại từ nguồn cũ.",
+        "workflowId": {"__rl":true,"value":"REPLACE_SEARCH_WORKFLOW_ID","mode":"id"}, "workflowInputs":{"mappingMode":"defineBelow","value":{},"matchingColumns":[],"schema":[],"attemptToConvertTypes":false,"convertFieldsToString":false}
+      },
+      "id": "3dc50753-daed-416c-8360-6149107eae57",
+      "name": "search_pollution_locations",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [560, 176]
+    },
+    {
+      "parameters": {
+        "description": "Đọc một pollution finding đã lưu theo thread_id và finding_id. Chỉ trả finding thuộc thread của admin hiện tại.",
+        "workflowId":{"__rl":true,"value":"REPLACE_GET_FINDING_WORKFLOW_ID","mode":"id"},"workflowInputs":{"mappingMode":"defineBelow","value":{},"matchingColumns":[],"schema":[],"attemptToConvertTypes":false,"convertFieldsToString":false}
+      },
+      "id": "7a6cc262-c552-4690-8492-bf14edb71525",
+      "name": "get_pollution_finding",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [736, 176]
+    },
+    {
+      "parameters": {
+        "description": "Tạo draft website và Threads từ finding đã chọn. cleanup_start_at bắt buộc; nếu thiếu trả missing_information. Tạo nguồn, ảnh, file HTML và preview nhưng không xuất bản.",
+        "workflowId":{"__rl":true,"value":"REPLACE_CREATE_DRAFT_WORKFLOW_ID","mode":"id"},"workflowInputs":{"mappingMode":"defineBelow","value":{},"matchingColumns":[],"schema":[],"attemptToConvertTypes":false,"convertFieldsToString":false}
+      },
+      "id": "2aa0bd0e-67fd-460f-9d62-fc0057f5694e",
+      "name": "create_cleanup_post_draft",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [912, 176]
+    },
+    {
+      "parameters": {
+        "description": "Đọc draft và version mới nhất theo thread_id và draft_id. Không trả draft của thread khác.",
+        "workflowId":{"__rl":true,"value":"REPLACE_GET_DRAFT_WORKFLOW_ID","mode":"id"},"workflowInputs":{"mappingMode":"defineBelow","value":{},"matchingColumns":[],"schema":[],"attemptToConvertTypes":false,"convertFieldsToString":false}
+      },
+      "id": "48193946-aa46-4b40-af06-f64768ad1afa",
+      "name": "get_post_draft",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [1088, 176]
+    },
+    {
+      "parameters": {
+        "description": "Áp dụng feedback vào base_version của draft, giữ draft_id, tạo version mới và render lại preview. Không sửa version đã duyệt và không xuất bản.",
+        "workflowId":{"__rl":true,"value":"REPLACE_REVISE_DRAFT_WORKFLOW_ID","mode":"id"},"workflowInputs":{"mappingMode":"defineBelow","value":{},"matchingColumns":[],"schema":[],"attemptToConvertTypes":false,"convertFieldsToString":false}
+      },
+      "id": "b09897c9-e961-4c99-a7b0-829c340e821e",
+      "name": "revise_post_draft",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [1264, 176]
+    },
+    {
+      "parameters": {
+        "description": "Duyệt chính xác version mới nhất sau xác nhận rõ của admin. Từ chối version cũ, thiếu confirmation_text hoặc người dùng không phải admin.",
+        "workflowId":{"__rl":true,"value":"REPLACE_APPROVE_DRAFT_WORKFLOW_ID","mode":"id"},"workflowInputs":{"mappingMode":"defineBelow","value":{},"matchingColumns":[],"schema":[],"attemptToConvertTypes":false,"convertFieldsToString":false}
+      },
+      "id": "37b2d1ba-2aa7-4894-a2ee-fe312993ebff",
+      "name": "approve_post_draft",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [1440, 176]
+    },
+    {
+      "parameters": {
+        "description": "Đăng hoặc lên lịch version đã duyệt vào bảng posts của website. Kiểm tra admin, version, confirmation và idempotency. publish_at null chỉ hợp lệ khi publish_now true và admin nói rõ đăng luôn.",
+        "workflowId":{"__rl":true,"value":"REPLACE_PUBLISH_WEBSITE_WORKFLOW_ID","mode":"id"},"workflowInputs":{"mappingMode":"defineBelow","value":{},"matchingColumns":[],"schema":[],"attemptToConvertTypes":false,"convertFieldsToString":false}
+      },
+      "id": "3e4a24ca-3882-4a0b-aa92-a3040e358bb1",
+      "name": "publish_website_post",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [1616, 176]
+    },
+    {
+      "parameters": {
+        "description": "Đăng hoặc lên lịch version đã duyệt lên Threads. Tạo media container bằng THREADS_USER_ID và ảnh public, chờ container sẵn sàng rồi gọi threads_publish. Kiểm tra độc lập quyền, version, confirmation và idempotency.",
+        "workflowId":{"__rl":true,"value":"REPLACE_PUBLISH_THREADS_WORKFLOW_ID","mode":"id"},"workflowInputs":{"mappingMode":"defineBelow","value":{},"matchingColumns":[],"schema":[],"attemptToConvertTypes":false,"convertFieldsToString":false}
+      },
+      "id": "36497b13-049e-470e-9aef-867d64e54755",
+      "name": "publish_threads_post",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [1792, 176]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.HNX_SUPABASE_URL + '/rest/v1/rpc/finalize_admin_agent_turn' }}",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [
+          { "name": "apikey", "value": "={{ $vars.HNX_SUPABASE_SECRET_KEY || $vars.HNX_SUPABASE_SERVICE_ROLE_KEY }}" },
+          { "name": "Authorization", "value": "={{ 'Bearer ' + ($vars.HNX_SUPABASE_SECRET_KEY || $vars.HNX_SUPABASE_SERVICE_ROLE_KEY) }}" },
+          { "name": "Content-Type", "value": "application/json" }
+        ] },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ requested_thread_id: $('Prepare Agent Turn').item.json.thread_id, assistant_message: $json.output, requested_workflow_state: 'active' }) }}",
+        "options": {}
+      },
+      "id": "a36f5df6-38c0-45cc-b699-21a311e34f03",
+      "name": "Persist Agent Response",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [656, -96]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "9fe2271c-27b1-455b-a56f-377e40c51cc3",
+      "name": "Return Agent Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [880, -96]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { error: 'forbidden', message: 'Tài khoản không có quyền admin.' } }}",
+        "options": { "responseCode": 403 }
+      },
+      "id": "ae50ad5f-6adc-4919-bc83-60e565f38f4d",
+      "name": "Return Forbidden",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [208, 96]
+    }
+  ],
+  "connections": {
+    "Admin Chat Webhook": { "main": [[{ "node": "Verify Supabase User", "type": "main", "index": 0 }]] },
+    "Verify Supabase User": { "main": [[{ "node": "Check Admin Role", "type": "main", "index": 0 }]] },
+    "Check Admin Role": { "main": [[{ "node": "Is Admin", "type": "main", "index": 0 }]] },
+    "Is Admin": { "main": [[{ "node": "Prepare Agent Turn", "type": "main", "index": 0 }], [{ "node": "Return Forbidden", "type": "main", "index": 0 }]] },
+    "Prepare Agent Turn": { "main": [[{ "node": "Admin Agent", "type": "main", "index": 0 }]] },
+    "Gemini Chat Model": { "ai_languageModel": [[{ "node": "Admin Agent", "type": "ai_languageModel", "index": 0 }]] },
+    "load_skill": { "ai_tool": [[{ "node": "Admin Agent", "type": "ai_tool", "index": 0 }]] },
+    "search_pollution_locations": { "ai_tool": [[{ "node": "Admin Agent", "type": "ai_tool", "index": 0 }]] },
+    "get_pollution_finding": { "ai_tool": [[{ "node": "Admin Agent", "type": "ai_tool", "index": 0 }]] },
+    "create_cleanup_post_draft": { "ai_tool": [[{ "node": "Admin Agent", "type": "ai_tool", "index": 0 }]] },
+    "get_post_draft": { "ai_tool": [[{ "node": "Admin Agent", "type": "ai_tool", "index": 0 }]] },
+    "revise_post_draft": { "ai_tool": [[{ "node": "Admin Agent", "type": "ai_tool", "index": 0 }]] },
+    "approve_post_draft": { "ai_tool": [[{ "node": "Admin Agent", "type": "ai_tool", "index": 0 }]] },
+    "publish_website_post": { "ai_tool": [[{ "node": "Admin Agent", "type": "ai_tool", "index": 0 }]] },
+    "publish_threads_post": { "ai_tool": [[{ "node": "Admin Agent", "type": "ai_tool", "index": 0 }]] },
+    "Admin Agent": { "main": [[{ "node": "Persist Agent Response", "type": "main", "index": 0 }]] },
+    "Persist Agent Response": { "main": [[{ "node": "Return Agent Response", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "versionId": "1d09f008-d138-4204-a79b-cba7b1fa52ec",
+  "meta": { "templateCredsSetupCompleted": false },
+  "tags": []
+}

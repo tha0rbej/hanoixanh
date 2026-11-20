@@ -473,6 +473,30 @@
 .admin-badge-editor-title > span { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 50%; background: #dcfce7; color: #15803d; }
 .admin-badge-editor-title .link-danger { padding: 7px; }
 .admin-reward-notice { margin: 12px 0 0; color: #166534; font-size: 13px; font-weight: 700; }
+.agent-console { display: grid; gap: 20px; }
+.agent-chat-panel { display: grid; gap: 16px; }
+.agent-messages { min-height: 300px; max-height: 540px; display: grid; align-content: start; gap: 12px; overflow-y: auto; padding: 16px; border: 1px solid #e2ebe5; border-radius: 12px; background: #f8fbf9; }
+.agent-message { max-width: min(760px, 88%); padding: 12px 14px; border: 1px solid #dce8df; border-radius: 12px; background: white; }
+.agent-message.admin { justify-self: end; border-color: #b7ddc2; background: #ecfdf3; }
+.agent-message strong { display: block; margin-bottom: 5px; color: #166534; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.agent-message p { margin: 0; color: #263b30; line-height: 1.55; white-space: pre-wrap; }
+.agent-composer { display: grid; gap: 10px; }
+.agent-composer .admin-primary { justify-self: end; margin-top: 0; }
+.agent-finding-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.agent-finding { overflow: hidden; border: 1px solid #e2ebe5; border-radius: 12px; background: #fbfdfb; }
+.agent-finding > img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #edf5ef; }
+.agent-finding > div { padding: 15px; }
+.agent-finding h3 { margin: 10px 0 3px; color: #0f382c; font-size: 17px; }
+.agent-finding small { color: #64748b; }
+.agent-finding p { color: #41584b; line-height: 1.5; }
+.agent-finding a { color: #166534; font-weight: 800; }
+.agent-finding button, .agent-draft-actions button, .agent-draft-actions a { display: inline-flex; margin-top: 12px; border: 1px solid #15803d; border-radius: 8px; padding: 9px 12px; background: white; color: #166534; font: inherit; font-size: 12px; font-weight: 800; text-decoration: none; cursor: pointer; }
+.agent-finding button { width: 100%; justify-content: center; }
+.agent-draft > img { width: min(560px, 100%); max-height: 320px; object-fit: cover; border-radius: 12px; }
+.agent-draft-copy { max-width: 800px; margin-top: 18px; color: #31483b; line-height: 1.65; white-space: pre-wrap; }
+.agent-draft-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.agent-setup p { color: #52665b; line-height: 1.6; }
+.agent-setup code { border-radius: 5px; padding: 2px 5px; background: #edf5ef; color: #0f382c; }
 
 /* The news manager is built inside the dashboard at runtime. Give its direct table
    the same visual structure as every table wrapped in .admin-table-wrap. */

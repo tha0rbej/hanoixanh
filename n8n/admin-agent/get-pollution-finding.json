@@ -1,0 +1,8 @@
+{
+  "name":"HNX Tool - Get Pollution Finding",
+  "nodes":[
+    {"parameters":{"workflowInputs":{"values":[{"name":"thread_id"},{"name":"finding_id"}]}},"id":"11f8064e-dbf7-42ca-b214-fbf6c0a0bf56","name":"When Executed by Another Workflow","type":"n8n-nodes-base.executeWorkflowTrigger","typeVersion":1.1,"position":[-240,0]},
+    {"parameters":{"operation":"getAll","tableId":"pollution_findings","limit":1,"filterType":"manual","matchType":"allFilters","filters":{"conditions":[{"keyName":"id","condition":"eq","keyValue":"={{ $json.finding_id }}"},{"keyName":"thread_id","condition":"eq","keyValue":"={{ $json.thread_id }}"}]}},"id":"c4d1ac70-202d-4b4c-ab1d-ea2cb903a90e","name":"Get Finding","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[0,0],"credentials":{"supabaseApi":{"id":"REPLACE_SUPABASE_CREDENTIAL_ID","name":"HNX Supabase Server"}}}
+  ],
+  "connections":{"When Executed by Another Workflow":{"main":[[{"node":"Get Finding","type":"main","index":0}]]}},"active":false,"settings":{"executionOrder":"v1"},"tags":[]
+}

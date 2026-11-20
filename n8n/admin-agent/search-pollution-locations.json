@@ -1,0 +1,34 @@
+{
+  "name": "HNX Tool - Search Pollution Locations",
+  "nodes": [
+    {
+      "parameters": { "workflowInputs": { "values": [{"name":"thread_id"},{"name":"query"},{"name":"time_range_days","type":"number"},{"name":"max_results","type":"number"}] } },
+      "id": "6e1abf56-0367-43a5-b9b8-aa11885848fb", "name": "When Executed by Another Workflow", "type": "n8n-nodes-base.executeWorkflowTrigger", "typeVersion": 1.1, "position": [-640, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST", "url": "https://api.tavily.com/search", "authentication": "genericCredentialType", "genericAuthType": "httpHeaderAuth", "sendBody": true, "contentType": "raw", "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ query: $json.query + ' Hà Nội nguồn mới nhất', topic: 'news', search_depth: 'advanced', days: Number($json.time_range_days || 30), max_results: Math.min(Number($json.max_results || 5), 10), include_images: true, include_image_descriptions: true, include_answer: false }) }}", "options": {}
+      },
+      "id": "c2dd5008-f672-44ab-99d4-e78478d34b45", "name": "Search Tavily", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [-416, 0],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE_TAVILY_CREDENTIAL_ID", "name": "HNX Tavily Search" } }
+    },
+    {
+      "parameters": { "jsCode": "const request = $('When Executed by Another Workflow').first().json; const data = $input.first().json; const images = Array.isArray(data.images) ? data.images : []; return (data.results || []).map((result, index) => ({ json: { thread_id: request.thread_id, location_name: result.title || 'Địa điểm cần xác minh', district: null, address: null, pollution_type: 'chưa phân loại', summary: String(result.content || '').slice(0, 3000), observed_at: result.published_date || null, confidence: result.score >= 0.75 ? 'high' : result.score >= 0.45 ? 'medium' : 'low', sources: [{ title: result.title, url: result.url, published_at: result.published_date || null }], images: images[index] ? [{ url: typeof images[index] === 'string' ? images[index] : images[index].url, caption: typeof images[index] === 'string' ? '' : images[index].description, source_url: result.url, license_status: 'unknown' }] : [] } }));" },
+      "id": "eb2016e9-5aa0-4690-8a16-d174b568c3b3", "name": "Normalize Findings", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [-192, 0]
+    },
+    {
+      "parameters": { "operation": "create", "tableId": "pollution_findings", "fieldsUi": { "fieldValues": [
+        {"fieldId":"thread_id","fieldValue":"={{ $json.thread_id }}"},{"fieldId":"location_name","fieldValue":"={{ $json.location_name }}"},{"fieldId":"district","fieldValue":"={{ $json.district }}"},{"fieldId":"pollution_type","fieldValue":"={{ $json.pollution_type }}"},{"fieldId":"summary","fieldValue":"={{ $json.summary }}"},{"fieldId":"observed_at","fieldValue":"={{ $json.observed_at }}"},{"fieldId":"confidence","fieldValue":"={{ $json.confidence }}"},{"fieldId":"sources","fieldValue":"={{ $json.sources }}"},{"fieldId":"images","fieldValue":"={{ $json.images }}"}
+      ] } },
+      "id": "4ea14330-d066-4ca6-8510-fdc24d503d9d", "name": "Save Findings", "type": "n8n-nodes-base.supabase", "typeVersion": 1, "position": [32, 0],
+      "credentials": { "supabaseApi": { "id": "REPLACE_SUPABASE_CREDENTIAL_ID", "name": "HNX Supabase Server" } }
+    },
+    {
+      "parameters": { "jsCode": "return [{ json: { status: 'ok', findings: $input.all().map(item => ({ ...item.json, finding_id: item.json.id })) } }];" },
+      "id": "0f0d7466-b876-4652-9614-c20688060a1f", "name": "Return Findings", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [256, 0]
+    }
+  ],
+  "connections": { "When Executed by Another Workflow":{"main":[[{"node":"Search Tavily","type":"main","index":0}]]}, "Search Tavily":{"main":[[{"node":"Normalize Findings","type":"main","index":0}]]}, "Normalize Findings":{"main":[[{"node":"Save Findings","type":"main","index":0}]]}, "Save Findings":{"main":[[{"node":"Return Findings","type":"main","index":0}]]} },
+  "active": false, "settings": {"executionOrder":"v1"}, "tags": []
+}

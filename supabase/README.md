@@ -11,6 +11,7 @@ where email = 'admin@example.com';
 
 3. Tạo `.env.local` ở thư mục gốc từ `env.example` và điền Project URL cùng anon key. Không dùng service-role key ở frontend.
 4. Storage bucket `hnx-media` được migration tạo tự động; tài khoản đã đăng nhập có thể upload ảnh báo cáo, còn ảnh quản trị bài viết/điểm dọn dẹp được kiểm soát bởi RLS.
+5. Migration `20261119000000_admin_agent.sql` tạo state, draft/version, publication jobs và audit log cho Admin Agent. Hai RPC `prepare_admin_agent_turn` và `finalize_admin_agent_turn` chỉ cấp quyền cho `service_role`; chỉ gọi chúng từ n8n bằng Supabase Secret key, không gọi từ trình duyệt.
 
 Các bảng dùng `campaign_key` để tương thích với chiến dịch HTML hiện tại. Khi admin tạo chiến dịch mới, frontend dùng UUID `campaign_id`; các chiến dịch cũ có thể được nhập dần sau.
 ## Email xác nhận tài khoản
