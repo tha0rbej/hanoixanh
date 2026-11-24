@@ -446,10 +446,26 @@ export async function rpc<T>(functionName: string, values: unknown, token: strin
   return parseResponse<T>(response)
 }
 
+function tokenSubject(token: string) {
+  try {
+    const encoded = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")
+    const payload = JSON.parse(window.atob(encoded.padEnd(encoded.length + (4 - encoded.length % 4) % 4, "="))) as { sub?: string }
+    return payload.sub || ""
+  } catch { return "" }
+}
+
+// Keep in sync with file_size_limit of the hnx-media bucket (20261122010000_harden_media_storage.sql).
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024
+
 export async function uploadPublicFile(file: File, token: string) {
   requireConfig()
+  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"]
+  const userId = tokenSubject(token)
+  if (!userId) throw new Error("Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.")
+  if (!allowedTypes.includes(file.type)) throw new Error("Chỉ chấp nhận ảnh JPG, PNG, WEBP hoặc GIF.")
+  if (file.size > MAX_UPLOAD_BYTES) throw new Error("Ảnh quá lớn. Vui lòng chọn ảnh nhỏ hơn 10 MB.")
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-")
-  const path = `${crypto.randomUUID()}-${safeName}`
+  const path = `${userId}/${crypto.randomUUID()}-${safeName}`
   const response = await fetch(`${supabaseUrl}/storage/v1/object/hnx-media/${path}`, {
     method: "POST",
     headers: { apikey: supabaseAnonKey!, Authorization: `Bearer ${token}`, "Content-Type": file.type || "application/octet-stream" },
