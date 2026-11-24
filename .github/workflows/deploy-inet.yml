@@ -28,11 +28,28 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
+
+      - name: Test
+        run: pnpm test
+
+      - name: Test n8n workflows
+        run: pnpm test:n8n
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Test mailer
+        run: python3 -m unittest discover -s mailer -p 'test_*.py'
+
       - name: Build
         run: pnpm build
         env:
           VITE_SUPABASE_URL: https://insdsjxaekwsjqzonqgo.supabase.co
           VITE_SUPABASE_ANON_KEY: sb_publishable_-B0wcZidFhnLGEiEDDufmQ_W29HaI6i
+          VITE_N8N_ADMIN_AGENT_WEBHOOK_URL: ${{ vars.VITE_N8N_ADMIN_AGENT_WEBHOOK_URL }}
 
       - name: Add .htaccess and robots.txt
         run: |
@@ -44,6 +61,13 @@ jobs:
           RewriteCond %{REQUEST_FILENAME} -d
           RewriteRule ^ - [L]
           RewriteRule ^ index.html [L]
+
+          <IfModule mod_headers.c>
+          Header always set X-Frame-Options "SAMEORIGIN"
+          Header always set Content-Security-Policy "frame-ancestors 'self'"
+          Header always set X-Content-Type-Options "nosniff"
+          Header always set Referrer-Policy "strict-origin-when-cross-origin"
+          </IfModule>
           HT
           printf 'User-agent: *\nAllow: /\n' > dist/robots.txt
 

@@ -9,7 +9,11 @@
     "preview": "vite preview",
     "format": "oxfmt",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:n8n": "node --test n8n/admin-agent/tests/*-test.js",
+    "test:mailer": "python3 -m unittest discover -s mailer -p 'test_*.py'",
+    "test:all": "pnpm test && pnpm test:n8n && pnpm test:mailer",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",

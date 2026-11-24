@@ -19,3 +19,11 @@ logs/
 # beside it.
 /.plugins/
 /.opencode-skills/
+
+# Local helper binaries
+.tools/
+
+# Python bytecode and the mailer's run lock
+__pycache__/
+*.pyc
+.mailer.lock
