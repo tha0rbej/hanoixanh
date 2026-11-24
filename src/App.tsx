@@ -46,22 +46,13 @@ type ParticipationSummaryRow = {
 type CampaignSummaryRow = { id: string; title?: string; location?: string; start_at?: string; reward_points?: number }
 type RewardMetricRow = { metric_key: string; metric_value: unknown }
 
-const campaignRegistrationWebhookUrl = "https://hanoixanh.app.n8n.cloud/webhook/3a99fa36-f158-4b77-8b52-f6b30a52c044"
-
-function formatCampaignDateTime(value?: string) {
-  if (!value) return ""
-  const date = new Date(value)
-  if (Number.isNaN(date.valueOf())) return ""
-  const parts = new Intl.DateTimeFormat("vi-VN", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  }).formatToParts(date)
-  const getPart = (type: Intl.DateTimeFormatPartTypes) => parts.find(part => part.type === type)?.value || ""
-  return `${getPart("day")}/${getPart("month")}/${getPart("year")} ${getPart("hour")}:${getPart("minute")} ${getPart("dayPeriod")}`
+type PollutionReport = {
+  location?: string
+  description?: string
+  latitude?: number
+  longitude?: number
+  image?: File | null
+  images?: File[]
 }
 
 function volunteerLevel(campaigns: number, hours: number) {
@@ -88,7 +79,7 @@ function SourceFrame({
   const { session, profile, refreshProfile, signOut, changePassword } = useAuth()
   const frameRef = useRef<HTMLIFrameElement>(null)
   const authStateRequestRef = useRef(0)
-  const pendingReportRef = useRef<{ location?: string; description?: string; latitude?: number; longitude?: number; image?: File | null; images?: File[] } | null>(null)
+  const pendingReportRef = useRef<PollutionReport | null>(null)
   const baseUrl = import.meta.env.BASE_URL.endsWith("/")
     ? import.meta.env.BASE_URL
     : `${import.meta.env.BASE_URL}/`
@@ -173,9 +164,26 @@ function SourceFrame({
     }, window.location.origin)
   }
 
+  const submitPollutionReport = async (report: PollutionReport, accessToken: string, userId: string) => {
+    try {
+      const images = Array.isArray(report.images) ? report.images : (report.image ? [report.image] : [])
+      const photoUrls = await Promise.all(images.filter((image): image is File => image instanceof File).map(image => uploadPublicFile(image, accessToken)))
+      const record = { user_id: userId, location_name: report.location, address: report.location, latitude: report.latitude || null, longitude: report.longitude || null, description: report.description, photo_url: photoUrls[0] || null, status: "new", severity: "medium" }
+      try {
+        await tableInsertMinimal("pollution_reports", { ...record, photo_urls: photoUrls }, accessToken)
+      } catch (cause) {
+        if (!String(cause).includes("photo_urls")) throw cause
+        await tableInsertMinimal("pollution_reports", record, accessToken)
+      }
+      trackEvent("pollution_report_success", { report_type: "pollution" })
+      frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: true }, window.location.origin)
+    } catch (error) { frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: false, message: error instanceof Error ? error.message : "Không gửi được báo cáo." }, window.location.origin) }
+  }
+
   useEffect(() => {
     const receiveNavigation = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return
+      if (event.source !== frameRef.current?.contentWindow) return
       const message = event.data as { type?: string; path?: string; section?: string; tab?: "login" | "register" | "reset"; campaignKey?: string; location?: string; description?: string; email?: string; latitude?: number; longitude?: number; fullName?: string; phone?: string; organization?: string; organizationType?: string; birthDate?: string; gender?: string; address?: string; occupation?: string; interests?: string; bio?: string; currentPassword?: string; newPassword?: string; image?: File; images?: File[]; rewardId?: string; points?: number; deliveryAddress?: string }
       if (message?.type === "hnx:navigate" && message.path && allowedPaths.has(message.path)) {
         const section = message.section?.replace(/[^a-z0-9-]/gi, "")
@@ -218,29 +226,12 @@ function SourceFrame({
         void tableSelect<{ id: string }>("campaign_registrations", "id", session.access_token, `&user_id=eq.${encodeURIComponent(session.user.id)}&campaign_key=eq.${encodeURIComponent(message.campaignKey || "")}&limit=1`)
           .then((existing) => { if (existing.length) throw new Error("Bạn đã đăng ký tham gia chiến dịch này rồi."); return tableInsert("campaign_registrations", { user_id: session.user.id, campaign_key: message.campaignKey, status: "registered" }, session.access_token) })
           .then(async () => {
-            const campaignKey = message.campaignKey || ""
-            void tableSelect<{ title?: string; start_at?: string; end_at?: string }>("campaigns", "title,start_at,end_at", session.access_token, `&id=eq.${encodeURIComponent(campaignKey)}&limit=1`)
-              .then(([campaign]) => fetch(campaignRegistrationWebhookUrl, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  ten: profile?.full_name || "",
-                  email: profile?.email || session.user.email || "",
-                  chien_dich: campaign?.title || campaignKey,
-                  thoi_gian_bat_dau: formatCampaignDateTime(campaign?.start_at),
-                  thoi_gian_ket_thuc: formatCampaignDateTime(campaign?.end_at),
-                }),
-              }))
-              .then((response) => {
-                if (!response.ok) throw new Error(`Webhook n8n trả về HTTP ${response.status}.`)
-              })
-              .catch((error) => console.error("Không thể gửi đăng ký chiến dịch sang n8n:", error))
             frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaign-register-result", ok: true }, window.location.origin)
             trackEvent("volunteer_registration_success", { campaign_id: message.campaignKey || "unknown" })
             await sendCampaignsState()
             void sendAuthState()
           })
-          .catch((error: Error) => frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaign-register-result", ok: false, message: error.message.includes("duplicate") ? "Bạn đã đăng ký tham gia chiến dịch này rồi." : error.message }, window.location.origin))
+          .catch((error: Error) => frameRef.current?.contentWindow?.postMessage({ type: "hnx:campaign-register-result", ok: false, message: error.message.includes("duplicate") ? "Bạn đã đăng ký tham gia chiến dịch này rồi." : error.message.includes("row-level security") ? "Chiến dịch này không còn hợp lệ. Vui lòng tải lại trang và thử lại." : error.message }, window.location.origin))
         return
       }
       if (message?.type === "hnx:green-redeem") {
@@ -273,20 +264,7 @@ function SourceFrame({
       }
       if (message?.type === "hnx:pollution-report") {
         if (!session) { pendingReportRef.current = message; onAuth("login"); return }
-        void (async () => {
-          try {
-            const images = Array.isArray(message.images) ? message.images : (message.image ? [message.image] : [])
-            const photoUrls = await Promise.all(images.filter((image): image is File => image instanceof File).map(image => uploadPublicFile(image, session.access_token)))
-            try {
-              await tableInsertMinimal("pollution_reports", { user_id: session.user.id, location_name: message.location, address: message.location, latitude: message.latitude || null, longitude: message.longitude || null, description: message.description, photo_url: photoUrls[0] || null, photo_urls: photoUrls, status: "new", severity: "medium" }, session.access_token)
-            } catch (cause) {
-              if (!String(cause).includes("photo_urls")) throw cause
-              await tableInsertMinimal("pollution_reports", { user_id: session.user.id, location_name: message.location, address: message.location, latitude: message.latitude || null, longitude: message.longitude || null, description: message.description, photo_url: photoUrls[0] || null, status: "new", severity: "medium" }, session.access_token)
-            }
-            trackEvent("pollution_report_success", { report_type: "pollution" })
-            frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: true }, window.location.origin)
-          } catch (error) { frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: false, message: error instanceof Error ? error.message : "Không gửi được báo cáo." }, window.location.origin) }
-        })()
+        void submitPollutionReport(message, session.access_token, session.user.id)
       }
       if (message?.type === "hnx:profile-update" && session) {
         void (async () => {
@@ -329,20 +307,7 @@ function SourceFrame({
     const report = pendingReportRef.current
     if (!session || !report) return
     pendingReportRef.current = null
-    void (async () => {
-      try {
-        const images = Array.isArray(report.images) ? report.images : (report.image ? [report.image] : [])
-        const photoUrls = await Promise.all(images.filter((image): image is File => image instanceof File).map(image => uploadPublicFile(image, session.access_token)))
-        try {
-          await tableInsertMinimal("pollution_reports", { user_id: session.user.id, location_name: report.location, address: report.location, latitude: report.latitude || null, longitude: report.longitude || null, description: report.description, photo_url: photoUrls[0] || null, photo_urls: photoUrls, status: "new", severity: "medium" }, session.access_token)
-        } catch (cause) {
-          if (!String(cause).includes("photo_urls")) throw cause
-          await tableInsertMinimal("pollution_reports", { user_id: session.user.id, location_name: report.location, address: report.location, latitude: report.latitude || null, longitude: report.longitude || null, description: report.description, photo_url: photoUrls[0] || null, status: "new", severity: "medium" }, session.access_token)
-        }
-        trackEvent("pollution_report_success", { report_type: "pollution" })
-        frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: true }, window.location.origin)
-      } catch (error) { frameRef.current?.contentWindow?.postMessage({ type: "hnx:pollution-report-result", ok: false, message: error instanceof Error ? error.message : "Không gửi được báo cáo." }, window.location.origin) }
-    })()
+    void submitPollutionReport(report, session.access_token, session.user.id)
   }, [session])
 
   useEffect(() => {
@@ -431,7 +396,7 @@ function SourceFrame({
   useEffect(() => {
     if (!['home', 'about', 'remaining'].includes(page)) return
     const refresh = () => { void sendCampaignsState() }
-    const timer = window.setInterval(refresh, 10000)
+    const timer = window.setInterval(refresh, 60000)
     window.addEventListener('focus', refresh)
     document.addEventListener('visibilitychange', refresh)
     return () => {

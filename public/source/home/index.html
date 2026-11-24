@@ -698,14 +698,14 @@
      HEADER 
 ===================================================== -->
 <header class="site-header home-header">
-    <div class="logo-area" onclick="window.parent.postMessage({type:'hnx:navigate', path:'/'}, '*')">
+    <div class="logo-area" onclick="window.parent.postMessage({type:'hnx:navigate', path:'/'}, window.location.origin)">
         <img src="logo.png" alt="Logo Hà Nội Xanh">
         <span class="site-brand-copy"><strong>HÀ NỘI XANH</strong><small>Vì một Hà Nội xanh</small></span>
     </div>
 
     <nav id="homeSiteNav">
         <ul>
-            <li><a href="../../" target="_parent" class="active" onclick="event.preventDefault(); window.parent.postMessage({type:'hnx:navigate', path:'/'}, '*')">Trang chủ</a></li>
+            <li><a href="../../" target="_parent" class="active" onclick="event.preventDefault(); window.parent.postMessage({type:'hnx:navigate', path:'/'}, window.location.origin)">Trang chủ</a></li>
             <li class="nav-dropdown">
                 <button class="nav-dropdown-trigger" type="button" aria-expanded="false" aria-haspopup="true">Về Hà Nội Xanh <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>
                 <div class="nav-dropdown-menu" role="menu">
@@ -730,7 +730,7 @@
             <i class="fa-regular fa-heart"></i>
             Quyên tặng
         </a>
-        <a href="#" onclick="event.preventDefault(); window.parent.postMessage({type:'hnx:auth-open', tab:'login'}, '*')" class="btn-login account-trigger"><img id="homeAccountAvatar" class="account-avatar" src="logo.png" alt="Avatar" hidden><span id="homeAccountName">Đăng nhập</span><i id="homeAccountCaret" class="fa-solid fa-chevron-down" hidden></i></a>
+        <a href="#" onclick="event.preventDefault(); window.parent.postMessage({type:'hnx:auth-open', tab:'login'}, window.location.origin)" class="btn-login account-trigger"><img id="homeAccountAvatar" class="account-avatar" src="logo.png" alt="Avatar" hidden><span id="homeAccountName">Đăng nhập</span><i id="homeAccountCaret" class="fa-solid fa-chevron-down" hidden></i></a>
     </div>
 </header>
 
@@ -1291,7 +1291,7 @@
     }
 
     function openHomeDonateModal() {
-        if (window.parent !== window) window.parent.postMessage({ type: 'hnx:donation-info' }, '*');
+        if (window.parent !== window) window.parent.postMessage({ type: 'hnx:donation-info' }, window.location.origin);
         document.getElementById('homeDonateModal')?.classList.add('open');
         document.body.style.overflow = 'hidden';
     }
@@ -1313,7 +1313,7 @@
         event.preventDefault();
         const input = document.getElementById('userMsgInput');
         if (!input.value.trim()) return;
-        if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:contact-message', description: input.value.trim() }, '*'); return; }
+        if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:contact-message', description: input.value.trim() }, window.location.origin); return; }
         alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!');
         input.value = '';
     }
@@ -1347,12 +1347,12 @@
     document.getElementById('homeCampaignRegister').addEventListener('click', function() {
         if (!activeHomeCampaignId) return;
         if (!homeCurrentUser) {
-            window.parent.postMessage({ type: 'hnx:auth-open', tab: 'login' }, '*');
+            window.parent.postMessage({ type: 'hnx:auth-open', tab: 'login' }, window.location.origin);
             return;
         }
         this.disabled = true;
         this.textContent = 'ĐANG ĐĂNG KÝ...';
-        window.parent.postMessage({ type: 'hnx:campaign-register', campaignKey: activeHomeCampaignId }, '*');
+        window.parent.postMessage({ type: 'hnx:campaign-register', campaignKey: activeHomeCampaignId }, window.location.origin);
     });
 
     function homeCampaignTime(value) {
@@ -1440,6 +1440,7 @@
         }).join('');
     }
     window.addEventListener('message', function(event) {
+        if (event.origin !== window.location.origin || event.source !== window.parent) return;
         if (event.data?.type === 'hnx:posts-data') { renderHomeNews(event.data.posts || []); return; }
         if (event.data?.type === 'hnx:contact-message-result') { if (event.data.ok) { alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!'); document.getElementById('userMsgInput').value = ''; } else alert(event.data.message || 'Không thể gửi lời nhắn.'); return; }
         if (event.data?.type === 'hnx:campaign-register-result') {
@@ -1494,15 +1495,15 @@
             if (event.data.user) accountAvatar.src = event.data.user.avatarUrl || 'logo.png';
             loginButton.onclick = function(e) {
                 e.preventDefault();
-                if (!event.data.user) { window.parent.postMessage({type:'hnx:auth-open', tab:'login'}, '*'); return; }
+                if (!event.data.user) { window.parent.postMessage({type:'hnx:auth-open', tab:'login'}, window.location.origin); return; }
                 let menu = document.getElementById('homeAccountMenu');
                 if (!menu) { menu = document.createElement('div'); menu.id = 'homeAccountMenu'; menu.style.cssText = 'position:absolute;right:0;top:calc(100% + 10px);z-index:20;width:200px;padding:10px 16px;border:1px solid #d1fae5;border-radius:14px;background:#fff;color:#111827;font-size:13px;line-height:1.2;box-shadow:0 12px 30px rgba(0,0,0,.12);text-align:left'; loginButton.parentElement.style.position = 'relative'; loginButton.parentElement.appendChild(menu); }
                 if (menu) {
                     menu.innerHTML = '<button id="homeProfileLink" type="button" style="display:block;width:100%;padding:10px 0;border:0;background:transparent;text-align:left;font-weight:700;cursor:pointer">Hồ sơ cá nhân</button><button id="homeLogoutLink" type="button" style="display:block;width:100%;padding:10px 0;border:0;background:transparent;text-align:left;color:#b91c1c;font-weight:700;cursor:pointer">Đăng xuất</button>';
                     menu.onclick = function(e) {
                         e.stopPropagation();
-                        if (e.target.id === 'homeProfileLink') window.parent.postMessage({type:'hnx:navigate', path:'/ho-so'}, '*');
-                        if (e.target.id === 'homeLogoutLink' && window.confirm('Bạn có chắc chắn muốn đăng xuất không?')) window.parent.postMessage({type:'hnx:signout'}, '*');
+                        if (e.target.id === 'homeProfileLink') window.parent.postMessage({type:'hnx:navigate', path:'/ho-so'}, window.location.origin);
+                        if (e.target.id === 'homeLogoutLink' && window.confirm('Bạn có chắc chắn muốn đăng xuất không?')) window.parent.postMessage({type:'hnx:signout'}, window.location.origin);
                         menu.remove();
                     };
                 } else menu.remove();
@@ -1510,12 +1511,19 @@
         }
         let link = document.getElementById('adminDashboardLink');
         if (event.data.user?.role === 'admin') {
-            if (!link) { link = document.createElement('a'); link.id = 'adminDashboardLink'; link.className = 'btn-login'; link.textContent = 'DASHBOARD'; link.href = '#'; link.onclick = function(e) { e.preventDefault(); window.parent.postMessage({ type: 'hnx:navigate', path: '/admin' }, '*'); }; actions.insertBefore(link, actions.lastElementChild); }
+            if (!link) { link = document.createElement('a'); link.id = 'adminDashboardLink'; link.className = 'btn-login'; link.textContent = 'DASHBOARD'; link.href = '#'; link.onclick = function(e) { e.preventDefault(); window.parent.postMessage({ type: 'hnx:navigate', path: '/admin' }, window.location.origin); }; actions.insertBefore(link, actions.lastElementChild); }
         } else if (link) link.remove();
     });
 
     function escapeNewsHtml(value) {
         return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+    }
+
+    function safeNewsUrl(value) {
+        const url = String(value ?? '').trim();
+        const probe = url.replace(/[\x00-\x20]/g, '');
+        if (/^[a-z][a-z0-9+.-]*:/i.test(probe) && !/^https?:/i.test(probe)) return '';
+        return url;
     }
 
     function resolveHomeNewsImage(imageUrl) {
@@ -1537,7 +1545,7 @@
         if (!posts.length) { grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#64748b">Chưa có bài viết nào được xuất bản.</p>'; return; }
         grid.innerHTML = posts.slice(0, 3).map(post => {
             const date = new Date(post.published_at || post.created_at).toLocaleDateString('vi-VN');
-            const url = post.source_url || '#';
+            const url = safeNewsUrl(post.source_url) || '#';
             const image = resolveHomeNewsImage(post.image_url);
             return `<article class="news-card"><img class="news-img" src="${escapeNewsHtml(image)}" alt="${escapeNewsHtml(post.title)}" onerror="this.onerror=null;this.src='news-hanoi-xanh.png'"><div class="news-body"><div class="news-meta"><span><i class="fa-regular fa-calendar"></i> ${date}</span><span><i class="fa-solid fa-newspaper"></i> ${escapeNewsHtml(post.source_name || post.category || 'Hà Nội Xanh')}</span></div><h3 class="news-title"><a href="${escapeNewsHtml(url)}" target="_blank" rel="noopener">${escapeNewsHtml(post.title)}</a></h3><p class="news-desc">${escapeNewsHtml(post.excerpt || post.content || '')}</p><a href="${escapeNewsHtml(url)}" target="_blank" rel="noopener" class="read-more">Đọc tiếp <i class="fa-solid fa-chevron-right"></i></a></div></article>`;
         }).join('');
@@ -1674,7 +1682,7 @@
                 detailJoin.style.display = data.completed ? 'none' : 'inline-flex';
                 detailJoin.onclick = function() {
                     if (data.campaignKey && homeCampaigns.has(String(data.campaignKey))) openHomeCampaignModal(data.campaignKey);
-                    else window.parent.postMessage({ type: 'hnx:navigate', path: '/chien-dich' }, '*');
+                    else window.parent.postMessage({ type: 'hnx:navigate', path: '/chien-dich' }, window.location.origin);
                 };
                 if (moveMap) map.flyTo(data.coords, 14, { animate: true, duration: 1.2 });
             }

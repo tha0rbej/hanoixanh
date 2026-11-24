@@ -778,7 +778,7 @@
         }
         // Sync the profile page with the React authentication layer.
         window.addEventListener('message', function(event) {
-            if (event.origin !== window.location.origin || !event.data) return;
+            if (event.origin !== window.location.origin || event.source !== window.parent || !event.data) return;
             var message = event.data;
             if (message.type === 'hnx:auth-state' && message.user) {
                 document.getElementById('profile-name').value = message.user.name || '';
@@ -793,7 +793,9 @@
                 document.getElementById('profile-joined-at').value = message.user.joinedAt ? new Date(message.user.joinedAt).toLocaleDateString('vi-VN') : '';
                 document.getElementById('header-user-name').textContent = message.user.name || 'Thành viên';
                 document.getElementById('profile-user-name').textContent = message.user.name || 'Thành viên';
-                document.getElementById('profile-level').innerHTML = '<i class="fa-solid fa-leaf"></i> ' + (message.user.level || 'Thành viên mới');
+                const levelBadge = document.getElementById('profile-level');
+                levelBadge.innerHTML = '<i class="fa-solid fa-leaf"></i> ';
+                levelBadge.append(document.createTextNode(message.user.level || 'Thành viên mới'));
                 document.getElementById('profile-campaign-count').textContent = String(message.user.camps || 0);
                 document.getElementById('profile-hours').textContent = String(message.user.hours || 0) + 'h';
                 const points = Number(message.user.points || 0).toLocaleString('vi-VN');

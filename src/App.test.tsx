@@ -44,10 +44,12 @@ describe("source HTML routes", () => {
   it("accepts navigation messages from the supplied HTML", async () => {
     window.history.replaceState({}, "", "/chien-dich")
     render(<App />)
+    const frame = screen.getByTitle("Chiến dịch Hà Nội Xanh") as HTMLIFrameElement
     act(() => {
       window.dispatchEvent(
         new MessageEvent("message", {
           origin: window.location.origin,
+          source: frame.contentWindow,
           data: { type: "hnx:navigate", path: "/ve-ha-noi-xanh" },
         }),
       )
@@ -61,10 +63,12 @@ describe("source HTML routes", () => {
   it("preserves a requested section when navigating to the impact dashboard", async () => {
     window.history.replaceState({}, "", "/chien-dich")
     render(<App />)
+    const frame = screen.getByTitle("Chiến dịch Hà Nội Xanh") as HTMLIFrameElement
     act(() => {
       window.dispatchEvent(
         new MessageEvent("message", {
           origin: window.location.origin,
+          source: frame.contentWindow,
           data: {
             type: "hnx:navigate",
             path: "/tac-dong",
@@ -76,6 +80,21 @@ describe("source HTML routes", () => {
     await waitFor(() => expect(window.location.pathname).toBe("/tac-dong"))
     expect(window.location.hash).toBe("#before-after")
     expect(screen.getByTitle("Tác động cộng đồng")).toBeInTheDocument()
+  })
+
+  it("ignores navigation messages that do not come from the page frame", () => {
+    window.history.replaceState({}, "", "/chien-dich")
+    render(<App />)
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent("message", {
+          origin: window.location.origin,
+          data: { type: "hnx:navigate", path: "/ve-ha-noi-xanh" },
+        }),
+      )
+    })
+    expect(window.location.pathname).toBe("/chien-dich")
+    expect(screen.getByTitle("Chiến dịch Hà Nội Xanh")).toBeInTheDocument()
   })
 
   it("keeps the old introduction URL working", async () => {

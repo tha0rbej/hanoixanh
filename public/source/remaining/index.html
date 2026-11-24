@@ -1766,7 +1766,7 @@
       const zalo = document.getElementById('campaignJoinZalo');
       if (qr && campaignJoinSettings.qr_url) qr.src = campaignJoinSettings.qr_url;
       if (qrWrap) qrWrap.style.display = campaignJoinSettings.qr_url ? 'block' : 'none';
-      if (zalo) { zalo.href = campaignJoinSettings.zalo_url || '#'; zalo.style.display = campaignJoinSettings.zalo_url ? 'inline-block' : 'none'; }
+      if (zalo) { zalo.href = safeImpactUrl(campaignJoinSettings.zalo_url) || '#'; zalo.style.display = campaignJoinSettings.zalo_url ? 'inline-block' : 'none'; }
     }
 
     function openCampaignJoinSuccessModal() {
@@ -1778,11 +1778,11 @@
     }
 
     function navigateParent(path) {
-      window.parent.postMessage({ type: 'hnx:navigate', path }, '*');
+      window.parent.postMessage({ type: 'hnx:navigate', path }, window.location.origin);
     }
 
     function openAuthModal(tab) {
-      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:auth-open', tab: tab }, '*'); return; }
+      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:auth-open', tab: tab }, window.location.origin); return; }
       switchAuthTab(tab);
       document.getElementById('authModal').style.display = 'flex';
     }
@@ -1806,7 +1806,7 @@
 
     function handleHeaderAuthClick() {
       if (currentUser) { document.getElementById('accountMenu')?.classList.toggle('open'); return; }
-      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:auth-open', tab: 'login' }, '*'); return; }
+      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:auth-open', tab: 'login' }, window.location.origin); return; }
       openAuthModal('login');
     }
 
@@ -1857,7 +1857,7 @@
     }
 
     function handleLogout() {
-      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:signout' }, '*'); return; }
+      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:signout' }, window.location.origin); return; }
       currentUser = null;
       applyUserDataToUI();
       alert("Đăng xuất thành công!");
@@ -1885,11 +1885,11 @@
         document.getElementById('uNoHistoryBox').style.display = campaignCount === 0 ? 'block' : 'none';
 
         const avatarBox = document.getElementById('uAvatarCircle');
-        const avatarUrl = currentUser.avatarUrl || currentUser.avatar;
+        const avatarUrl = safeImpactUrl(currentUser.avatarUrl || currentUser.avatar);
         if (avatarUrl) {
-          avatarBox.innerHTML = `<img src="${avatarUrl}" alt="Ảnh đại diện của ${currentUser.name}">`;
+          avatarBox.innerHTML = `<img src="${escapeImpactHtml(avatarUrl)}" alt="Ảnh đại diện của ${escapeImpactHtml(currentUser.name)}">`;
         } else {
-          avatarBox.innerHTML = `<span id="uAvatarText">${currentUser.name.charAt(0).toUpperCase()}</span>`;
+          avatarBox.innerHTML = `<span id="uAvatarText">${escapeImpactHtml(currentUser.name.charAt(0).toUpperCase())}</span>`;
         }
       } else {
         loggedOutBox.style.display = 'flex';
@@ -1911,7 +1911,7 @@
     function handleSaveProfile(e) {
       e.preventDefault();
       if (window.parent !== window) {
-        window.parent.postMessage({ type: 'hnx:profile-update', fullName: document.getElementById('editName').value.trim(), phone: document.getElementById('editPhone').value.trim(), image: document.getElementById('editAvatarFile').files?.[0] || null }, '*');
+        window.parent.postMessage({ type: 'hnx:profile-update', fullName: document.getElementById('editName').value.trim(), phone: document.getElementById('editPhone').value.trim(), image: document.getElementById('editAvatarFile').files?.[0] || null }, window.location.origin);
         closeModal('editProfileModal');
         return;
       }
@@ -1991,7 +1991,7 @@
 
     function openImpactDashboard() {
       if (window.parent !== window) {
-        window.parent.postMessage({ type: 'hnx:navigate', path: '/tac-dong', section: 'before-after' }, '*');
+        window.parent.postMessage({ type: 'hnx:navigate', path: '/tac-dong', section: 'before-after' }, window.location.origin);
         return;
       }
       switchMainView('tac-dong', false);
@@ -2080,7 +2080,7 @@
     }
 
     function registerCampaignFromModal() {
-      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:campaign-register', campaignKey: activeCampaignKey }, '*'); return; }
+      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:campaign-register', campaignKey: activeCampaignKey }, window.location.origin); return; }
       if (!currentUser) {
         alert('Vui lòng đăng nhập để đăng ký tham gia chiến dịch!');
         openAuthModal('login');
@@ -2099,7 +2099,7 @@
       registerCampaignFromModal();
     }
 
-    function openDonateModal() { if (window.parent !== window) window.parent.postMessage({ type: 'hnx:donation-info' }, '*'); document.getElementById('donateModal').style.display = 'flex'; }
+    function openDonateModal() { if (window.parent !== window) window.parent.postMessage({ type: 'hnx:donation-info' }, window.location.origin); document.getElementById('donateModal').style.display = 'flex'; }
 
     const defaultImpactProjects = [
       { title: "Dự án 1 – Chợ Tứ Liên (Tây Hồ)", description: "Mương nước ngập rác sinh hoạt dày đặc ➔ Đã khơi thông dòng chảy hoàn toàn.", before_url: "Picture1.jpg", after_url: "Picture2.jpg", completed_at: "2026-07-27", location: "Chợ Tứ Liên, Tây Hồ, Hà Nội", participants: "45" },
@@ -2116,6 +2116,13 @@
 
     function escapeImpactHtml(value) {
       return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+    }
+
+    function safeImpactUrl(value) {
+      const url = String(value ?? '').trim();
+      const probe = url.replace(/[\x00-\x20]/g, '');
+      if (/^[a-z][a-z0-9+.-]*:/i.test(probe) && !/^https?:/i.test(probe)) return '';
+      return url;
     }
 
     let leaderboardData = { month: [], year: [], all: [] };
@@ -2217,12 +2224,12 @@
       const getImage = (post, index) => escapeImpactHtml(post.image_url || fallbackImages[index % fallbackImages.length]);
       const article = (post, index) => {
         const date = new Date(post.published_at || post.created_at).toLocaleDateString('vi-VN');
-        const url = escapeImpactHtml(post.source_url || '#');
+        const url = escapeImpactHtml(safeImpactUrl(post.source_url) || '#');
         return `<a class="news-story-card" href="${url}" target="_blank" rel="noopener"><div class="news-story-media"><img src="${getImage(post, index + 1)}" alt="${escapeImpactHtml(post.title || '')}"></div><div class="news-story-body"><h3>${escapeImpactHtml(post.title || '')}</h3><p>${escapeImpactHtml(post.excerpt || post.content || '')}</p><div class="news-story-footer"><span>${date} · ${escapeImpactHtml(post.source_name || 'Hà Nội Xanh')}</span><span class="news-story-arrow">→</span></div></div></a>`;
       };
       const [featured, ...others] = posts;
       const date = new Date(featured.published_at || featured.created_at).toLocaleDateString('vi-VN');
-      featuredRoot.innerHTML = `<div class="news-featured-media"><img src="${getImage(featured, 0)}" alt="${escapeImpactHtml(featured.title || '')}"></div><div class="news-featured-body"><div class="news-kicker">Câu chuyện mới nhất</div><h2>${escapeImpactHtml(featured.title || '')}</h2><p>${escapeImpactHtml(featured.excerpt || featured.content || '')}</p><div class="news-meta-row"><span>${date} · ${escapeImpactHtml(featured.source_name || 'Hà Nội Xanh')}</span><a href="${escapeImpactHtml(featured.source_url || '#')}" target="_blank" rel="noopener" class="news-link-read">Đọc bài viết →</a></div></div>`;
+      featuredRoot.innerHTML = `<div class="news-featured-media"><img src="${getImage(featured, 0)}" alt="${escapeImpactHtml(featured.title || '')}"></div><div class="news-featured-body"><div class="news-kicker">Câu chuyện mới nhất</div><h2>${escapeImpactHtml(featured.title || '')}</h2><p>${escapeImpactHtml(featured.excerpt || featured.content || '')}</p><div class="news-meta-row"><span>${date} · ${escapeImpactHtml(featured.source_name || 'Hà Nội Xanh')}</span><a href="${escapeImpactHtml(safeImpactUrl(featured.source_url) || '#')}" target="_blank" rel="noopener" class="news-link-read">Đọc bài viết →</a></div></div>`;
       storyGrid.innerHTML = others.length ? others.map(article).join('') : '<div class="news-empty">Các câu chuyện mới đang được cập nhật.</div>';
     }
 
@@ -2301,13 +2308,14 @@
       if (!descInput.value.trim()) { alert('Vui lòng điền mô tả chi tiết.'); descInput.focus(); return; }
       if (!selectedReportImages.length) { alert('Vui lòng chọn ít nhất một hình ảnh hiện trạng.'); document.getElementById('fileInput').click(); return; }
       if (window.parent !== window) {
-        if (!selectedReportImages.length) return alert('Vui lòng chọn ít nhất một ảnh.'); window.parent.postMessage({ type: 'hnx:pollution-report', location: document.getElementById('reportLocation').value.trim(), description: document.getElementById('reportDesc').value.trim(), latitude: selectedLat, longitude: selectedLng, images: selectedReportImages }, '*');
+        if (!selectedReportImages.length) return alert('Vui lòng chọn ít nhất một ảnh.'); window.parent.postMessage({ type: 'hnx:pollution-report', location: document.getElementById('reportLocation').value.trim(), description: document.getElementById('reportDesc').value.trim(), latitude: selectedLat, longitude: selectedLng, images: selectedReportImages }, window.location.origin);
         return;
       }
       document.getElementById('successModal').style.display = 'flex';
     });
 
     window.addEventListener('message', function(event) {
+      if (event.origin !== window.location.origin || event.source !== window.parent) return;
       if (event.data?.type === 'hnx:posts-data') { renderNewsPosts(event.data.posts || []); return; }
       if (event.data?.type === 'hnx:homepage-metrics') { renderImpactMetrics(event.data.metrics); return; }
       if (event.data?.type === 'hnx:leaderboard-data') { leaderboardData = event.data.leaderboards || { month: [], year: [], all: [] }; renderLeaderboard(); return; }
@@ -2323,7 +2331,7 @@
       if (event.data?.type === 'hnx:auth-state') {
         currentUser = event.data.user || null; applyUserDataToUI();
         const actions = document.querySelector('#top .header-actions'); let link = document.getElementById('adminDashboardLink');
-        if (currentUser?.role === 'admin' && actions && !link) { link = document.createElement('a'); link.id = 'adminDashboardLink'; link.className = 'btn-login'; link.textContent = 'DASHBOARD'; link.href = '#'; link.onclick = function(e) { e.preventDefault(); window.parent.postMessage({ type: 'hnx:navigate', path: '/admin' }, '*'); }; actions.insertBefore(link, actions.lastElementChild); }
+        if (currentUser?.role === 'admin' && actions && !link) { link = document.createElement('a'); link.id = 'adminDashboardLink'; link.className = 'btn-login'; link.textContent = 'DASHBOARD'; link.href = '#'; link.onclick = function(e) { e.preventDefault(); window.parent.postMessage({ type: 'hnx:navigate', path: '/admin' }, window.location.origin); }; actions.insertBefore(link, actions.lastElementChild); }
         if (currentUser?.role !== 'admin' && link) link.remove();
         if (currentUser && pendingSharedCampaignKey && campaignDetails[pendingSharedCampaignKey]) {
           const sharedKey = pendingSharedCampaignKey;
@@ -2371,11 +2379,12 @@
       e.preventDefault();
       const input = document.getElementById('userMsgInput');
       if (!input.value.trim()) return;
-      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:contact-message', description: input.value.trim() }, '*'); return; }
+      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:contact-message', description: input.value.trim() }, window.location.origin); return; }
       alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!'); input.value = '';
     }
 
     window.addEventListener('message', function(event) {
+      if (event.origin !== window.location.origin || event.source !== window.parent) return;
       if (event.data?.type === 'hnx:contact-message-result') { if (event.data.ok) { alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!'); document.getElementById('userMsgInput').value = ''; } else alert(event.data.message || 'Không thể gửi lời nhắn.'); return; }
       if (event.data?.type !== 'hnx:campaigns-data' || !Array.isArray(event.data.campaigns)) return;
       const groups = { upcoming: document.getElementById('pane-upcoming'), completed: document.getElementById('pane-completed') };
@@ -2398,7 +2407,8 @@
         const campaignCapacity = Math.max(0, Number(c.capacity) || 0);
         const campaignRegistered = Math.max(0, Number(c.registered_count ?? c.volunteers_registered ?? 0));
         const campaignProgress = campaignCapacity ? Math.min(100, Math.round((campaignRegistered / campaignCapacity) * 100)) : 0;
-        card.innerHTML = '<div class="card-thumb"><span class="badge-card">' + (ended ? 'Đã diễn ra' : 'Sắp diễn ra') + '</span>' + (campaignImages[0] ? '<img src="' + campaignImages[0] + '" alt="">' : '') + '</div><div class="card-info"><h4></h4><div class="card-meta-line"><i class="fa-solid fa-location-dot ui-icon" aria-hidden="true"></i> ' + (c.location || '') + '</div><div class="card-meta-line"><i class="fa-regular fa-calendar ui-icon" aria-hidden="true"></i> ' + formatVietnamDateTime(c.start_at) + '</div><div class="card-desc"></div><div class="card-bottom"><div class="campaign-progress-copy"><strong>' + campaignRegistered.toLocaleString('vi-VN') + '/' + (campaignCapacity || 0).toLocaleString('vi-VN') + ' tình nguyện viên</strong><span>đã đăng ký / quy mô</span></div><div class="campaign-progress" aria-label="Tiến độ đăng ký"><span style="width:' + campaignProgress + '%"></span></div><button class="btn-view">Xem chi tiết →</button></div></div>';
+        const campaignThumb = safeImpactUrl(campaignImages[0]);
+        card.innerHTML = '<div class="card-thumb"><span class="badge-card">' + (ended ? 'Đã diễn ra' : 'Sắp diễn ra') + '</span>' + (campaignThumb ? '<img src="' + escapeImpactHtml(campaignThumb) + '" alt="">' : '') + '</div><div class="card-info"><h4></h4><div class="card-meta-line"><i class="fa-solid fa-location-dot ui-icon" aria-hidden="true"></i> ' + escapeImpactHtml(c.location || '') + '</div><div class="card-meta-line"><i class="fa-regular fa-calendar ui-icon" aria-hidden="true"></i> ' + formatVietnamDateTime(c.start_at) + '</div><div class="card-desc"></div><div class="card-bottom"><div class="campaign-progress-copy"><strong>' + campaignRegistered.toLocaleString('vi-VN') + '/' + (campaignCapacity || 0).toLocaleString('vi-VN') + ' tình nguyện viên</strong><span>đã đăng ký / quy mô</span></div><div class="campaign-progress" aria-label="Tiến độ đăng ký"><span style="width:' + campaignProgress + '%"></span></div><button class="btn-view">Xem chi tiết →</button></div></div>';
         card.querySelector('h4').textContent = c.title || ''; card.querySelector('.card-desc').textContent = c.description || '';
         campaignDetails[c.id] = { isCompleted: ended, title: c.title || '', meta: (c.location || '') + ' | ' + formatVietnamDateTime(c.start_at), status: c.pollution_status || c.description || 'Chưa cập nhật.', action: c.action_plan || 'Chưa cập nhật.', support: c.support_equipment || 'Chưa cập nhật.', image: campaignImages[0] || '', image_urls: campaignImages };
         card.onclick = function(event) { if (!event.target.closest('.btn-view, .btn-join-campaign')) focusCampaignOnMap(c.id, event); };
@@ -2617,7 +2627,7 @@
       campaignMapMarkers = [];
       knownCampaignLocations.forEach(loc => {
         const marker = L.marker([loc.lat, loc.lng], { icon: createMapMarkerIcon('fa-broom', loc.color) }).addTo(bMap);
-        marker.bindTooltip(loc.name, { direction: 'top', offset: [0, -8] });
+        marker.bindTooltip(escapeImpactHtml(loc.name), { direction: 'top', offset: [0, -8] });
         marker.on('click', () => {
           focusCampaignCardFromMap(loc);
           bMap.panTo([loc.lat, loc.lng], { animate: true });
@@ -2848,6 +2858,7 @@
       window.parent.postMessage({ type: 'hnx:green-redeem', rewardId: rewardSelect.value, points: Number(pointsInput.value), fullName: document.getElementById('greenRedeemName').value.trim(), phone: document.getElementById('greenRedeemPhone').value.trim(), deliveryAddress: document.getElementById('greenRedeemAddress').value.trim() }, window.location.origin);
     });
     window.addEventListener('message', event => {
+      if (event.origin !== window.location.origin || event.source !== window.parent) return;
       if (event.data?.type === 'hnx:green-rewards-data') { greenRewards = Array.isArray(event.data.rewards) ? event.data.rewards : []; renderRewards(); updateRewardHint(); }
       if (event.data?.type === 'hnx:green-redeem-result') {
         if (!event.data.ok) { if (submitButton) submitButton.disabled = false; alert(event.data.message || 'Không thể đổi quà lúc này.'); return; }

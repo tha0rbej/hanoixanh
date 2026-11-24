@@ -4321,12 +4321,23 @@
     let currentUser = null;
     let activeCampaignKey = null;
 
+    function escapeAboutHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+    }
+
+    function safeAboutUrl(value) {
+      const url = String(value ?? '').trim();
+      const probe = url.replace(/[\x00-\x20]/g, '');
+      if (/^[a-z][a-z0-9+.-]*:/i.test(probe) && !/^https?:/i.test(probe)) return '';
+      return url;
+    }
+
     function navigateParent(path) {
-      window.parent.postMessage({ type: 'hnx:navigate', path }, '*');
+      window.parent.postMessage({ type: 'hnx:navigate', path }, window.location.origin);
     }
 
     function openDonateModal() {
-      if (window.parent !== window) window.parent.postMessage({ type: 'hnx:donation-info' }, '*');
+      if (window.parent !== window) window.parent.postMessage({ type: 'hnx:donation-info' }, window.location.origin);
       document.getElementById('donateModal').style.display = 'flex';
     }
 
@@ -4346,7 +4357,7 @@
     }
 
     function openAuthModal(tab) {
-      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:auth-open', tab: tab }, '*'); return; }
+      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:auth-open', tab: tab }, window.location.origin); return; }
       switchAuthTab(tab);
       document.getElementById('authModal').style.display = 'flex';
     }
@@ -4372,7 +4383,7 @@
 
     function handleHeaderAuthClick() {
       if (currentUser) { document.getElementById('accountMenu')?.classList.toggle('open'); return; }
-      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:auth-open', tab: 'login' }, '*'); return; }
+      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:auth-open', tab: 'login' }, window.location.origin); return; }
       openAuthModal('login');
     }
 
@@ -4423,7 +4434,7 @@
     }
 
     function handleLogout() {
-      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:signout' }, '*'); return; }
+      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:signout' }, window.location.origin); return; }
       currentUser = null;
       applyUserDataToUI();
       alert("Đăng xuất thành công!");
@@ -4451,10 +4462,11 @@
         if(noHistoryBox) noHistoryBox.style.display = 'none';
 
         const avatarBox = document.getElementById('uAvatarCircle');
-        if (currentUser.avatar) {
-          avatarBox.innerHTML = `<img src="${currentUser.avatar}" alt="Avatar">`;
+        const avatarUrl = safeAboutUrl(currentUser.avatar);
+        if (avatarUrl) {
+          avatarBox.innerHTML = `<img src="${escapeAboutHtml(avatarUrl)}" alt="Avatar">`;
         } else {
-          avatarBox.innerHTML = `<span id="uAvatarText">${currentUser.name.charAt(0).toUpperCase()}</span>`;
+          avatarBox.innerHTML = `<span id="uAvatarText">${escapeAboutHtml(currentUser.name.charAt(0).toUpperCase())}</span>`;
         }
       } else {
         loggedOutBox.style.display = 'flex';
@@ -4477,7 +4489,7 @@
     function handleSaveProfile(e) {
       e.preventDefault();
       if (window.parent !== window) {
-        window.parent.postMessage({ type: 'hnx:profile-update', fullName: document.getElementById('editName').value.trim(), phone: document.getElementById('editPhone').value.trim(), image: document.getElementById('editAvatarFile').files?.[0] || null }, '*');
+        window.parent.postMessage({ type: 'hnx:profile-update', fullName: document.getElementById('editName').value.trim(), phone: document.getElementById('editPhone').value.trim(), image: document.getElementById('editAvatarFile').files?.[0] || null }, window.location.origin);
         closeModal('editProfileModal');
         return;
       }
@@ -4613,7 +4625,7 @@
     }
 
     function registerCampaignFromModal() {
-      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:campaign-register', campaignKey: activeCampaignKey }, '*'); return; }
+      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:campaign-register', campaignKey: activeCampaignKey }, window.location.origin); return; }
       if (!currentUser) {
         alert("Vui lòng đăng nhập để đăng ký tham gia chiến dịch!");
         openAuthModal('login');
@@ -4669,17 +4681,18 @@
       if (!descInput.value.trim()) { alert('Vui lòng điền mô tả chi tiết.'); descInput.focus(); return; }
       if (!selectedReportImages.length) { alert('Vui lòng chọn ít nhất một hình ảnh hiện trạng.'); document.getElementById('fileInput').click(); return; }
       if (window.parent !== window) {
-        if (!selectedReportImages.length) return alert('Vui lòng chọn ít nhất một ảnh.'); window.parent.postMessage({ type: 'hnx:pollution-report', location: document.getElementById('reportLocation').value.trim(), description: document.getElementById('reportDesc').value.trim(), latitude: selectedLat, longitude: selectedLng, images: selectedReportImages }, '*');
+        if (!selectedReportImages.length) return alert('Vui lòng chọn ít nhất một ảnh.'); window.parent.postMessage({ type: 'hnx:pollution-report', location: document.getElementById('reportLocation').value.trim(), description: document.getElementById('reportDesc').value.trim(), latitude: selectedLat, longitude: selectedLng, images: selectedReportImages }, window.location.origin);
         return;
       }
       document.getElementById('successModal').style.display = 'flex';
     });
 
     window.addEventListener('message', function(event) {
+      if (event.origin !== window.location.origin || event.source !== window.parent) return;
       if (event.data?.type === 'hnx:auth-state') {
         currentUser = event.data.user || null; applyUserDataToUI();
         const actions = document.querySelector('#top .header-actions'); let link = document.getElementById('adminDashboardLink');
-        if (currentUser?.role === 'admin' && actions && !link) { link = document.createElement('a'); link.id = 'adminDashboardLink'; link.className = 'btn-login'; link.textContent = 'DASHBOARD'; link.href = '#'; link.onclick = function(e) { e.preventDefault(); window.parent.postMessage({ type: 'hnx:navigate', path: '/admin' }, '*'); }; actions.insertBefore(link, actions.lastElementChild); }
+        if (currentUser?.role === 'admin' && actions && !link) { link = document.createElement('a'); link.id = 'adminDashboardLink'; link.className = 'btn-login'; link.textContent = 'DASHBOARD'; link.href = '#'; link.onclick = function(e) { e.preventDefault(); window.parent.postMessage({ type: 'hnx:navigate', path: '/admin' }, window.location.origin); }; actions.insertBefore(link, actions.lastElementChild); }
         if (currentUser?.role !== 'admin' && link) link.remove();
       }
       if (event.data?.type === 'hnx:campaign-register-result') {
@@ -4694,7 +4707,7 @@
     function handleThamGiaCaNhan(e) {
       e.preventDefault();
       const values = [...e.target.querySelectorAll('input')].map(x => x.value.trim());
-      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:volunteer-register', fullName: values[0], phone: values[1], email: values[2], address: values[3] }, '*'); return; }
+      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:volunteer-register', fullName: values[0], phone: values[1], email: values[2], address: values[3] }, window.location.origin); return; }
       alert("Đăng ký tình nguyện viên thành công! Hà Nội Xanh sẽ liên hệ với bạn sớm.");
       e.target.reset();
     }
@@ -4703,11 +4716,11 @@
       e.preventDefault();
       const values = [...e.target.querySelectorAll('input')].map(x => x.value.trim());
       const organizationType = e.target.querySelector('select')?.value || '';
-      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:partner-register', organization: values[0], organizationType, fullName: values[1], phone: values[2], email: values[3] }, '*'); return; }
+      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:partner-register', organization: values[0], organizationType, fullName: values[1], phone: values[2], email: values[3] }, window.location.origin); return; }
       alert("Đăng ký đối tác thành công! Cảm ơn sự đồng hành của quý tổ chức/doanh nghiệp.");
       e.target.reset();
     }
-    window.addEventListener('message', function(event) { if (event.data?.type === 'hnx:participation-result') { const success = event.data.kind === 'partner' ? 'Đăng ký hợp tác thành công! Hà Nội Xanh sẽ liên hệ với bạn sớm.' : 'Cảm ơn bạn đã trở thành tình nguyện viên của Hà Nội Xanh!'; alert(event.data.ok ? success : (event.data.message || 'Email này đã đăng ký trước đó.')); } });
+    window.addEventListener('message', function(event) { if (event.origin !== window.location.origin || event.source !== window.parent) return; if (event.data?.type === 'hnx:participation-result') { const success = event.data.kind === 'partner' ? 'Đăng ký hợp tác thành công! Hà Nội Xanh sẽ liên hệ với bạn sớm.' : 'Cảm ơn bạn đã trở thành tình nguyện viên của Hà Nội Xanh!'; alert(event.data.ok ? success : (event.data.message || 'Email này đã đăng ký trước đó.')); } });
 
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     document.addEventListener('keydown', function(event) { if (event.key === 'Escape') closeModal('successModal'); });
@@ -4717,18 +4730,19 @@
       const input = document.getElementById('userMsgInput');
       const messageText = input.value.trim();
       if (!messageText) return;
-      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:contact-message', description: messageText }, '*'); return; }
+      if (window.parent !== window) { window.parent.postMessage({ type: 'hnx:contact-message', description: messageText }, window.location.origin); return; }
       alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!');
       input.value = '';
     }
 
     window.addEventListener('message', function(event) {
+      if (event.origin !== window.location.origin || event.source !== window.parent) return;
       if (event.data?.type === 'hnx:contact-message-result') { if (event.data.ok) { alert('Cảm ơn bạn đã gửi lời nhắn đến Hà Nội Xanh!'); document.getElementById('userMsgInput').value = ''; } else alert(event.data.message || 'Không thể gửi lời nhắn.'); return; }
       if (event.data?.type !== 'hnx:campaigns-data' || !Array.isArray(event.data.campaigns)) return;
       const groups = { upcoming: document.getElementById('pane-upcoming'), completed: document.getElementById('pane-completed') };
       if (!groups.upcoming || !groups.completed) return;
       groups.upcoming.innerHTML = ''; groups.completed.innerHTML = '';
-      event.data.campaigns.forEach(function(c) { const ended = c.status === 'completed'; const pane = ended ? groups.completed : groups.upcoming; const card = document.createElement('div'); card.className = 'camp-card'; card.innerHTML = '<div class="card-thumb"><span class="badge-card">' + (ended ? 'Đã diễn ra' : 'Sắp diễn ra') + '</span>' + (c.image_url ? '<img src="' + c.image_url + '" alt="">' : '') + '</div><div class="card-info"><h4></h4><div class="card-meta-line"><i class="fa-solid fa-location-dot"></i> ' + (c.location || '') + '</div><div class="card-meta-line"><i class="fa-regular fa-calendar"></i> ' + new Date(c.start_at).toLocaleString('vi-VN') + '</div><div class="card-desc"></div><div class="card-bottom"><span class="card-members"><i class="fa-solid fa-user-group"></i> ' + (c.capacity || '') + ' người</span><button class="btn-view">Xem chi tiết <i class="fa-solid fa-arrow-right"></i></button></div></div>'; card.querySelector('h4').textContent = c.title || ''; card.querySelector('.card-desc').textContent = c.description || ''; campaignDetails[c.id] = { isCompleted: ended, title: c.title || '', meta: (c.location || '') + ' • ' + new Date(c.start_at).toLocaleString('vi-VN'), status: c.pollution_status || c.description || 'Chưa cập nhật.', action: c.action_plan || 'Chưa cập nhật.', support: c.support_equipment || 'Chưa cập nhật.' }; card.querySelector('.btn-view').onclick = function() { openDetailModal(c.id); }; pane.appendChild(card); });
+      event.data.campaigns.forEach(function(c) { const ended = c.status === 'completed'; const pane = ended ? groups.completed : groups.upcoming; const card = document.createElement('div'); card.className = 'camp-card'; card.innerHTML = '<div class="card-thumb"><span class="badge-card">' + (ended ? 'Đã diễn ra' : 'Sắp diễn ra') + '</span>' + (safeAboutUrl(c.image_url) ? '<img src="' + escapeAboutHtml(safeAboutUrl(c.image_url)) + '" alt="">' : '') + '</div><div class="card-info"><h4></h4><div class="card-meta-line"><i class="fa-solid fa-location-dot"></i> ' + escapeAboutHtml(c.location || '') + '</div><div class="card-meta-line"><i class="fa-regular fa-calendar"></i> ' + new Date(c.start_at).toLocaleString('vi-VN') + '</div><div class="card-desc"></div><div class="card-bottom"><span class="card-members"><i class="fa-solid fa-user-group"></i> ' + escapeAboutHtml(c.capacity || '') + ' người</span><button class="btn-view">Xem chi tiết <i class="fa-solid fa-arrow-right"></i></button></div></div>'; card.querySelector('h4').textContent = c.title || ''; card.querySelector('.card-desc').textContent = c.description || ''; campaignDetails[c.id] = { isCompleted: ended, title: c.title || '', meta: (c.location || '') + ' • ' + new Date(c.start_at).toLocaleString('vi-VN'), status: c.pollution_status || c.description || 'Chưa cập nhật.', action: c.action_plan || 'Chưa cập nhật.', support: c.support_equipment || 'Chưa cập nhật.' }; card.querySelector('.btn-view').onclick = function() { openDetailModal(c.id); }; pane.appendChild(card); });
     });
 
     const knownCampaignLocations = [
@@ -4813,7 +4827,9 @@
             const statusEl = document.getElementById('popStatus');
             statusEl.innerText = "Chưa có dữ liệu";
             statusEl.style.color = "var(--status-gray)";
-            document.getElementById('popDesc').innerHTML = `Khu vực này hiện chưa có chiến dịch xử lý.<br><a onclick="reportThisLocation('${displayName}')" style="color:var(--primary);font-weight:bold;cursor:pointer;">+ Báo điểm ô nhiễm tại đây</a>`;
+            const popDesc = document.getElementById('popDesc');
+            popDesc.innerHTML = 'Khu vực này hiện chưa có chiến dịch xử lý.<br><a data-report-location style="color:var(--primary);font-weight:bold;cursor:pointer;">+ Báo điểm ô nhiễm tại đây</a>';
+            popDesc.querySelector('[data-report-location]').onclick = () => reportThisLocation(displayName);
           } else {
             fallbackSearch(rawQuery, btn);
           }
@@ -4830,7 +4846,9 @@
       const statusEl = document.getElementById('popStatus');
       statusEl.innerText = "Chưa có dữ liệu";
       statusEl.style.color = "var(--status-gray)";
-      document.getElementById('popDesc').innerHTML = `Khu vực "${rawQuery}" đã được định vị trên bản đồ.<br><a onclick="reportThisLocation('${rawQuery}')" style="color:var(--primary);font-weight:bold;cursor:pointer;">+ Báo điểm ô nhiễm tại đây</a>`;
+      const popDesc = document.getElementById('popDesc');
+      popDesc.innerHTML = `Khu vực "${escapeAboutHtml(rawQuery)}" đã được định vị trên bản đồ.<br><a data-report-location style="color:var(--primary);font-weight:bold;cursor:pointer;">+ Báo điểm ô nhiễm tại đây</a>`;
+      popDesc.querySelector('[data-report-location]').onclick = () => reportThisLocation(rawQuery);
     }
 
     function reportThisLocation(name) {
@@ -4956,6 +4974,7 @@
       });
     };
     window.addEventListener('message', event => {
+      if (event.origin !== window.location.origin || event.source !== window.parent) return;
       if (event.data?.type !== 'hnx:homepage-metrics' || !Array.isArray(event.data.metrics)) return;
       const metric = event.data.metrics.find(item => item.metric_key === 'founding_shareholders');
       if (metric) renderFounderData(metric.metric_value);
@@ -4986,6 +5005,7 @@
       });
     };
     window.addEventListener('message', event => {
+      if (event.origin !== window.location.origin || event.source !== window.parent) return;
       if (event.data?.type !== 'hnx:homepage-metrics' || !Array.isArray(event.data.metrics)) return;
       const metric = event.data.metrics.find(item => item.metric_key === 'team_members');
       if (metric) renderTeam(metric.metric_value);

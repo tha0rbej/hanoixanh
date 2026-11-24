@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, type ReactNode } from "react";
 
 interface DialogProps {
   open: boolean;
@@ -12,6 +12,11 @@ export default function Dialog({ open, title, onClose, children, size = "md" }: 
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const openerRef = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+
+  useLayoutEffect(() => {
+    onCloseRef.current = onClose;
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -20,9 +25,11 @@ export default function Dialog({ open, title, onClose, children, size = "md" }: 
     document.body.style.overflow = "hidden";
     const panel = panelRef.current;
     const focusable = () => Array.from(panel?.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])') ?? []);
-    requestAnimationFrame(() => focusable()[0]?.focus());
+    const frame = requestAnimationFrame(() => {
+      if (!panel?.contains(document.activeElement)) focusable()[0]?.focus();
+    });
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") onCloseRef.current();
       if (event.key !== "Tab") return;
       const nodes = focusable();
       if (!nodes.length) return;
@@ -33,11 +40,12 @@ export default function Dialog({ open, title, onClose, children, size = "md" }: 
     };
     document.addEventListener("keydown", onKeyDown);
     return () => {
+      cancelAnimationFrame(frame);
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", onKeyDown);
       openerRef.current?.focus();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
   return (
