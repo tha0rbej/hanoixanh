@@ -1,0 +1,6 @@
+{
+  "name": "hnx-admin-agent-tests",
+  "private": true,
+  "type": "commonjs",
+  "description": "Test workflow n8n của Admin Agent: node:test, không cần cài thêm thư viện."
+}

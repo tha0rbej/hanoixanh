@@ -1,0 +1,49 @@
+# n8n tự host chỉ để chạy Admin Agent của Hà Nội Xanh.
+# Chạy: cp env.example .env  (điền giá trị)  ->  docker compose up -d
+# Hướng dẫn đầy đủ: n8n/README.md
+
+name: hnx-n8n
+
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:2.48.8 # đã thử với đúng tag này, đừng dùng latest
+    container_name: hnx-n8n
+    restart: unless-stopped
+    ports:
+      # Chỉ mở cho chính máy này. Muốn truy cập từ máy khác phải đi qua tunnel/reverse proxy có HTTPS.
+      - "127.0.0.1:5678:5678"
+    env_file: .env
+    environment:
+      TZ: Asia/Ho_Chi_Minh
+      GENERIC_TIMEZONE: Asia/Ho_Chi_Minh
+      # Bắt buộc, không có mặc định. Mất khóa này thì credential đã lưu không giải mã được nữa.
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY:?Chưa đặt N8N_ENCRYPTION_KEY trong n8n/.env}
+      # n8n 2.x chặn $env trong node theo mặc định. Workflow đọc HNX_* qua $env nên phải bật.
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
+      # Node load_skill đọc /skills/pollution-campaign-post/SKILL.md bằng module fs.
+      NODE_FUNCTION_ALLOW_BUILTIN: fs
+      # URL gốc mà n8n in ra trong Production URL của webhook.
+      # Chạy local: http://localhost:5678/. Khi có tunnel/domain thì đặt N8N_PUBLIC_URL trong .env thành URL công khai
+      # (có dấu / cuối), ví dụ https://n8n.example.com/ rồi chạy lại: docker compose up -d
+      N8N_WEBHOOK_URL: ${N8N_PUBLIC_URL:-http://localhost:5678/}
+      N8N_EDITOR_BASE_URL: ${N8N_PUBLIC_URL:-http://localhost:5678/}
+      # Truy cập qua http (không HTTPS) thì cookie đăng nhập "secure" bị trình duyệt từ chối.
+      # Đổi thành "true" (hoặc xóa dòng này) khi đã đặt n8n sau HTTPS.
+      N8N_SECURE_COOKIE: ${N8N_SECURE_COOKIE:-false}
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      N8N_VERSION_NOTIFICATIONS_ENABLED: "false"
+      N8N_HIRING_BANNER_ENABLED: "false"
+    volumes:
+      - hnx-n8n-data:/home/node/.n8n
+      # Skill của Agent, chỉ đọc. Sửa SKILL.md là Agent dùng bản mới ngay, không cần import lại.
+      - ../skills:/skills:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5678/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  hnx-n8n-data:
+    name: hnx-n8n-data
