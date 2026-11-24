@@ -1,0 +1,25 @@
+# Mẫu systemd user service. Cài đặt:
+#   mkdir -p ~/.config/systemd/user
+#   cp hnx-registration-mailer.service ~/.config/systemd/user/
+#   # sửa đường dẫn trong WorkingDirectory/ExecStart cho đúng máy của bạn
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now hnx-registration-mailer
+#   loginctl enable-linger "$USER"   # để chạy cả khi chưa đăng nhập, và tự bật lại sau khi khởi động máy
+# Xem log: journalctl --user -u hnx-registration-mailer -f
+[Unit]
+Description=Ha Noi Xanh - gui email xac nhan dang ky chien dich
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/works/hanoixanh/mailer
+# Cấu hình đọc từ mailer/.env (chmod 600 .env)
+ExecStart=/usr/bin/python3 %h/works/hanoixanh/mailer/registration_mailer.py
+Restart=on-failure
+RestartSec=15
+# Mã 2 = thiếu/sai cấu hình: không tự khởi động lại vô ích
+RestartPreventExitStatus=2
+
+[Install]
+WantedBy=default.target

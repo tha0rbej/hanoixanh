@@ -1,0 +1,11 @@
+Chào ${ten},
+
+Hà Nội Xanh đã ghi nhận đăng ký tham gia chiến dịch "${chien_dich}" của bạn. Cảm ơn bạn đã cùng chung tay vì một Hà Nội xanh hơn!
+
+${thoi_gian}
+Địa điểm: ${dia_diem}
+${dong_lien_ket}
+Nếu cần hỗ trợ hoặc muốn thay đổi kế hoạch tham gia, bạn hãy liên hệ hanoixanhh@gmail.com hoặc hotline +84 987 231 832.
+
+Trân trọng,
+Ban Quản trị Hà Nội Xanh

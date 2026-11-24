@@ -1,0 +1,14 @@
+${dong_thu}Chào ${ten},
+
+${noi_dung}
+
+----------------------------------------
+Chiến dịch "${chien_dich}"
+${thoi_gian}
+Địa điểm: ${dia_diem}
+${dong_lien_ket}
+Bạn nhận thư này vì đã đăng ký tham gia chiến dịch "${chien_dich}".
+Nếu cần hỗ trợ, bạn hãy liên hệ hanoixanhh@gmail.com hoặc hotline +84 987 231 832.
+
+Trân trọng,
+Ban Quản trị Hà Nội Xanh
