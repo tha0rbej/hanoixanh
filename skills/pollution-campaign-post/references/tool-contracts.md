@@ -48,7 +48,7 @@ Input: `draft_id`, `base_version`, `feedback`, nội dung `website_payload`, `th
 
 Input: `draft_id`, `version`.
 
-## `publish_website_post`
+## `publish_campaign`
 
 Đăng hoặc lên lịch version đã duyệt vào bảng `posts` của website. Kiểm tra quyền admin, `approved_version`, idempotency và confirmation. Xác nhận lấy từ tin nhắn thật của admin ở lượt hiện tại và phải là tin nhắn riêng sau lượt duyệt; trả `needs_admin_confirmation` nếu admin chưa nói rõ đăng/hẹn giờ hoặc bản nháp vừa được duyệt trong chính lượt này. `publish_at = null` chỉ hợp lệ khi `publish_now = true` và admin nói rõ đăng ngay/đăng luôn. Trước khi đăng, tool giành job nguyên tử (`claim_publication_job`); nếu execution khác đang đăng hoặc đã đăng thì trả `in_progress`/`already_published` và không đăng trùng. Trả `publication_job_id`, trạng thái và URL bài viết.
 
@@ -60,4 +60,4 @@ Nếu `publish_at` còn xa hơn khoảng 1 phút, tool chỉ ghi job `scheduled`
 
 Đăng hoặc lên lịch version đã duyệt lên Threads bằng credential server-side. Kiểm tra quyền, version, giới hạn nội dung, media, idempotency và confirmation độc lập với website, cùng cơ chế giành job nguyên tử. Trả `publication_job_id`, trạng thái, provider post ID và URL nếu có.
 
-Input giống `publish_website_post`.
+Input giống `publish_campaign`.
