@@ -26,9 +26,9 @@ Input: `finding_id`.
 
 ## `create_cleanup_post_draft`
 
-Tạo draft mới từ finding đã chọn và dữ liệu sự kiện. `finding_id` phải thuộc thread hiện tại, nếu không trả `finding_not_found`. Bắt buộc có cả `cleanup_start_at` và `cleanup_end_at`; nếu thiếu phải trả `missing_information` thay vì tự suy đoán. Draft bắt buộc có ít nhất một ảnh URL https hợp lệ, `pollution_status`, `objective` và `support_equipment` trong `website_payload`; workflow tự chèn ngày giờ và địa điểm chính xác từ finding. Lưu nội dung website, caption Threads, nguồn và ảnh thành version 1; không tạo file HTML hay `preview_url`/`file_url` (admin xem bản xem trước trên Admin Dashboard). Không duyệt, không xuất bản.
+Tạo draft mới từ finding đã chọn và dữ liệu sự kiện. `finding_id` phải thuộc thread hiện tại, nếu không trả `finding_not_found`. Bắt buộc có cả `cleanup_start_at` và `cleanup_end_at`; nếu thiếu phải trả `missing_information` thay vì tự suy đoán. Draft bắt buộc có ít nhất một ảnh URL https hợp lệ, `pollution_status`, `objective` và `support_equipment` trong `website_payload`; Agent có thể để trống `images` và `image_url` khi ảnh finding chưa xác minh, vì workflow tự chèn ảnh HTTPS dự phòng của dự án. Workflow tự chèn ngày giờ và địa điểm chính xác từ finding. Lưu nội dung website, caption Threads, nguồn và ảnh thành version 1; không tạo file HTML hay `preview_url`/`file_url` (admin xem bản xem trước trên Admin Dashboard). Không duyệt, không xuất bản.
 
-Input: `finding_id`, `cleanup_start_at`, `cleanup_end_at`, `meeting_point?`, `contact?`, `website_payload`, `threads_payload`, `images`, `sources`. Thời gian không kèm múi giờ được hiểu là giờ Hà Nội (+07:00).
+Input: `finding_id`, `cleanup_start_at`, `cleanup_end_at`, `meeting_point?`, `contact?`, `website_payload`, `threads_payload`, `images?`, `sources`. `images` và các `image_url` là tùy chọn; nếu không có ảnh hợp lệ thì workflow dùng ảnh HTTPS dự phòng của dự án. Thời gian không kèm múi giờ được hiểu là giờ Hà Nội (+07:00).
 
 ## `get_post_draft`
 

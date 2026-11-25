@@ -471,7 +471,7 @@
     },
     {
       "parameters": {
-        "description": "Tạo draft chiến dịch website và Threads từ finding đã chọn; finding phải thuộc thread hiện tại, nếu không trả finding_not_found. cleanup_start_at và cleanup_end_at đều bắt buộc; nếu thiếu trả missing_information. Lưu ảnh, nguồn, ngày giờ, địa điểm và đúng ba mục chiến dịch để admin xem trước trên Admin Dashboard; không tạo nội dung bài đăng website, file HTML hay đường dẫn xem trước. Không duyệt và không xuất bản.",
+        "description": "Tạo draft chiến dịch website và Threads từ finding đã chọn; finding phải thuộc thread hiện tại, nếu không trả finding_not_found. cleanup_start_at và cleanup_end_at đều bắt buộc; nếu thiếu trả missing_information. Lưu ảnh, nguồn, ngày giờ, địa điểm và đúng ba mục chiến dịch để admin xem trước trên Admin Dashboard; không tạo nội dung bài đăng website, file HTML hay đường dẫn xem trước. Không yêu cầu admin cung cấp URL ảnh: ảnh finding chưa xác minh chỉ để tham khảo, Agent có thể bỏ trống images và image_url; workflow sẽ tự dùng ảnh chiến dịch HTTPS dự phòng của dự án. Không duyệt và không xuất bản.",
         "workflowId": {
           "__rl": true,
           "value": "hnxToolCreateDraft",
@@ -488,9 +488,9 @@
             "cleanup_end_at": "={{ $fromAI('cleanup_end_at', `Thời gian kết thúc buổi vệ sinh, ISO 8601 kèm múi giờ, ví dụ 2026-12-06T10:00:00+07:00. Bắt buộc; nếu admin chưa nói thì để trống để nhận lỗi missing_information rồi hỏi lại admin.`, 'string', ``) }}",
             "meeting_point": "={{ $fromAI('meeting_point', `Điểm tập trung. Có thể để trống.`, 'string', ``) }}",
             "contact": "={{ $fromAI('contact', `Người hoặc số liên hệ. Có thể để trống.`, 'string', ``) }}",
-            "website_payload": "={{ $fromAI('website_payload', `Chuỗi JSON thông tin chiến dịch trên web. Có title và image_url (URL https); không cần content bài đăng. Workflow tự điền pollution_status, objective, support_equipment nếu thiếu và tự chèn schedule gồm ngày giờ bắt đầu/kết thúc, múi giờ và địa điểm chính xác từ finding.`, 'string') }}",
-            "threads_payload": "={{ $fromAI('threads_payload', `Chuỗi JSON của một object nội dung Threads, có các khóa text (tối đa 500 ký tự) và image_url (URL https công khai). Dùng cùng ảnh với website.`, 'string') }}",
-            "images": "={{ $fromAI('images', `Chuỗi JSON của một array ảnh. Bắt buộc có ít nhất một phần tử có url https công khai; mỗi phần tử có các khóa url, caption, source_url, license_status.`, 'string') }}",
+            "website_payload": "={{ $fromAI('website_payload', `Chuỗi JSON thông tin chiến dịch trên web. Có title; image_url là tùy chọn, có thể bỏ qua vì workflow tự chèn ảnh HTTPS dự phòng của dự án; không cần content bài đăng. Workflow tự điền pollution_status, objective, support_equipment nếu thiếu và tự chèn schedule gồm ngày giờ bắt đầu/kết thúc, múi giờ và địa điểm chính xác từ finding.`, 'string') }}",
+            "threads_payload": "={{ $fromAI('threads_payload', `Chuỗi JSON của một object nội dung Threads, có khóa text (tối đa 500 ký tự); image_url là tùy chọn, có thể bỏ qua vì workflow tự dùng cùng ảnh HTTPS dự phòng với website.`, 'string') }}",
+            "images": "={{ $fromAI('images', `Chuỗi JSON của array ảnh nếu có. Có thể truyền [] hoặc bỏ trống; không yêu cầu URL ảnh từ admin. Ảnh tìm kiếm chưa xác minh không dùng để xuất bản, workflow sẽ tự chèn ảnh chiến dịch HTTPS dự phòng của dự án.`, 'string', `[]`) }}",
             "sources": "={{ $fromAI('sources', `Chuỗi JSON của một array nguồn, mỗi phần tử có các khóa title, url, published_at.`, 'string', `[]`) }}"
           },
           "matchingColumns": [],
