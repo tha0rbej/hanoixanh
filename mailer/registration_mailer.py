@@ -88,6 +88,9 @@ ENV_KEYS = (
     "ANNOUNCEMENTS_ENABLED",
     "ANNOUNCE_PER_MINUTE",
     "MAILER_DAILY_LIMIT",
+    "AI_EMAIL_WEBHOOK_URL",
+    "AI_EMAIL_WEBHOOK_TOKEN",
+    "AI_EMAIL_TIMEOUT_SECONDS",
 )
 
 
@@ -226,6 +229,9 @@ class Config:
     announcements_enabled: bool = True
     announce_per_minute: int = 20  # số thư thông báo tối đa mỗi phút (tránh bị Gmail khóa)
     daily_limit: int = 400  # tổng thư (xác nhận + thông báo + thử) mỗi ngày
+    ai_email_webhook_url: str = ""
+    ai_email_webhook_token: str = field(default="", repr=False)
+    ai_email_timeout_seconds: int = 30
 
     @property
     def tz(self) -> tzinfo:
@@ -326,6 +332,10 @@ def load_config(env: Mapping[str, str], *, dry_run: bool = False) -> Config:
     announcements_enabled = get_bool("ANNOUNCEMENTS_ENABLED", True)
     announce_per_minute = get_int("ANNOUNCE_PER_MINUTE", 20, 1, 120)
     daily_limit = get_int("MAILER_DAILY_LIMIT", 400, 1, 100000)
+    ai_email_webhook_url = get("AI_EMAIL_WEBHOOK_URL")
+    ai_email_timeout = get_int("AI_EMAIL_TIMEOUT_SECONDS", 30, 5, 120)
+    if ai_email_webhook_url and not _is_http_url(ai_email_webhook_url):
+        problems.append("AI_EMAIL_WEBHOOK_URL phải bắt đầu bằng http:// hoặc https://.")
 
     smtp_user = get("SMTP_USER")
     smtp_password = env.get("SMTP_PASSWORD") or ""
@@ -382,6 +392,9 @@ def load_config(env: Mapping[str, str], *, dry_run: bool = False) -> Config:
         announcements_enabled=announcements_enabled,
         announce_per_minute=announce_per_minute,
         daily_limit=daily_limit,
+        ai_email_webhook_url=ai_email_webhook_url,
+        ai_email_webhook_token=env.get("AI_EMAIL_WEBHOOK_TOKEN") or "",
+        ai_email_timeout_seconds=ai_email_timeout,
     )
 
 
@@ -494,6 +507,50 @@ class RenderedEmail:
     subject: str
     text: str
     html: str
+
+
+class AiEmailClient:
+    """Gọi n8n AI Agent để sinh nội dung; Mailer vẫn là nơi gửi SMTP."""
+
+    def __init__(self, cfg: Config, *, http: Optional[HttpFunc] = None):
+        self.url = cfg.ai_email_webhook_url
+        self.token = cfg.ai_email_webhook_token
+        self.timeout = cfg.ai_email_timeout_seconds
+        self._http = http or default_http
+
+    def render(self, data: Mapping[str, Any]) -> RenderedEmail:
+        payload = json.dumps(data, ensure_ascii=False).encode("utf-8")
+        headers = {"Content-Type": "application/json", "Accept": "application/json"}
+        if self.token:
+            headers["Authorization"] = f"Bearer {self.token}"
+        try:
+            status, raw = self._http("POST", self.url, headers, payload, self.timeout)
+        except OSError as exc:
+            raise SystemicError(
+                f"Không kết nối được n8n AI Agent ({type(exc).__name__}).", "ai_webhook_unreachable"
+            ) from None
+        if status >= 400:
+            snippet = raw[:200].decode("utf-8", "replace") if raw else ""
+            raise SystemicError(f"n8n AI Agent trả HTTP {status}: {snippet}", "ai_webhook_error")
+        try:
+            result = json.loads(raw)
+        except (ValueError, UnicodeDecodeError):
+            raise SystemicError("n8n AI Agent trả dữ liệu không phải JSON.", "ai_webhook_bad_response") from None
+        if isinstance(result, dict) and isinstance(result.get("output"), str):
+            try:
+                result = json.loads(result["output"])
+            except ValueError:
+                raise SystemicError("AI Agent không trả JSON nội dung thư hợp lệ.", "ai_webhook_bad_response") from None
+        if not isinstance(result, dict):
+            raise SystemicError("n8n AI Agent trả cấu trúc không hợp lệ.", "ai_webhook_bad_response")
+        subject = clean_inline(str(result.get("subject") or ""), 200)
+        text = str(result.get("text") or "").strip()
+        body_html = str(result.get("html") or "").strip()
+        if not subject or not text or not body_html:
+            raise SystemicError("AI Agent thiếu subject, text hoặc html.", "ai_webhook_bad_response")
+        if re.search(r"[\r\n]", subject):
+            raise SystemicError("AI Agent trả subject không hợp lệ.", "ai_webhook_bad_response")
+        return RenderedEmail(subject=subject, text=text, html=body_html)
 
 
 def load_template(name: str, directory: Path = TEMPLATES_DIR) -> Template:
@@ -836,6 +893,7 @@ class Mailer:
         now: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
         out: Callable[[str], None] = print,
         templates_dir: Path = TEMPLATES_DIR,
+        http: HttpFunc = default_http,
     ):
         self.cfg = cfg
         self.db = db
@@ -844,6 +902,7 @@ class Mailer:
         self.now = now
         self.out = out
         self.templates_dir = templates_dir
+        self.ai = AiEmailClient(cfg, http=http) if cfg.ai_email_webhook_url else None
         # Sự cố chung của vòng gần nhất (None nếu vòng chạy bình thường).
         self.last_systemic: Optional[SystemicError] = None
         # Bộ xử lý thông báo hàng loạt (announcements.AnnouncementWorker); None = không xử lý thông báo.
@@ -900,16 +959,18 @@ class Mailer:
                 raise PermanentError("Chiến dịch không tồn tại.", "campaign_not_found")
 
             name = display_name(self.db.get_profile_name(user_id), email)
-            rendered = render_email(
-                name=name,
-                campaign_title=campaign.get("title") or "",
-                location=campaign.get("location") or "",
-                start_at=campaign.get("start_at"),
-                end_at=campaign.get("end_at"),
-                campaign_url=build_campaign_url(self.cfg.site_url, campaign_id),
-                tz=self.cfg.tz,
-                templates_dir=self.templates_dir,
-            )
+            email_data = {
+                "name": name,
+                "campaign_title": campaign.get("title") or "",
+                "location": campaign.get("location") or "",
+                "start_at": campaign.get("start_at"),
+                "end_at": campaign.get("end_at"),
+                "campaign_url": build_campaign_url(self.cfg.site_url, campaign_id),
+            }
+            if self.ai is not None:
+                rendered = self.ai.render(email_data)
+            else:
+                rendered = render_email(tz=self.cfg.tz, templates_dir=self.templates_dir, **email_data)
             msg = build_message(
                 rendered, to_addr=email, from_addr=self.cfg.mail_from, reply_to=self.cfg.mail_reply_to
             )

@@ -1,6 +1,6 @@
 # Mailer: email xác nhận đăng ký và thông báo hàng loạt
 
-Chương trình Python nhỏ, chỉ dùng thư viện chuẩn, gửi một mẫu thư có sẵn cho người vừa đăng ký chiến dịch, và (từ migration `20261124000000`) gửi thông báo tùy biến do admin duyệt tới mọi người đã đăng ký một chiến dịch (xem mục "Thông báo hàng loạt cho người đăng ký"). Không dùng n8n, không dùng LLM. Nội dung thư điền từ chính dữ liệu đăng ký trong Supabase: tên người đăng ký, tên chiến dịch, địa điểm, thời gian bắt đầu/kết thúc và liên kết xem chiến dịch.
+Chương trình Python nhỏ, chỉ dùng thư viện chuẩn, gửi một mẫu thư có sẵn cho người vừa đăng ký chiến dịch, và (từ migration `20261124000000`) gửi thông báo tùy biến do admin duyệt tới mọi người đã đăng ký một chiến dịch (xem mục "Thông báo hàng loạt cho người đăng ký"). Mặc định không cần n8n/LLM; có thể bật tùy chọn AI Agent n8n ở cuối tài liệu để sinh nội dung, còn Python Mailer vẫn gửi SMTP. Nội dung đầu vào lấy từ dữ liệu đăng ký trong Supabase.
 
 ## Cách hoạt động
 
@@ -43,6 +43,9 @@ Biến môi trường thật được ưu tiên hơn file `.env`. Tên file mẫ
 | `ANNOUNCEMENTS_ENABLED` | không | Mặc định `true`. `false` tắt riêng phần thông báo hàng loạt (thư xác nhận vẫn chạy) |
 | `ANNOUNCE_PER_MINUTE` | không | Mặc định 20 (1-120): số thư thông báo tối đa mỗi phút |
 | `MAILER_DAILY_LIMIT` | không | Mặc định 400: tổng số thư mỗi ngày (xác nhận + thông báo + thư thử), xem mục thông báo hàng loạt |
+| `AI_EMAIL_WEBHOOK_URL` | không | URL webhook n8n AI Agent; bỏ trống để dùng template cố định |
+| `AI_EMAIL_WEBHOOK_TOKEN` | không | Bearer token tùy chọn nếu webhook yêu cầu |
+| `AI_EMAIL_TIMEOUT_SECONDS` | không | Timeout gọi AI Agent, mặc định 30 giây |
 
 Thiếu hoặc sai biến thì chương trình báo lỗi bằng tiếng Việt và thoát với mã 2.
 
@@ -291,3 +294,13 @@ Chỉ liệt kê đúng các `id` cần gửi bù. Tuyệt đối không chạy 
 cd mailer
 python3 -m unittest -v
 ```
+# Tuỳ chọn: AI Agent n8n viết nội dung thư
+
+Mailer không bắt buộc phải có n8n. Nếu để trống `AI_EMAIL_WEBHOOK_URL`, thư dùng mẫu cố định như trước. Để đáp ứng demo có AI Agent, import workflow `n8n/registration-email-ai-agent.json` vào n8n local, gắn Google Gemini credential cho node `Google Gemini Chat Model`, bật workflow rồi đặt:
+
+```dotenv
+AI_EMAIL_WEBHOOK_URL=http://localhost:5678/webhook/hnx-registration-email-ai
+AI_EMAIL_TIMEOUT_SECONDS=30
+```
+
+Mailer sẽ gửi POST chứa `name`, `campaign_title`, `location`, `start_at`, `end_at`, `campaign_url`. Workflow phải trả JSON gồm `subject`, `text`, `html`. AI Agent chỉ viết nội dung; Mailer vẫn gửi bằng Gmail SMTP và chỉ đánh dấu Supabase là đã gửi sau khi SMTP thành công. Nếu n8n/AI lỗi, Mailer dừng vòng và giữ lượt đăng ký để thử lại.

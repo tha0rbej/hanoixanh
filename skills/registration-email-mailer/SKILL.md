@@ -5,7 +5,7 @@ description: Vận hành và xử lý sự cố luồng email xác nhận đăng
 
 # Registration email mailer
 
-Luồng xác nhận đăng ký là một worker Python polling, không phải n8n và không dùng LLM. Worker đọc các dòng `campaign_registrations` đang chờ trong Supabase, dựng thư từ template cố định rồi gửi qua Gmail SMTP.
+Luồng xác nhận đăng ký là một worker Python polling. Mặc định worker dựng thư từ template cố định rồi gửi qua Gmail SMTP. Khi đặt `AI_EMAIL_WEBHOOK_URL`, worker gọi workflow n8n có AI Agent để sinh `subject`, `text`, `html`; Python Mailer vẫn là thành phần gửi SMTP và ghi trạng thái Supabase.
 
 ## Nguyên tắc an toàn
 
@@ -14,6 +14,7 @@ Luồng xác nhận đăng ký là một worker Python polling, không phải n8
 - Không chạy hai worker cho cùng một Supabase project. Trên một máy, tôn trọng `mailer/.mailer.lock`; trước khi chạy tay hãy kiểm tra worker/service đang hoạt động.
 - Không chạy lại câu backfill `set confirmation_email_sent_at = now()` trong migration. Câu đó chỉ chạy một lần khi triển khai migration.
 - Không khôi phục webhook n8n cũ cho frontend mới nếu không có yêu cầu rõ; frontend mới ghi đăng ký vào Supabase và để Mailer xử lý.
+- Nếu bật AI webhook, khi n8n/LLM lỗi phải giữ lượt đăng ký chờ thử lại và không gửi thư fallback trong cùng lần xử lý.
 
 ## Khi cần kiểm tra
 
@@ -46,6 +47,6 @@ Nếu `--dry-run` báo `supabase_unreachable`, `supabase_unauthorized`, `supabas
 
 ## Phạm vi của skill
 
-- Mail xác nhận: Mailer tự gửi bằng template, không cần n8n/LLM.
+- Mail xác nhận: Mailer tự gửi bằng template; tùy chọn có thể dùng AI Agent n8n để soạn nội dung qua `n8n/registration-email-ai-agent.json`.
 - Thông báo hàng loạt: Admin Agent có thể dùng n8n/LLM để soạn và duyệt; Mailer vẫn là thành phần gửi thư thật. Với quy trình đó, dùng skill `campaign-announcement`.
 - Không biến skill này thành nơi lưu credential, không thêm secret vào workflow JSON, frontend, GitHub Actions log hoặc commit.
