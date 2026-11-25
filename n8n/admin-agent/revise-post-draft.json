@@ -1,13 +1,308 @@
 {
-  "id":"hnxToolReviseDraft",
-  "name":"HNX Tool - Revise Post Draft",
-  "nodes":[
-    {"parameters":{"workflowInputs":{"values":[{"name":"thread_id","type":"string"},{"name":"admin_user_id","type":"string"},{"name":"draft_id","type":"string"},{"name":"base_version","type":"number"},{"name":"feedback","type":"string"},{"name":"website_payload","type":"string"},{"name":"threads_payload","type":"string"},{"name":"images","type":"string"},{"name":"sources","type":"string"}]}},"id":"dc2d0755-2aca-4ff2-9827-c2f7112202e8","name":"When Executed by Another Workflow","type":"n8n-nodes-base.executeWorkflowTrigger","typeVersion":1.1,"position":[-480,0]},
-    {"parameters":{"operation":"getAll","tableId":"content_drafts","limit":1,"filterType":"manual","matchType":"allFilters","filters":{"conditions":[{"keyName":"id","condition":"eq","keyValue":"={{ $json.draft_id }}"},{"keyName":"thread_id","condition":"eq","keyValue":"={{ $json.thread_id }}"}]}},"id":"19c18f20-eea1-4562-85b1-9a00fd5f746b","name":"Get Draft","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[-256,0],"credentials":{"supabaseApi":{"id":"REPLACE_SUPABASE_CREDENTIAL_ID","name":"HNX Supabase Server"}},"alwaysOutputData":true},
-    {"parameters":{"jsCode":"const req = $('When Executed by Another Workflow').first().json;\nconst draft = $input.first().json;\nif (!draft.id) throw new Error('draft_not_found');\nif (Number(req.base_version) !== Number(draft.current_version)) throw new Error('stale_version: version mới nhất là ' + draft.current_version);\nif (['approved', 'publishing', 'published', 'partial_failure'].includes(draft.status)) throw new Error('approved_version_is_immutable');\nif (!String(req.feedback || '').trim()) throw new Error('missing_information: feedback');\nconst parse = (v, f, fb) => { if (v === undefined || v === null || v === '') return fb; if (typeof v !== 'string') return v; try { return JSON.parse(v); } catch (e) { throw new Error('invalid_json: ' + f); } };\nconst website = parse(req.website_payload, 'website_payload', null);\nconst threads = parse(req.threads_payload, 'threads_payload', null);\nif (!website || typeof website !== 'object' || !String(website.title || '').trim()) throw new Error('invalid_payload: website_payload cần có title');\nif (!threads || typeof threads !== 'object' || !String(threads.text || threads.content || '').trim()) throw new Error('invalid_payload: threads_payload cần có text');\nif (String(threads.text || threads.content).length > 500) throw new Error('threads_text_too_long: tối đa 500 ký tự');\nconst images = parse(req.images, 'images', []);\nconst sources = parse(req.sources, 'sources', []);\nif (!Array.isArray(images) || !Array.isArray(sources)) throw new Error('invalid_json: images và sources phải là array');\nreturn [{ json: { ...req, next_version: Number(draft.current_version) + 1, website_payload: website, threads_payload: threads, images, sources } }];"},"id":"f36c3019-17b1-46ca-be88-f8b5845a31d4","name":"Validate Revision","type":"n8n-nodes-base.code","typeVersion":2,"position":[-32,0]},
-    {"parameters":{"operation":"create","tableId":"draft_versions","fieldsUi":{"fieldValues":[{"fieldId":"draft_id","fieldValue":"={{ $json.draft_id }}"},{"fieldId":"version","fieldValue":"={{ $json.next_version }}"},{"fieldId":"website_payload","fieldValue":"={{ $json.website_payload }}"},{"fieldId":"threads_payload","fieldValue":"={{ $json.threads_payload }}"},{"fieldId":"images","fieldValue":"={{ $json.images }}"},{"fieldId":"sources","fieldValue":"={{ $json.sources }}"},{"fieldId":"feedback","fieldValue":"={{ $json.feedback }}"},{"fieldId":"created_by","fieldValue":"={{ $json.admin_user_id }}"}]}},"id":"b8fd0494-dfd1-4d22-8c82-fdfcefe0b123","name":"Create Revised Version","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[192,0],"credentials":{"supabaseApi":{"id":"REPLACE_SUPABASE_CREDENTIAL_ID","name":"HNX Supabase Server"}}},
-    {"parameters":{"operation":"update","tableId":"content_drafts","filterType":"manual","matchType":"allFilters","filters":{"conditions":[{"keyName":"id","condition":"eq","keyValue":"={{ $json.draft_id }}"}]},"fieldsUi":{"fieldValues":[{"fieldId":"current_version","fieldValue":"={{ $json.version }}"},{"fieldId":"status","fieldValue":"in_review"},{"fieldId":"updated_at","fieldValue":"={{ $now.toISO() }}"}]}},"id":"891a5108-3767-4cfe-8221-b61557afdd7e","name":"Advance Draft Version","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[416,0],"credentials":{"supabaseApi":{"id":"REPLACE_SUPABASE_CREDENTIAL_ID","name":"HNX Supabase Server"}}},
-    {"parameters":{"jsCode":"const draft = $input.first().json;\nconst v = $('Create Revised Version').first().json;\nreturn [{ json: { status: 'in_review', draft: { ...draft, draft_id: draft.id, version: v.version, website_payload: v.website_payload, threads_payload: v.threads_payload, images: v.images, sources: v.sources } } }];"},"id":"7e4a1c63-3e8f-4b9c-a042-6f5e4d3c2b08","name":"Return Revision","type":"n8n-nodes-base.code","typeVersion":2,"position":[640,0]}
+  "id": "hnxToolReviseDraft",
+  "name": "HNX Tool - Revise Post Draft",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "thread_id",
+              "type": "string"
+            },
+            {
+              "name": "admin_user_id",
+              "type": "string"
+            },
+            {
+              "name": "draft_id",
+              "type": "string"
+            },
+            {
+              "name": "base_version",
+              "type": "number"
+            },
+            {
+              "name": "feedback",
+              "type": "string"
+            },
+            {
+              "name": "website_payload",
+              "type": "string"
+            },
+            {
+              "name": "threads_payload",
+              "type": "string"
+            },
+            {
+              "name": "images",
+              "type": "string"
+            },
+            {
+              "name": "sources",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "dc2d0755-2aca-4ff2-9827-c2f7112202e8",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "content_drafts",
+        "limit": 1,
+        "filterType": "string",
+        "filterString": "={{ 'id=eq.' + ($json.draft_id || '00000000-0000-0000-0000-000000000000') }}"
+      },
+      "id": "19c18f20-eea1-4562-85b1-9a00fd5f746b",
+      "name": "Get Draft",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        0
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_SUPABASE_CREDENTIAL_ID",
+          "name": "HNX Supabase Server"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "draft_versions",
+        "limit": 1,
+        "filterType": "string",
+        "filterString": "={{ 'draft_id=eq.' + ($json.id || '00000000-0000-0000-0000-000000000000') + '&version=eq.' + ($json.current_version || 1) }}"
+      },
+      "id": "802190f5-aa60-4302-8f9f-8af7c920dc6a",
+      "name": "Get Current Version",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        0
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_SUPABASE_CREDENTIAL_ID",
+          "name": "HNX Supabase Server"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const req = $('When Executed by Another Workflow').first().json;\nconst draft = $('Get Draft').first().json;\nconst current = $input.first().json;\nconst fallbackImage = 'https://raw.githubusercontent.com/tha0rbej/hanoixanh/main/anh-chien-dich-kenh-muong.png';\nif (!draft.id) throw new Error('draft_not_found');\nif (!current.id) throw new Error('version_not_found: version mới nhất không tồn tại');\nif (Number(req.base_version) !== Number(draft.current_version)) throw new Error('stale_version: version mới nhất là ' + draft.current_version);\nif (['approved', 'publishing', 'published', 'partial_failure'].includes(draft.status)) throw new Error('approved_version_is_immutable');\nif (!String(req.feedback || '').trim()) throw new Error('missing_information: feedback');\nconst parse = (v, f, fb) => { if (v === undefined || v === null || v === '') return fb; if (typeof v !== 'string') return v; try { return JSON.parse(v); } catch (e) { if (f === 'sources' || f === 'images') return fb; throw new Error('invalid_json: ' + f); } };\nconst mergePayload = (base, incoming) => { const out = { ...(base && typeof base === 'object' ? base : {}) }; for (const [key, value] of Object.entries(incoming && typeof incoming === 'object' ? incoming : {})) if (value !== undefined && value !== null && value !== '') out[key] = value; return out; };\nconst safeImage = value => { const v = String(value ?? '').trim(); return /^https:\\/\\/\\S+$/i.test(v) ? v : null; };\nconst existingWebsite = parse(current.website_payload, 'current_website_payload', {});\nconst existingThreads = parse(current.threads_payload, 'current_threads_payload', {});\nconst website = mergePayload(existingWebsite, parse(req.website_payload, 'website_payload', {}));\nconst threads = mergePayload(existingThreads, parse(req.threads_payload, 'threads_payload', {}));\nif (!website || typeof website !== 'object' || !String(website.title || '').trim()) throw new Error('invalid_payload: website_payload cần có title');\nif (!String(website.pollution_status || '').trim()) throw new Error('missing_information: website_payload.pollution_status');\nif (!String(website.objective || '').trim()) throw new Error('missing_information: website_payload.objective');\nif (!String(website.support_equipment || '').trim()) throw new Error('missing_information: website_payload.support_equipment');\nif (!threads || typeof threads !== 'object' || !String(threads.text || threads.content || '').trim()) throw new Error('invalid_payload: threads_payload cần có text');\nif (String(threads.text || threads.content).length > 500) throw new Error('threads_text_too_long: tối đa 500 ký tự');\nconst imagesRaw = parse(req.images, 'images', parse(current.images, 'current_images', []));\nconst sourcesRaw = parse(req.sources, 'sources', parse(current.sources, 'current_sources', []));\nconst images = Array.isArray(imagesRaw) ? imagesRaw : [];\nconst sources = Array.isArray(sourcesRaw) ? sourcesRaw : [];\nconst validImages = images.filter(image => safeImage(typeof image === 'string' ? image : image?.url));\nconst imageUrl = validImages.map(image => safeImage(typeof image === 'string' ? image : image?.url)).find(Boolean) || fallbackImage;\nconst storedImages = validImages.length ? validImages : [{ url: fallbackImage, caption: 'Ảnh chiến dịch Hà Nội Xanh', source_url: fallbackImage, license_status: 'project_asset' }];\nwebsite.image_url = safeImage(website.image_url) || imageUrl;\nthreads.image_url = safeImage(threads.image_url) || imageUrl;\nreturn [{ json: { ...req, next_version: Number(draft.current_version) + 1, website_payload: website, threads_payload: threads, images: storedImages, sources } }];"
+      },
+      "id": "f36c3019-17b1-46ca-be88-f8b5845a31d4",
+      "name": "Validate Revision",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "tableId": "draft_versions",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "draft_id",
+              "fieldValue": "={{ $json.draft_id }}"
+            },
+            {
+              "fieldId": "version",
+              "fieldValue": "={{ $json.next_version }}"
+            },
+            {
+              "fieldId": "website_payload",
+              "fieldValue": "={{ $json.website_payload }}"
+            },
+            {
+              "fieldId": "threads_payload",
+              "fieldValue": "={{ $json.threads_payload }}"
+            },
+            {
+              "fieldId": "images",
+              "fieldValue": "={{ $json.images }}"
+            },
+            {
+              "fieldId": "sources",
+              "fieldValue": "={{ $json.sources }}"
+            },
+            {
+              "fieldId": "feedback",
+              "fieldValue": "={{ $json.feedback }}"
+            },
+            {
+              "fieldId": "created_by",
+              "fieldValue": "={{ $json.admin_user_id }}"
+            }
+          ]
+        }
+      },
+      "id": "b8fd0494-dfd1-4d22-8c82-fdfcefe0b123",
+      "name": "Create Revised Version",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        192,
+        0
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_SUPABASE_CREDENTIAL_ID",
+          "name": "HNX Supabase Server"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "content_drafts",
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Validate Revision').first().json.draft_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "current_version",
+              "fieldValue": "={{ $('Validate Revision').first().json.next_version }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "in_review"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ $now.toISO() }}"
+            }
+          ]
+        }
+      },
+      "id": "891a5108-3767-4cfe-8221-b61557afdd7e",
+      "name": "Advance Draft Version",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_SUPABASE_CREDENTIAL_ID",
+          "name": "HNX Supabase Server"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const draft = $input.first().json;\nconst v = $('Create Revised Version').first().json;\nreturn [{ json: { status: 'in_review', draft: { ...draft, draft_id: draft.id, version: v.version, website_payload: v.website_payload, threads_payload: v.threads_payload, images: v.images, sources: v.sources } } }];"
+      },
+      "id": "7e4a1c63-3e8f-4b9c-a042-6f5e4d3c2b08",
+      "name": "Return Revision",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        0
+      ]
+    }
   ],
-  "connections":{"When Executed by Another Workflow":{"main":[[{"node":"Get Draft","type":"main","index":0}]]},"Get Draft":{"main":[[{"node":"Validate Revision","type":"main","index":0}]]},"Validate Revision":{"main":[[{"node":"Create Revised Version","type":"main","index":0}]]},"Create Revised Version":{"main":[[{"node":"Advance Draft Version","type":"main","index":0}]]},"Advance Draft Version":{"main":[[{"node":"Return Revision","type":"main","index":0}]]}},"active":false,"settings":{"executionOrder":"v1"},"tags":[]
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Draft": {
+      "main": [
+        [
+          {
+            "node": "Get Current Version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Current Version": {
+      "main": [
+        [
+          {
+            "node": "Validate Revision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Revision": {
+      "main": [
+        [
+          {
+            "node": "Create Revised Version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Revised Version": {
+      "main": [
+        [
+          {
+            "node": "Advance Draft Version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Advance Draft Version": {
+      "main": [
+        [
+          {
+            "node": "Return Revision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
 }

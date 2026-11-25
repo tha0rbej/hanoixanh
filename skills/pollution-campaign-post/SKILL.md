@@ -1,11 +1,11 @@
 ---
 name: pollution-campaign-post
-description: Tìm và xác minh địa điểm ô nhiễm tại Hà Nội, tạo và chỉnh sửa bài kêu gọi vệ sinh, rồi đăng hoặc lên lịch đăng lên website Hà Nội Xanh và Threads. Dùng khi admin yêu cầu bất kỳ phần nào của quy trình nghiên cứu, viết, duyệt hoặc xuất bản bài về địa điểm ô nhiễm.
+description: Tìm và xác minh địa điểm ô nhiễm tại Hà Nội, tạo và chỉnh sửa chiến dịch vệ sinh trên website Hà Nội Xanh, rồi đăng hoặc lên lịch nội dung lên Threads. Dùng khi admin yêu cầu bất kỳ phần nào của quy trình nghiên cứu, tạo chiến dịch, duyệt hoặc đăng Threads.
 ---
 
 # Pollution campaign post
 
-Hỗ trợ admin đi từ một nhu cầu nghiên cứu đến bài đăng đa kênh đã được kiểm soát. Chỉ thực hiện đúng phần admin yêu cầu và dừng tại điểm cần lựa chọn hoặc xác nhận.
+Hỗ trợ admin đi từ một nhu cầu nghiên cứu đến chiến dịch trên website và bài đăng Threads đã được kiểm soát. Website chỉ hiển thị chiến dịch; không tạo bài tin tức website.
 
 ## Nguyên tắc
 
@@ -22,7 +22,7 @@ Hỗ trợ admin đi từ một nhu cầu nghiên cứu đến bài đăng đa k
 
 ### 1. Nghiên cứu địa điểm
 
-Khi admin yêu cầu tìm kiếm, gọi `search_pollution_locations`. Trình bày mỗi kết quả với tên địa điểm, quận/huyện, loại ô nhiễm, tóm tắt bằng chứng, ngày nguồn, mức tin cậy, nguồn và ảnh. Ảnh do tìm kiếm trả về là danh sách chung, không gắn với từng bài viết (`source_url` = null, `license_status` = unknown): chỉ là ảnh tham khảo chưa xác minh, đừng nói ảnh đó thuộc bài viết cụ thể.
+Khi admin yêu cầu tìm kiếm, gọi `search_pollution_locations`. Chỉ trình bày đúng tối đa 3 kết quả hợp lệ tại Hà Nội; nếu không đủ 3 nguồn hợp lệ thì nói rõ là chưa đủ, tuyệt đối không bù bằng địa điểm ngoài Hà Nội. Mỗi kết quả chỉ gồm tên địa điểm, một câu “Tình trạng ô nhiễm” tối đa 180 ký tự, nêu đúng hiện trạng trọng tâm (rác, nước thải, bèo tây, tắc dòng chảy…), và đúng một link bài báo nguồn. Bỏ tiêu đề lặp, số vốn, công suất, danh sách hạ tầng, kế hoạch xử lý và phần trích dẫn dài. Không đưa ảnh, danh sách nguồn dài, nội dung ngoài Hà Nội hoặc finding cũ của lần tìm trước vào phần trả lời. Ảnh do tìm kiếm trả về là danh sách chung, không gắn với từng bài viết (`source_url` = null, `license_status` = unknown): chỉ là ảnh tham khảo chưa xác minh, đừng nói ảnh đó thuộc bài viết cụ thể.
 
 Nếu admin chỉ yêu cầu tìm kiếm, trả kết quả rồi dừng. Không tự tạo bài.
 
@@ -32,11 +32,11 @@ Trước khi tạo bài, phải có một `finding_id` đã được admin chọ
 
 ### 3. Thu thập thông tin bắt buộc
 
-Phải có thời gian bắt đầu buổi vệ sinh. Nếu thiếu, hỏi admin. Có thể hỏi thêm giờ kết thúc, điểm tập trung, vật dụng cần mang và số liên hệ, nhưng không chặn tạo draft nếu các trường đó không bắt buộc theo tool contract.
+Phải có cả thời gian bắt đầu và thời gian kết thúc buổi vệ sinh. Nếu thiếu một trong hai, hỏi admin và không gọi tạo draft. Có thể hỏi thêm điểm tập trung, vật dụng cần mang và số liên hệ.
 
 ### 4. Tạo và chỉnh sửa draft
 
-Gọi `create_cleanup_post_draft` sau khi đủ dữ liệu. Draft phải có phiên bản website, phiên bản Threads, ảnh và nguồn; admin xem và tải HTML trực tiếp trên giao diện admin (chưa có preview/file URL riêng).
+Gọi `create_cleanup_post_draft` sau khi đủ dữ liệu. Draft chiến dịch phải có ảnh URL https hợp lệ, nguồn, ngày giờ, địa điểm và đúng ba mục: tình trạng ô nhiễm, mục tiêu/kế hoạch, trang bị hỗ trợ. Workflow tự điền ba mục từ finding nếu model chưa truyền; khi sửa draft không yêu cầu admin nhập lại ảnh vì workflow tự giữ ảnh cũ hoặc chèn ảnh dự phòng hợp lệ. Không tạo nội dung bài đăng website. Nội dung đăng chỉ nằm trong `threads_payload`.
 
 Đưa draft cho admin đọc rồi dừng ở đó; không duyệt trong cùng lượt với lúc tạo/sửa. Với mỗi feedback, gọi `revise_post_draft`, giữ nguyên `draft_id` và tạo version mới. Dùng `get_post_draft` để lấy version mới nhất khi tiếp tục một phiên cũ.
 
@@ -46,7 +46,7 @@ Chỉ gọi `approve_post_draft` khi admin, ở một tin nhắn sau khi đã đ
 
 ### 6. Hỏi thời gian đăng
 
-Sau khi draft được duyệt, hỏi admin muốn đăng lúc nào và chờ tin nhắn trả lời riêng của họ.
+Sau khi draft chiến dịch được duyệt, hỏi admin muốn đăng Threads lúc nào và chờ tin nhắn trả lời riêng của họ.
 
 - Có thời gian: truyền ISO 8601 có múi giờ `Asia/Ho_Chi_Minh` vào `publish_at`.
 - Admin nói “đăng luôn” hoặc “không cần hẹn giờ”: truyền `publish_at = null` và xác nhận đăng ngay.
@@ -54,7 +54,7 @@ Sau khi draft được duyệt, hỏi admin muốn đăng lúc nào và chờ ti
 
 ### 7. Xuất bản
 
-Chỉ khi admin vừa nhắn rõ muốn đăng (ở lượt sau lượt duyệt), gọi riêng `publish_website_post` và `publish_threads_post`. Báo trạng thái, URL và lỗi của từng kênh. `in_progress` hoặc `already_published` nghĩa là một lượt chạy khác đã giành job: báo đúng như vậy, không gọi lại liên tục. Nếu một kênh lỗi, chỉ đề xuất retry kênh đó.
+Chỉ khi admin vừa nhắn rõ muốn đưa chiến dịch lên web hoặc đăng (ở lượt sau lượt duyệt), gọi `publish_campaign` để tạo bản ghi trong `campaigns`; nếu admin muốn đăng mạng xã hội thì gọi `publish_threads_post`. Không gọi công cụ đăng bài tin tức website. Báo trạng thái, URL và lỗi của từng hành động. `in_progress` hoặc `already_published` nghĩa là một lượt chạy khác đã giành job: báo đúng như vậy, không gọi lại liên tục.
 
 ## Điều kiện hoàn thành
 

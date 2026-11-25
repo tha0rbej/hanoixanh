@@ -1,61 +1,1195 @@
 {
   "id": "hnxToolPublishWebsite",
-  "name": "HNX Tool - Publish Website Post",
+  "name": "HNX Tool - Publish Campaign",
   "nodes": [
-    {"parameters":{"workflowInputs":{"values":[{"name":"thread_id","type":"string"},{"name":"admin_user_id","type":"string"},{"name":"draft_id","type":"string"},{"name":"approved_version","type":"number"},{"name":"publish_at","type":"string"},{"name":"publish_now","type":"boolean"},{"name":"confirmation_text","type":"string"},{"name":"turn_started_at","type":"string"},{"name":"trigger_source","type":"string"},{"name":"job_id","type":"string"}]}},"id":"e596cc75-5f0d-5773-a89a-00cc79c566e9","name":"When Executed by Another Workflow","type":"n8n-nodes-base.executeWorkflowTrigger","typeVersion":1.1,"position":[-1400,0]},
-    {"parameters":{"operation":"getAll","tableId":"content_drafts","limit":1,"filterType":"manual","matchType":"allFilters","filters":{"conditions":[{"keyName":"id","condition":"eq","keyValue":"={{ $json.draft_id }}"},{"keyName":"thread_id","condition":"eq","keyValue":"={{ $json.thread_id }}"}]}},"id":"a4db42fd-907c-5944-8441-69a2998e1147","name":"Get Approved Draft","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[-1180,0],"credentials":{"supabaseApi":{"id":"REPLACE_SUPABASE_CREDENTIAL_ID","name":"HNX Supabase Server"}},"alwaysOutputData":true},
-    {"parameters":{"jsCode":"const req = $('When Executed by Another Workflow').first().json;\nconst draft = $input.first().json;\nif (!draft.id) throw new Error('draft_not_found');\nif (draft.status !== 'approved') throw new Error('draft_not_approved');\nif (Number(req.approved_version) !== Number(draft.approved_version)) throw new Error('approved_version_mismatch');\nconst stop = (status, message) => [{ json: { allowed: false, result: { status, draft_id: draft.id, approved_version: Number(req.approved_version), message } } }];\nconst raw = String(req.publish_at || '').trim();\nconst publishNow = req.publish_now === true || String(req.publish_now).toLowerCase() === 'true';\nif (req.trigger_source === 'scheduler') {\n  // Lần chạy của Scheduled Publisher: admin đã xác nhận lúc hẹn giờ; job được kiểm ở Decide Job và giành nguyên tử ở Claim Job.\n  if (!String(req.job_id || '').trim()) throw new Error('job_id_required');\n} else {\n  // Xác nhận chỉ lấy từ tin nhắn thật của admin ở lượt này (main workflow gắn cố định, model không điền được).\n  const text = String(req.confirmation_text || '').normalize('NFC').toLowerCase();\n  const L = '(?<![\\\\p{L}\\\\p{N}_])';\n  const R = '(?![\\\\p{L}\\\\p{N}_])';\n  const words = '(?:đăng|xuất bản|publish|lên lịch|hẹn giờ|hẹn|lên bài|schedule)';\n  const publishRe = new RegExp(L + words + R, 'u');\n  const negatedRe = new RegExp(L + '(?:đừng|chớ|chưa|không|khoan|hủy|huỷ|bỏ|dừng|don\\'t|do not|not|never|cancel)\\\\s+(?:được\\\\s+|nên\\\\s+|cần\\\\s+|vội\\\\s+|phải\\\\s+)*' + words + R, 'u');\n  const immediateRe = new RegExp(L + '(?:ngay lập tức|ngay|luôn|bây giờ|hiện tại|lập tức|liền|now|immediately|go live|đăng đi|xuất bản đi)' + R, 'u');\n  if (!publishRe.test(text) || negatedRe.test(text)) {\n    return stop('needs_admin_confirmation', 'Tin nhắn hiện tại của admin chưa yêu cầu đăng hoặc hẹn giờ đăng rõ ràng (ví dụ \"đăng luôn\", \"đăng lúc 8h sáng mai\"). Hãy hỏi admin và chờ tin nhắn xác nhận của họ. Không tự đăng.');\n  }\n  // Duyệt và đăng phải ở hai lượt chat khác nhau: bản vừa được duyệt trong chính lượt này thì admin chưa xác nhận đăng.\n  const turnMs = Date.parse(req.turn_started_at);\n  if (Number.isNaN(turnMs)) throw new Error('turn_started_at_missing: không xác định được thời điểm bắt đầu lượt chat nên không thể đăng');\n  const approvedMs = Date.parse(draft.approved_at);\n  const SKEW_MS = 5000; // dung sai lệch đồng hồ n8n/Supabase, nghiêng về phía từ chối\n  if (Number.isNaN(approvedMs) || approvedMs >= turnMs - SKEW_MS) {\n    return stop('needs_admin_confirmation', 'Bản nháp vừa được duyệt ở lượt này; cần admin xác nhận đăng bằng một tin nhắn riêng ở lượt sau (đăng ngay hay hẹn giờ).');\n  }\n  if (!raw && publishNow && !immediateRe.test(text)) {\n    return stop('needs_admin_confirmation', 'Admin chưa nói rõ đăng ngay hay hẹn giờ. Hãy hỏi admin muốn đăng lúc nào, hoặc \"đăng luôn\" nếu đăng ngay.');\n  }\n}\nif (!raw && !publishNow) throw new Error('publish_time_or_publish_now_required');\nlet runAt = new Date();\nif (raw) {\n  const withT = raw.replace(/^(\\d{4}-\\d{2}-\\d{2})\\s+/, '$1T');\n  const hasZone = /(Z|[+-]\\d{2}:?\\d{2})$/i.test(withT);\n  const t = Date.parse((hasZone ? withT : (/^\\d{4}-\\d{2}-\\d{2}$/.test(withT) ? withT + 'T00:00:00' : withT) + '+07:00'));\n  if (Number.isNaN(t)) throw new Error('invalid_datetime: publish_at=' + raw);\n  if (t < Date.now() - 5 * 60000) throw new Error('publish_at_in_past: thời gian đăng đã qua, hãy hỏi lại admin.');\n  runAt = new Date(t);\n}\nconst due = runAt.getTime() <= Date.now() + 60000;\nreturn [{ json: { allowed: true, ...req, publish_now: publishNow, run_at: runAt.toISOString(), due } }];"},"id":"895a887b-0f3b-593e-92f7-40b1cba9f471","name":"Validate Publish","type":"n8n-nodes-base.code","typeVersion":2,"position":[-960,0]},
-    {"parameters":{"conditions":{"options":{"caseSensitive":true,"leftValue":"","typeValidation":"loose"},"conditions":[{"id":"709358ed-ebb8-402e-8021-4e6436aa0001","leftValue":"={{ $json.allowed === true }}","rightValue":"","operator":{"type":"boolean","operation":"true","singleValue":true}}],"combinator":"and"},"options":{}},"id":"709358ed-ebb8-402e-8021-4e6436aa827c","name":"Validation Passed","type":"n8n-nodes-base.if","typeVersion":2.2,"position":[-740,0]},
-    {"parameters":{"jsCode":"return [{ json: $input.first().json.result }];"},"id":"e9a98e59-c895-41ed-8c2e-33e3e0109cb4","name":"Return Validation Result","type":"n8n-nodes-base.code","typeVersion":2,"position":[-740,-240]},
-    {"parameters":{"operation":"getAll","tableId":"publication_jobs","limit":1,"filterType":"manual","matchType":"allFilters","filters":{"conditions":[{"keyName":"draft_id","condition":"eq","keyValue":"={{ $json.draft_id }}"},{"keyName":"draft_version","condition":"eq","keyValue":"={{ $json.approved_version }}"},{"keyName":"channel","condition":"eq","keyValue":"website"}]}},"id":"fcd54e4a-b54f-5892-8803-ce078feb5d95","name":"Get Existing Job","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[-740,0],"credentials":{"supabaseApi":{"id":"REPLACE_SUPABASE_CREDENTIAL_ID","name":"HNX Supabase Server"}},"alwaysOutputData":true},
-    {"parameters":{"jsCode":"const ctx = $('Validate Publish').first().json;\nconst job = $input.first().json;\nconst now = Date.now();\nconst stopWith = (base, result) => [{ json: { ...base, action: 'stop', result } }];\nif (!job.id) {\n  if (ctx.trigger_source === 'scheduler') return stopWith(ctx, { status: 'job_not_found', message: 'Không tìm thấy job để chạy theo lịch.' });\n  return [{ json: { ...ctx, action: 'create' } }];\n}\nconst base = { ...ctx, job };\nconst stop = result => stopWith(base, result);\nconst info = { publication_job_id: job.id, channel: job.channel, provider_post_id: job.provider_post_id || null, published_url: job.published_url || null, publish_at: job.publish_at || null };\nif (job.status === 'published') return stop({ ...info, status: 'already_published', message: 'Kênh này đã đăng version này, không đăng lại.' });\nif (job.status === 'cancelled') return stop({ ...info, status: 'job_cancelled', message: 'Job đăng của kênh này đã bị hủy, không tự đăng lại. Hãy hỏi admin.' });\nif (ctx.trigger_source === 'scheduler') {\n  if (job.id !== ctx.job_id || job.status !== 'scheduled') return stop({ ...info, status: 'skipped', message: 'Job không còn ở trạng thái scheduled, bỏ qua lần chạy theo lịch.' });\n}\nif (job.status === 'scheduled') {\n  if (Date.parse(job.publish_at) <= now + 60000) return [{ json: { ...base, action: 'claim' } }];\n  return stop({ ...info, status: 'already_scheduled', message: 'Version này đã được lên lịch cho kênh này, chưa thể đổi giờ qua tool.' });\n}\nconst retryable = job.status === 'failed' || now - Date.parse(job.updated_at || job.created_at) > 10 * 60000;\nif (!retryable) return stop({ ...info, status: 'in_progress', message: 'Kênh này đang được đăng, hãy kiểm tra lại sau ít phút.' });\n// failed hoặc kẹt quá 10 phút: đến hạn thì giành job đăng luôn; chưa đến hạn thì đặt lại lịch.\nreturn [{ json: { ...base, action: ctx.due ? 'claim' : 'reschedule' } }];"},"id":"5d302a2e-4732-5f38-b2b9-8d08997b1573","name":"Decide Job","type":"n8n-nodes-base.code","typeVersion":2,"position":[-520,0]},
-    {"parameters":{"conditions":{"options":{"caseSensitive":true,"leftValue":"","typeValidation":"loose"},"conditions":[{"id":"bb7fa907-8a98-5657-a03f-35422adef959","leftValue":"={{ $json.action === 'stop' }}","rightValue":"","operator":{"type":"boolean","operation":"true","singleValue":true}}],"combinator":"and"},"options":{}},"id":"c5a6b37c-38db-598c-a7d7-2c4326f2c5ac","name":"Should Stop","type":"n8n-nodes-base.if","typeVersion":2.2,"position":[-300,0]},
-    {"parameters":{"jsCode":"return [{ json: $input.first().json.result }];"},"id":"308c719a-7d8f-50ec-92b0-d523a795b467","name":"Return Existing Job","type":"n8n-nodes-base.code","typeVersion":2,"position":[-80,-240]},
-    {"parameters":{"conditions":{"options":{"caseSensitive":true,"leftValue":"","typeValidation":"loose"},"conditions":[{"id":"444dda6b-14f5-58b1-9600-379980b5656d","leftValue":"={{ $json.action === 'create' }}","rightValue":"","operator":{"type":"boolean","operation":"true","singleValue":true}}],"combinator":"and"},"options":{}},"id":"e16c0a15-25f5-5778-87b5-d7e27fccec60","name":"Is New Job","type":"n8n-nodes-base.if","typeVersion":2.2,"position":[-80,0]},
-    {"parameters":{"operation":"create","tableId":"publication_jobs","fieldsUi":{"fieldValues":[{"fieldId":"draft_id","fieldValue":"={{ $json.draft_id }}"},{"fieldId":"draft_version","fieldValue":"={{ $json.approved_version }}"},{"fieldId":"channel","fieldValue":"website"},{"fieldId":"status","fieldValue":"scheduled"},{"fieldId":"publish_at","fieldValue":"={{ $json.run_at }}"},{"fieldId":"requested_by","fieldValue":"={{ $json.admin_user_id }}"}]}},"id":"0f588527-da6c-560d-ba02-c41f067f88ab","name":"Create Job","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[140,-120],"credentials":{"supabaseApi":{"id":"REPLACE_SUPABASE_CREDENTIAL_ID","name":"HNX Supabase Server"}}},
-    {"parameters":{"conditions":{"options":{"caseSensitive":true,"leftValue":"","typeValidation":"loose"},"conditions":[{"id":"2de7f8d6-e3c5-4764-acc8-e073e7430002","leftValue":"={{ $json.action === 'reschedule' }}","rightValue":"","operator":{"type":"boolean","operation":"true","singleValue":true}}],"combinator":"and"},"options":{}},"id":"2f311bdb-cd8c-4074-a320-8877eaeb6fe6","name":"Needs Reschedule","type":"n8n-nodes-base.if","typeVersion":2.2,"position":[140,120]},
-    {"parameters":{"operation":"update","tableId":"publication_jobs","filterType":"manual","matchType":"allFilters","filters":{"conditions":[{"keyName":"id","condition":"eq","keyValue":"={{ $json.job.id }}"},{"keyName":"status","condition":"eq","keyValue":"={{ $json.job.status }}"},{"keyName":"updated_at","condition":"eq","keyValue":"={{ $json.job.updated_at }}"}]},"fieldsUi":{"fieldValues":[{"fieldId":"status","fieldValue":"scheduled"},{"fieldId":"publish_at","fieldValue":"={{ $json.run_at }}"},{"fieldId":"requested_by","fieldValue":"={{ $json.admin_user_id }}"},{"fieldId":"error_message","fieldValue":"={{ null }}"},{"fieldId":"updated_at","fieldValue":"={{ $now.toISO() }}"}]}},"id":"0568ca7e-1d07-5197-8398-8b35892a0cf1","name":"Reuse Job","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[360,240],"credentials":{"supabaseApi":{"id":"REPLACE_SUPABASE_CREDENTIAL_ID","name":"HNX Supabase Server"}},"alwaysOutputData":true},
-    {"parameters":{"jsCode":"const ctx = $('Decide Job').first().json;\nconst src = $input.first().json;\nconst jobId = ctx.action === 'claim' ? ctx.job.id : src.id;\nif (!jobId) throw new Error('job_changed_concurrently: job vừa được execution khác thay đổi, hãy kiểm tra lại trạng thái rồi thử lại.');\nreturn [{ json: { ...ctx, job_id: jobId } }];"},"id":"2cdc0c15-abaf-5f47-be8f-dc05d68e7307","name":"Job Ready","type":"n8n-nodes-base.code","typeVersion":2,"position":[360,0]},
-    {"parameters":{"conditions":{"options":{"caseSensitive":true,"leftValue":"","typeValidation":"loose"},"conditions":[{"id":"bd2f0511-2581-5495-8db4-b7577ab8e106","leftValue":"={{ $json.due }}","rightValue":"","operator":{"type":"boolean","operation":"true","singleValue":true}}],"combinator":"and"},"options":{}},"id":"434f88da-4f28-51c2-af80-a0a25adf1e06","name":"Due Now","type":"n8n-nodes-base.if","typeVersion":2.2,"position":[580,0]},
-    {"parameters":{"jsCode":"const x = $input.first().json;\nreturn [{ json: { status: 'scheduled', publication_job_id: x.job_id, channel: 'website', publish_at: x.run_at, message: 'Đã lên lịch. Hệ thống tự đăng trong vòng khoảng 1 phút sau giờ hẹn.' } }];"},"id":"a264dd1a-0be0-5498-bb3f-773688c04507","name":"Return Scheduled","type":"n8n-nodes-base.code","typeVersion":2,"position":[800,-240]},
-    {"parameters":{"operation":"getAll","tableId":"draft_versions","limit":1,"filterType":"manual","matchType":"allFilters","filters":{"conditions":[{"keyName":"draft_id","condition":"eq","keyValue":"={{ $json.draft_id }}"},{"keyName":"version","condition":"eq","keyValue":"={{ $json.approved_version }}"}]}},"id":"f8ffef35-2a51-50ec-acc0-e9e699c8222c","name":"Get Approved Version","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[800,0],"credentials":{"supabaseApi":{"id":"REPLACE_SUPABASE_CREDENTIAL_ID","name":"HNX Supabase Server"}},"alwaysOutputData":true},
-    {"parameters":{"jsCode":"const req = $('Job Ready').first().json;\nconst version = $input.first().json;\nif (!version.id) throw new Error('version_not_found');\nconst p = typeof version.website_payload === 'string' ? JSON.parse(version.website_payload) : (version.website_payload || {});\nconst clean = v => { let s = String(v ?? ''); let prev; do { prev = s; s = s.replace(/<\\/?[a-zA-Z!][^>]*>/g, ''); } while (s !== prev); return s.trim(); };\nconst safeUrl = v => { const s = String(v ?? '').replace(/^[\\s\\u0000-\\u001f\\u007f-\\u009f]+/, '').trim(); return /^https?:\\/\\//i.test(s) ? s : null; };\nconst title = clean(p.title);\nif (!title) throw new Error('Tiêu đề bài viết trống sau khi loại bỏ thẻ HTML');\nconst slug = String(clean(p.slug) || title || 'bai-viet').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Date.now();\nreturn [{ json: { ...req, title, slug, content: clean(p.content), excerpt: clean(p.excerpt), image_url: safeUrl(p.image_url) || safeUrl((version.images || [])[0]?.url), source_name: clean(p.source_name) || 'Hà Nội Xanh', source_url: safeUrl(p.source_url), category: clean(p.category) || 'Hoạt động' } }];"},"id":"1e08a4df-298c-5de0-8acc-a1a97c39da79","name":"Prepare Website Post","type":"n8n-nodes-base.code","typeVersion":2,"position":[1020,0],"onError":"continueErrorOutput"},
-    {"parameters":{"method":"POST","url":"={{ $env.HNX_SUPABASE_URL + '/rest/v1/rpc/claim_publication_job' }}","sendHeaders":true,"headerParameters":{"parameters":[{"name":"apikey","value":"={{ $env.HNX_SUPABASE_SECRET_KEY || $env.HNX_SUPABASE_SERVICE_ROLE_KEY }}"},{"name":"Authorization","value":"={{ 'Bearer ' + ($env.HNX_SUPABASE_SECRET_KEY || $env.HNX_SUPABASE_SERVICE_ROLE_KEY) }}"},{"name":"Content-Type","value":"application/json"}]},"sendBody":true,"contentType":"raw","rawContentType":"application/json","body":"={{ JSON.stringify({ p_job_id: $json.job_id, p_stale_after: '10 minutes' }) }}","options":{}},"id":"cb97c02e-73bc-4e41-9041-33a25e26392c","name":"Claim Job","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[1240,0],"alwaysOutputData":true},
-    {"parameters":{"jsCode":"const prepared = $('Prepare Website Post').first().json;\nconst rows = $input.all().map(item => item.json).filter(row => row && row.id);\nif (rows.length === 1) return [{ json: { ...prepared, claimed: true, claimed_job: rows[0] } }];\nreturn [{ json: { claimed: false, job_id: prepared.job_id, channel: 'website' } }];"},"id":"d1f7db61-b3f1-41c0-8b1b-0d733c15ead6","name":"Evaluate Claim","type":"n8n-nodes-base.code","typeVersion":2,"position":[1460,0]},
-    {"parameters":{"conditions":{"options":{"caseSensitive":true,"leftValue":"","typeValidation":"loose"},"conditions":[{"id":"2de7f8d6-e3c5-4764-acc8-e073e7430003","leftValue":"={{ $json.claimed === true }}","rightValue":"","operator":{"type":"boolean","operation":"true","singleValue":true}}],"combinator":"and"},"options":{}},"id":"8dc41a40-643e-4b4d-8a63-5e2cedf73b5c","name":"Claimed","type":"n8n-nodes-base.if","typeVersion":2.2,"position":[1680,0]},
-    {"parameters":{"operation":"getAll","tableId":"publication_jobs","limit":1,"filterType":"manual","matchType":"allFilters","filters":{"conditions":[{"keyName":"id","condition":"eq","keyValue":"={{ $json.job_id }}"}]}},"id":"b06c7f9e-a60f-41e6-89b2-b71f5b7ac0f0","name":"Get Job After Claim","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[1680,-240],"credentials":{"supabaseApi":{"id":"REPLACE_SUPABASE_CREDENTIAL_ID","name":"HNX Supabase Server"}},"alwaysOutputData":true},
-    {"parameters":{"jsCode":"const x = $('Evaluate Claim').first().json;\nconst job = $input.first().json;\nconst info = { publication_job_id: x.job_id, channel: x.channel, provider_post_id: job.provider_post_id || null, published_url: job.published_url || null };\nif (job.status === 'published') return [{ json: { ...info, status: 'already_published', message: 'Kênh này đã được đăng bởi một lượt chạy khác, không đăng lại.' } }];\nreturn [{ json: { ...info, status: 'in_progress', message: 'Một lượt chạy khác đang đăng hoặc đã xử lý job này, không đăng trùng. Hãy kiểm tra lại sau ít phút.' } }];"},"id":"7410a994-f072-4215-9d37-093fb7b0777e","name":"Return Claim Lost","type":"n8n-nodes-base.code","typeVersion":2,"position":[1900,-240]},
-    {"parameters":{"operation":"create","tableId":"posts","fieldsUi":{"fieldValues":[{"fieldId":"title","fieldValue":"={{ $json.title }}"},{"fieldId":"slug","fieldValue":"={{ $json.slug }}"},{"fieldId":"content","fieldValue":"={{ $json.content }}"},{"fieldId":"excerpt","fieldValue":"={{ $json.excerpt }}"},{"fieldId":"image_url","fieldValue":"={{ $json.image_url }}"},{"fieldId":"source_name","fieldValue":"={{ $json.source_name }}"},{"fieldId":"source_url","fieldValue":"={{ $json.source_url }}"},{"fieldId":"category","fieldValue":"={{ $json.category }}"},{"fieldId":"status","fieldValue":"published"},{"fieldId":"author_id","fieldValue":"={{ $json.admin_user_id }}"},{"fieldId":"published_at","fieldValue":"={{ $now.toISO() }}"}]}},"id":"bf1ce86f-048e-5b4f-8fc5-edbdba9ebca2","name":"Publish Website Post","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[1900,0],"credentials":{"supabaseApi":{"id":"REPLACE_SUPABASE_CREDENTIAL_ID","name":"HNX Supabase Server"}},"onError":"continueErrorOutput"},
-    {"parameters":{"operation":"update","tableId":"publication_jobs","filterType":"manual","matchType":"allFilters","filters":{"conditions":[{"keyName":"id","condition":"eq","keyValue":"={{ $('Job Ready').first().json.job_id }}"}]},"fieldsUi":{"fieldValues":[{"fieldId":"status","fieldValue":"published"},{"fieldId":"provider_post_id","fieldValue":"={{ $json.id }}"},{"fieldId":"published_url","fieldValue":"={{ String($env.HNX_PUBLIC_SITE_URL || '').replace(/\\/+$/, '') + '/tin-tuc' }}"},{"fieldId":"published_at","fieldValue":"={{ $now.toISO() }}"},{"fieldId":"updated_at","fieldValue":"={{ $now.toISO() }}"}]}},"id":"4b77a1d3-4be6-5155-86b8-8ea1e4417976","name":"Complete Website Job","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[2120,-60],"credentials":{"supabaseApi":{"id":"REPLACE_SUPABASE_CREDENTIAL_ID","name":"HNX Supabase Server"}}},
-    {"parameters":{"jsCode":"const job = $input.first().json;\nreturn [{ json: { status: 'published', publication_job_id: job.id, channel: 'website', provider_post_id: job.provider_post_id, published_url: job.published_url, published_at: job.published_at } }];"},"id":"228c936c-12df-5e18-803f-69a1b9eec9af","name":"Return Result","type":"n8n-nodes-base.code","typeVersion":2,"position":[2340,-60]},
-    {"parameters":{"operation":"update","tableId":"publication_jobs","filterType":"manual","matchType":"allFilters","filters":{"conditions":[{"keyName":"id","condition":"eq","keyValue":"={{ $('Job Ready').first().json.job_id }}"}]},"fieldsUi":{"fieldValues":[{"fieldId":"status","fieldValue":"failed"},{"fieldId":"error_message","fieldValue":"={{ String(typeof $json.error === 'string' ? $json.error : ($json.error && $json.error.message) || 'unknown error').slice(0, 500) }}"},{"fieldId":"updated_at","fieldValue":"={{ $now.toISO() }}"}]}},"id":"3f6cac9a-d75b-5f2c-ac53-03793bae7417","name":"Mark Job Failed","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[2120,120],"credentials":{"supabaseApi":{"id":"REPLACE_SUPABASE_CREDENTIAL_ID","name":"HNX Supabase Server"}}},
-    {"parameters":{"jsCode":"const row = $input.first().json;\nthrow new Error('publish_failed: ' + (row.error_message || 'unknown error') + '. Job đã đánh dấu failed, có thể thử lại cho riêng kênh này.');"},"id":"656c9868-c82d-5af8-be73-27dfe3cd10fc","name":"Throw Failure","type":"n8n-nodes-base.code","typeVersion":2,"position":[2340,120]}
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "thread_id",
+              "type": "string"
+            },
+            {
+              "name": "admin_user_id",
+              "type": "string"
+            },
+            {
+              "name": "draft_id",
+              "type": "string"
+            },
+            {
+              "name": "approved_version",
+              "type": "number"
+            },
+            {
+              "name": "publish_at",
+              "type": "string"
+            },
+            {
+              "name": "publish_now",
+              "type": "boolean"
+            },
+            {
+              "name": "confirmation_text",
+              "type": "string"
+            },
+            {
+              "name": "turn_started_at",
+              "type": "string"
+            },
+            {
+              "name": "trigger_source",
+              "type": "string"
+            },
+            {
+              "name": "job_id",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "e596cc75-5f0d-5773-a89a-00cc79c566e9",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1400,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "content_drafts",
+        "limit": 1,
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.draft_id }}"
+            },
+            {
+              "keyName": "thread_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.thread_id }}"
+            }
+          ]
+        }
+      },
+      "id": "a4db42fd-907c-5944-8441-69a2998e1147",
+      "name": "Get Approved Draft",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1180,
+        0
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_SUPABASE_CREDENTIAL_ID",
+          "name": "HNX Supabase Server"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const req = $('When Executed by Another Workflow').first().json;\nconst draft = $input.first().json;\nif (!draft.id) throw new Error('draft_not_found');\nif (draft.status !== 'approved') throw new Error('draft_not_approved');\nif (Number(req.approved_version) !== Number(draft.approved_version)) throw new Error('approved_version_mismatch');\nconst stop = (status, message) => [{ json: { allowed: false, result: { status, draft_id: draft.id, approved_version: Number(req.approved_version), message } } }];\nconst raw = String(req.publish_at || '').trim();\nconst publishNow = req.publish_now === true || String(req.publish_now).toLowerCase() === 'true';\nif (req.trigger_source === 'scheduler') {\n  // Lần chạy của Scheduled Publisher: admin đã xác nhận lúc hẹn giờ; job được kiểm ở Decide Job và giành nguyên tử ở Claim Job.\n  if (!String(req.job_id || '').trim()) throw new Error('job_id_required');\n} else {\n  // Xác nhận chỉ lấy từ tin nhắn thật của admin ở lượt này (main workflow gắn cố định, model không điền được).\n  const text = String(req.confirmation_text || '').normalize('NFC').toLowerCase();\n  const L = '(?<![\\\\p{L}\\\\p{N}_])';\n  const R = '(?![\\\\p{L}\\\\p{N}_])';\n  const words = '(?:đăng|xuất bản|publish|lên lịch|hẹn giờ|hẹn|lên bài|schedule)';\n  const publishRe = new RegExp(L + words + R, 'u');\n  const negatedRe = new RegExp(L + '(?:đừng|chớ|chưa|không|khoan|hủy|huỷ|bỏ|dừng|don\\'t|do not|not|never|cancel)\\\\s+(?:được\\\\s+|nên\\\\s+|cần\\\\s+|vội\\\\s+|phải\\\\s+)*' + words + R, 'u');\n  const immediateRe = new RegExp(L + '(?:ngay lập tức|ngay|luôn|bây giờ|hiện tại|lập tức|liền|now|immediately|go live|đăng đi|xuất bản đi)' + R, 'u');\n  const approvalRe = new RegExp(L + '(?:phê duyệt|duyệt|chốt|đồng ý|xác nhận|approve|approved|ok|okay|oke)' + R, 'u');\n  const combinedApproval = approvalRe.test(text) && !negatedRe.test(text);\n  if (!publishRe.test(text) || negatedRe.test(text)) {\n    return stop('needs_admin_confirmation', 'Tin nhắn hiện tại của admin chưa yêu cầu đăng hoặc hẹn giờ đăng rõ ràng (ví dụ \"đăng luôn\", \"đăng lúc 8h sáng mai\"). Hãy hỏi admin và chờ tin nhắn xác nhận của họ. Không tự đăng.');\n  }\n  // Duyệt và đăng phải ở hai lượt chat khác nhau: bản vừa được duyệt trong chính lượt này thì admin chưa xác nhận đăng.\n  const turnMs = Date.parse(req.turn_started_at);\n  if (Number.isNaN(turnMs)) throw new Error('turn_started_at_missing: không xác định được thời điểm bắt đầu lượt chat nên không thể đăng');\n  const approvedMs = Date.parse(draft.approved_at);\n  const SKEW_MS = 5000; // dung sai lệch đồng hồ n8n/Supabase, nghiêng về phía từ chối\n  if (Number.isNaN(approvedMs) || (approvedMs >= turnMs - SKEW_MS && !combinedApproval)) {\n    return stop('needs_admin_confirmation', 'Bản nháp vừa được duyệt ở lượt này; cần admin xác nhận đăng bằng một tin nhắn riêng ở lượt sau (đăng ngay hay hẹn giờ).');\n  }\n  if (!raw && publishNow && !immediateRe.test(text)) {\n    return stop('needs_admin_confirmation', 'Admin chưa nói rõ đăng ngay hay hẹn giờ. Hãy hỏi admin muốn đăng lúc nào, hoặc \"đăng luôn\" nếu đăng ngay.');\n  }\n}\nif (!raw && !publishNow) throw new Error('publish_time_or_publish_now_required');\nlet runAt = new Date();\nif (raw) {\n  const withT = raw.replace(/^(\\d{4}-\\d{2}-\\d{2})\\s+/, '$1T');\n  const hasZone = /(Z|[+-]\\d{2}:?\\d{2})$/i.test(withT);\n  const t = Date.parse((hasZone ? withT : (/^\\d{4}-\\d{2}-\\d{2}$/.test(withT) ? withT + 'T00:00:00' : withT) + '+07:00'));\n  if (Number.isNaN(t)) throw new Error('invalid_datetime: publish_at=' + raw);\n  if (t < Date.now() - 5 * 60000) throw new Error('publish_at_in_past: thời gian đăng đã qua, hãy hỏi lại admin.');\n  runAt = new Date(t);\n}\nconst due = runAt.getTime() <= Date.now() + 60000;\nreturn [{ json: { allowed: true, ...req, publish_now: publishNow, run_at: runAt.toISOString(), due } }];"
+      },
+      "id": "895a887b-0f3b-593e-92f7-40b1cba9f471",
+      "name": "Validate Publish",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "709358ed-ebb8-402e-8021-4e6436aa0001",
+              "leftValue": "={{ $json.allowed === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "709358ed-ebb8-402e-8021-4e6436aa827c",
+      "name": "Validation Passed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -740,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: $input.first().json.result }];"
+      },
+      "id": "e9a98e59-c895-41ed-8c2e-33e3e0109cb4",
+      "name": "Return Validation Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -740,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "publication_jobs",
+        "limit": 1,
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "draft_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.draft_id }}"
+            },
+            {
+              "keyName": "draft_version",
+              "condition": "eq",
+              "keyValue": "={{ $json.approved_version }}"
+            },
+            {
+              "keyName": "channel",
+              "condition": "eq",
+              "keyValue": "website"
+            }
+          ]
+        }
+      },
+      "id": "fcd54e4a-b54f-5892-8803-ce078feb5d95",
+      "name": "Get Existing Job",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -740,
+        0
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_SUPABASE_CREDENTIAL_ID",
+          "name": "HNX Supabase Server"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('Validate Publish').first().json;\nconst job = $input.first().json;\nconst now = Date.now();\nconst stopWith = (base, result) => [{ json: { ...base, action: 'stop', result } }];\nif (!job.id) {\n  if (ctx.trigger_source === 'scheduler') return stopWith(ctx, { status: 'job_not_found', message: 'Không tìm thấy job để chạy theo lịch.' });\n  return [{ json: { ...ctx, action: 'create' } }];\n}\nconst base = { ...ctx, job };\nconst stop = result => stopWith(base, result);\nconst info = { publication_job_id: job.id, channel: job.channel, provider_post_id: job.provider_post_id || null, published_url: job.published_url || null, publish_at: job.publish_at || null };\nif (job.status === 'published') return stop({ ...info, status: 'already_published', message: 'Kênh này đã đăng version này, không đăng lại.' });\nif (job.status === 'cancelled') return stop({ ...info, status: 'job_cancelled', message: 'Job đăng của kênh này đã bị hủy, không tự đăng lại. Hãy hỏi admin.' });\nif (ctx.trigger_source === 'scheduler') {\n  if (job.id !== ctx.job_id || job.status !== 'scheduled') return stop({ ...info, status: 'skipped', message: 'Job không còn ở trạng thái scheduled, bỏ qua lần chạy theo lịch.' });\n}\nif (job.status === 'scheduled') {\n  if (Date.parse(job.publish_at) <= now + 60000) return [{ json: { ...base, action: 'claim' } }];\n  return stop({ ...info, status: 'already_scheduled', message: 'Version này đã được lên lịch cho kênh này, chưa thể đổi giờ qua tool.' });\n}\nconst retryable = job.status === 'failed' || now - Date.parse(job.updated_at || job.created_at) > 10 * 60000;\nif (!retryable) return stop({ ...info, status: 'in_progress', message: 'Kênh này đang được đăng, hãy kiểm tra lại sau ít phút.' });\n// failed hoặc kẹt quá 10 phút: đến hạn thì giành job đăng luôn; chưa đến hạn thì đặt lại lịch.\nreturn [{ json: { ...base, action: ctx.due ? 'claim' : 'reschedule' } }];"
+      },
+      "id": "5d302a2e-4732-5f38-b2b9-8d08997b1573",
+      "name": "Decide Job",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "bb7fa907-8a98-5657-a03f-35422adef959",
+              "leftValue": "={{ $json.action === 'stop' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c5a6b37c-38db-598c-a7d7-2c4326f2c5ac",
+      "name": "Should Stop",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: $input.first().json.result }];"
+      },
+      "id": "308c719a-7d8f-50ec-92b0-d523a795b467",
+      "name": "Return Existing Job",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "444dda6b-14f5-58b1-9600-379980b5656d",
+              "leftValue": "={{ $json.action === 'create' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e16c0a15-25f5-5778-87b5-d7e27fccec60",
+      "name": "Is New Job",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -80,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "tableId": "publication_jobs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "draft_id",
+              "fieldValue": "={{ $json.draft_id }}"
+            },
+            {
+              "fieldId": "draft_version",
+              "fieldValue": "={{ $json.approved_version }}"
+            },
+            {
+              "fieldId": "channel",
+              "fieldValue": "website"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "scheduled"
+            },
+            {
+              "fieldId": "publish_at",
+              "fieldValue": "={{ $json.run_at }}"
+            },
+            {
+              "fieldId": "requested_by",
+              "fieldValue": "={{ $json.admin_user_id }}"
+            }
+          ]
+        }
+      },
+      "id": "0f588527-da6c-560d-ba02-c41f067f88ab",
+      "name": "Create Job",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        140,
+        -120
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_SUPABASE_CREDENTIAL_ID",
+          "name": "HNX Supabase Server"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "2de7f8d6-e3c5-4764-acc8-e073e7430002",
+              "leftValue": "={{ $json.action === 'reschedule' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2f311bdb-cd8c-4074-a320-8877eaeb6fe6",
+      "name": "Needs Reschedule",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        140,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "publication_jobs",
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.job.id }}"
+            },
+            {
+              "keyName": "status",
+              "condition": "eq",
+              "keyValue": "={{ $json.job.status }}"
+            },
+            {
+              "keyName": "updated_at",
+              "condition": "eq",
+              "keyValue": "={{ $json.job.updated_at }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "scheduled"
+            },
+            {
+              "fieldId": "publish_at",
+              "fieldValue": "={{ $json.run_at }}"
+            },
+            {
+              "fieldId": "requested_by",
+              "fieldValue": "={{ $json.admin_user_id }}"
+            },
+            {
+              "fieldId": "error_message",
+              "fieldValue": "={{ null }}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ $now.toISO() }}"
+            }
+          ]
+        }
+      },
+      "id": "0568ca7e-1d07-5197-8398-8b35892a0cf1",
+      "name": "Reuse Job",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        360,
+        240
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_SUPABASE_CREDENTIAL_ID",
+          "name": "HNX Supabase Server"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('Decide Job').first().json;\nconst src = $input.first().json;\nconst jobId = ctx.action === 'claim' ? ctx.job.id : src.id;\nif (!jobId) throw new Error('job_changed_concurrently: job vừa được execution khác thay đổi, hãy kiểm tra lại trạng thái rồi thử lại.');\nreturn [{ json: { ...ctx, job_id: jobId } }];"
+      },
+      "id": "2cdc0c15-abaf-5f47-be8f-dc05d68e7307",
+      "name": "Job Ready",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        360,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "bd2f0511-2581-5495-8db4-b7577ab8e106",
+              "leftValue": "={{ $json.due }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "434f88da-4f28-51c2-af80-a0a25adf1e06",
+      "name": "Due Now",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        580,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const x = $input.first().json;\nreturn [{ json: { status: 'scheduled', publication_job_id: x.job_id, channel: 'website', publish_at: x.run_at, message: 'Đã lên lịch. Hệ thống tự đăng trong vòng khoảng 1 phút sau giờ hẹn.' } }];"
+      },
+      "id": "a264dd1a-0be0-5498-bb3f-773688c04507",
+      "name": "Return Scheduled",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "draft_versions",
+        "limit": 1,
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "draft_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.draft_id }}"
+            },
+            {
+              "keyName": "version",
+              "condition": "eq",
+              "keyValue": "={{ $json.approved_version }}"
+            }
+          ]
+        }
+      },
+      "id": "f8ffef35-2a51-50ec-acc0-e9e699c8222c",
+      "name": "Get Approved Version",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        800,
+        0
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_SUPABASE_CREDENTIAL_ID",
+          "name": "HNX Supabase Server"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const req = $('Job Ready').first().json;\nconst version = $input.first().json;\nif (!version.id) throw new Error('version_not_found');\nconst p = typeof version.website_payload === 'string' ? JSON.parse(version.website_payload) : (version.website_payload || {});\nconst clean = v => { let s = String(v ?? ''); let prev; do { prev = s; s = s.replace(/<\\/?[a-zA-Z!][^>]*>/g, ''); } while (s !== prev); return s.trim(); };\nconst safeUrl = v => { const s = String(v ?? '').replace(/^[\\s\\u0000-\\u001f\\u007f-\\u009f]+/, '').trim(); return /^https?:\\/\\//i.test(s) ? s : null; };\nconst title = clean(p.title);\nconst schedule = p.schedule || {};\nconst image_url = safeUrl(p.image_url) || safeUrl((version.images || [])[0]?.url);\nif (!title) throw new Error('Tên chiến dịch trống');\nif (!schedule.start_at) throw new Error('Chiến dịch thiếu thời gian bắt đầu');\nif (!image_url) throw new Error('Chiến dịch thiếu ảnh https');\nconst pollution_status = clean(p.pollution_status) || 'Ghi nhận điểm ô nhiễm cần xử lý.';\nconst action_plan = clean(p.objective || p.action_plan) || 'Thu gom rác, làm sạch khu vực và khôi phục không gian an toàn cho cộng đồng.';\nconst support_equipment = clean(p.support_equipment) || 'Bao tay, kẹp gắp rác, bao tải, dụng cụ thu gom và nước sát khuẩn do Hà Nội Xanh chuẩn bị.';\nreturn [{ json: { ...req, title, description: action_plan, status: 'upcoming', start_at: schedule.start_at, end_at: schedule.end_at || null, location: clean(schedule.location || p.location) || 'Hà Nội', capacity: Number(p.capacity || 100), reward_points: Number(p.reward_points || 10000), image_url, image_urls: [image_url], pollution_status, action_plan, support_equipment } }];"
+      },
+      "id": "1e08a4df-298c-5de0-8acc-a1a97c39da79",
+      "name": "Prepare Website Post",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        0
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.HNX_SUPABASE_URL + '/rest/v1/rpc/claim_publication_job' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.HNX_SUPABASE_SECRET_KEY || $env.HNX_SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + ($env.HNX_SUPABASE_SECRET_KEY || $env.HNX_SUPABASE_SERVICE_ROLE_KEY) }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ p_job_id: $json.job_id, p_stale_after: '10 minutes' }) }}",
+        "options": {}
+      },
+      "id": "cb97c02e-73bc-4e41-9041-33a25e26392c",
+      "name": "Claim Job",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1240,
+        0
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const prepared = $('Prepare Website Post').first().json;\nconst rows = $input.all().map(item => item.json).filter(row => row && row.id);\nif (rows.length === 1) return [{ json: { ...prepared, claimed: true, claimed_job: rows[0] } }];\nreturn [{ json: { claimed: false, job_id: prepared.job_id, channel: 'website' } }];"
+      },
+      "id": "d1f7db61-b3f1-41c0-8b1b-0d733c15ead6",
+      "name": "Evaluate Claim",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "2de7f8d6-e3c5-4764-acc8-e073e7430003",
+              "leftValue": "={{ $json.claimed === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "8dc41a40-643e-4b4d-8a63-5e2cedf73b5c",
+      "name": "Claimed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1680,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "publication_jobs",
+        "limit": 1,
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.job_id }}"
+            }
+          ]
+        }
+      },
+      "id": "b06c7f9e-a60f-41e6-89b2-b71f5b7ac0f0",
+      "name": "Get Job After Claim",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        -240
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_SUPABASE_CREDENTIAL_ID",
+          "name": "HNX Supabase Server"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const x = $('Evaluate Claim').first().json;\nconst job = $input.first().json;\nconst info = { publication_job_id: x.job_id, channel: x.channel, provider_post_id: job.provider_post_id || null, published_url: job.published_url || null };\nif (job.status === 'published') return [{ json: { ...info, status: 'already_published', message: 'Kênh này đã được đăng bởi một lượt chạy khác, không đăng lại.' } }];\nreturn [{ json: { ...info, status: 'in_progress', message: 'Một lượt chạy khác đang đăng hoặc đã xử lý job này, không đăng trùng. Hãy kiểm tra lại sau ít phút.' } }];"
+      },
+      "id": "7410a994-f072-4215-9d37-093fb7b0777e",
+      "name": "Return Claim Lost",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1900,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "tableId": "campaigns",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "title",
+              "fieldValue": "={{ $json.title }}"
+            },
+            {
+              "fieldId": "description",
+              "fieldValue": "={{ $json.description }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.status }}"
+            },
+            {
+              "fieldId": "start_at",
+              "fieldValue": "={{ $json.start_at }}"
+            },
+            {
+              "fieldId": "end_at",
+              "fieldValue": "={{ $json.end_at }}"
+            },
+            {
+              "fieldId": "location",
+              "fieldValue": "={{ $json.location }}"
+            },
+            {
+              "fieldId": "capacity",
+              "fieldValue": "={{ $json.capacity }}"
+            },
+            {
+              "fieldId": "reward_points",
+              "fieldValue": "={{ $json.reward_points }}"
+            },
+            {
+              "fieldId": "image_url",
+              "fieldValue": "={{ $json.image_url }}"
+            },
+            {
+              "fieldId": "image_urls",
+              "fieldValue": "={{ $json.image_urls }}"
+            },
+            {
+              "fieldId": "pollution_status",
+              "fieldValue": "={{ $json.pollution_status }}"
+            },
+            {
+              "fieldId": "action_plan",
+              "fieldValue": "={{ $json.action_plan }}"
+            },
+            {
+              "fieldId": "support_equipment",
+              "fieldValue": "={{ $json.support_equipment }}"
+            },
+            {
+              "fieldId": "created_by",
+              "fieldValue": "={{ $json.admin_user_id }}"
+            }
+          ]
+        }
+      },
+      "id": "bf1ce86f-048e-5b4f-8fc5-edbdba9ebca2",
+      "name": "Publish Website Post",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1900,
+        0
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_SUPABASE_CREDENTIAL_ID",
+          "name": "HNX Supabase Server"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "publication_jobs",
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Job Ready').first().json.job_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "published"
+            },
+            {
+              "fieldId": "provider_post_id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldId": "published_url",
+              "fieldValue": "={{ String($env.HNX_PUBLIC_SITE_URL || '').replace(/\\/+$/, '') + '/tin-tuc' }}"
+            },
+            {
+              "fieldId": "published_at",
+              "fieldValue": "={{ $now.toISO() }}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ $now.toISO() }}"
+            }
+          ]
+        }
+      },
+      "id": "4b77a1d3-4be6-5155-86b8-8ea1e4417976",
+      "name": "Complete Website Job",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2120,
+        -60
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_SUPABASE_CREDENTIAL_ID",
+          "name": "HNX Supabase Server"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const job = $input.first().json;\nreturn [{ json: { status: 'published', publication_job_id: job.id, channel: 'website', provider_post_id: job.provider_post_id, published_url: job.published_url, published_at: job.published_at } }];"
+      },
+      "id": "228c936c-12df-5e18-803f-69a1b9eec9af",
+      "name": "Return Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2340,
+        -60
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "publication_jobs",
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Job Ready').first().json.job_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "failed"
+            },
+            {
+              "fieldId": "error_message",
+              "fieldValue": "={{ String(typeof $json.error === 'string' ? $json.error : ($json.error && $json.error.message) || 'unknown error').slice(0, 500) }}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ $now.toISO() }}"
+            }
+          ]
+        }
+      },
+      "id": "3f6cac9a-d75b-5f2c-ac53-03793bae7417",
+      "name": "Mark Job Failed",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2120,
+        120
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_SUPABASE_CREDENTIAL_ID",
+          "name": "HNX Supabase Server"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const row = $input.first().json;\nthrow new Error('publish_failed: ' + (row.error_message || 'unknown error') + '. Job đã đánh dấu failed, có thể thử lại cho riêng kênh này.');"
+      },
+      "id": "656c9868-c82d-5af8-be73-27dfe3cd10fc",
+      "name": "Throw Failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2340,
+        120
+      ]
+    }
   ],
   "connections": {
-    "When Executed by Another Workflow": {"main":[[{"node":"Get Approved Draft","type":"main","index":0}]]},
-    "Get Approved Draft": {"main":[[{"node":"Validate Publish","type":"main","index":0}]]},
-    "Validate Publish": {"main":[[{"node":"Validation Passed","type":"main","index":0}]]},
-    "Validation Passed": {"main":[[{"node":"Get Existing Job","type":"main","index":0}],[{"node":"Return Validation Result","type":"main","index":0}]]},
-    "Get Existing Job": {"main":[[{"node":"Decide Job","type":"main","index":0}]]},
-    "Decide Job": {"main":[[{"node":"Should Stop","type":"main","index":0}]]},
-    "Should Stop": {"main":[[{"node":"Return Existing Job","type":"main","index":0}],[{"node":"Is New Job","type":"main","index":0}]]},
-    "Is New Job": {"main":[[{"node":"Create Job","type":"main","index":0}],[{"node":"Needs Reschedule","type":"main","index":0}]]},
-    "Needs Reschedule": {"main":[[{"node":"Reuse Job","type":"main","index":0}],[{"node":"Job Ready","type":"main","index":0}]]},
-    "Create Job": {"main":[[{"node":"Job Ready","type":"main","index":0}]]},
-    "Reuse Job": {"main":[[{"node":"Job Ready","type":"main","index":0}]]},
-    "Job Ready": {"main":[[{"node":"Due Now","type":"main","index":0}]]},
-    "Due Now": {"main":[[{"node":"Get Approved Version","type":"main","index":0}],[{"node":"Return Scheduled","type":"main","index":0}]]},
-    "Get Approved Version": {"main":[[{"node":"Prepare Website Post","type":"main","index":0}]]},
-    "Prepare Website Post": {"main":[[{"node":"Claim Job","type":"main","index":0}],[{"node":"Mark Job Failed","type":"main","index":0}]]},
-    "Claim Job": {"main":[[{"node":"Evaluate Claim","type":"main","index":0}]]},
-    "Evaluate Claim": {"main":[[{"node":"Claimed","type":"main","index":0}]]},
-    "Claimed": {"main":[[{"node":"Publish Website Post","type":"main","index":0}],[{"node":"Get Job After Claim","type":"main","index":0}]]},
-    "Get Job After Claim": {"main":[[{"node":"Return Claim Lost","type":"main","index":0}]]},
-    "Publish Website Post": {"main":[[{"node":"Complete Website Job","type":"main","index":0}],[{"node":"Mark Job Failed","type":"main","index":0}]]},
-    "Complete Website Job": {"main":[[{"node":"Return Result","type":"main","index":0}]]},
-    "Mark Job Failed": {"main":[[{"node":"Throw Failure","type":"main","index":0}]]}
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get Approved Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Approved Draft": {
+      "main": [
+        [
+          {
+            "node": "Validate Publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Publish": {
+      "main": [
+        [
+          {
+            "node": "Validation Passed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validation Passed": {
+      "main": [
+        [
+          {
+            "node": "Get Existing Job",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return Validation Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Existing Job": {
+      "main": [
+        [
+          {
+            "node": "Decide Job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decide Job": {
+      "main": [
+        [
+          {
+            "node": "Should Stop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Stop": {
+      "main": [
+        [
+          {
+            "node": "Return Existing Job",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is New Job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is New Job": {
+      "main": [
+        [
+          {
+            "node": "Create Job",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Needs Reschedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs Reschedule": {
+      "main": [
+        [
+          {
+            "node": "Reuse Job",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Job Ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Job": {
+      "main": [
+        [
+          {
+            "node": "Job Ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reuse Job": {
+      "main": [
+        [
+          {
+            "node": "Job Ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job Ready": {
+      "main": [
+        [
+          {
+            "node": "Due Now",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Due Now": {
+      "main": [
+        [
+          {
+            "node": "Get Approved Version",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return Scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Approved Version": {
+      "main": [
+        [
+          {
+            "node": "Prepare Website Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Website Post": {
+      "main": [
+        [
+          {
+            "node": "Claim Job",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark Job Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claim Job": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Claim",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate Claim": {
+      "main": [
+        [
+          {
+            "node": "Claimed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claimed": {
+      "main": [
+        [
+          {
+            "node": "Publish Website Post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Job After Claim",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Job After Claim": {
+      "main": [
+        [
+          {
+            "node": "Return Claim Lost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish Website Post": {
+      "main": [
+        [
+          {
+            "node": "Complete Website Job",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark Job Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Complete Website Job": {
+      "main": [
+        [
+          {
+            "node": "Return Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Job Failed": {
+      "main": [
+        [
+          {
+            "node": "Throw Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "active": false,
-  "settings": {"executionOrder":"v1"},
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
   "tags": []
 }

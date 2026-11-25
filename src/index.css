@@ -473,13 +473,25 @@
 .admin-badge-editor-title > span { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 50%; background: #dcfce7; color: #15803d; }
 .admin-badge-editor-title .link-danger { padding: 7px; }
 .admin-reward-notice { margin: 12px 0 0; color: #166534; font-size: 13px; font-weight: 700; }
-.agent-console { display: grid; gap: 20px; }
+.agent-console { display: grid; grid-template-columns: minmax(210px, 260px) minmax(0, 1fr); gap: 20px; align-items: start; }
+.agent-session-sidebar { position: sticky; top: 18px; min-height: 420px; padding: 14px; border: 1px solid #dce8df; border-radius: 14px; background: #f8fbf9; }
+.agent-session-sidebar-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.agent-session-sidebar-head h3 { margin: 3px 0 0; color: #0f382c; font-size: 16px; }
+.agent-session-sidebar-head button { width: 30px; height: 30px; border: 1px solid #b7ddc2; border-radius: 8px; background: white; color: #166534; font-size: 20px; line-height: 1; cursor: pointer; }
+.agent-new-session { width: 100%; padding: 10px 12px; border: 1px solid #15803d; border-radius: 9px; background: #166534; color: white; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
+.agent-session-list { display: grid; gap: 7px; max-height: 600px; margin-top: 14px; overflow-y: auto; }
+.agent-session-item { display: grid; gap: 4px; width: 100%; padding: 10px; border: 1px solid transparent; border-radius: 9px; background: transparent; color: #315343; text-align: left; cursor: pointer; }
+.agent-session-item:hover, .agent-session-item.active { border-color: #b7ddc2; background: #eaf7ee; }
+.agent-session-item strong { overflow: hidden; font-size: 12px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+.agent-session-item small, .agent-session-empty { color: #708176; font-size: 11px; }
+.agent-session-empty { margin: 12px 4px; line-height: 1.5; }
+.agent-session-content { min-width: 0; display: grid; gap: 20px; }
 .agent-chat-panel { display: grid; gap: 16px; }
 .agent-messages { min-height: 300px; max-height: 540px; display: grid; align-content: start; gap: 12px; overflow-y: auto; padding: 16px; border: 1px solid #e2ebe5; border-radius: 12px; background: #f8fbf9; }
-.agent-message { max-width: min(760px, 88%); padding: 12px 14px; border: 1px solid #dce8df; border-radius: 12px; background: white; }
+.agent-message { min-width: 0; width: fit-content; max-width: min(760px, 88%); box-sizing: border-box; padding: 12px 14px; border: 1px solid #dce8df; border-radius: 12px; background: white; }
 .agent-message.admin { justify-self: end; border-color: #b7ddc2; background: #ecfdf3; }
 .agent-message strong { display: block; margin-bottom: 5px; color: #166534; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
-.agent-message p { margin: 0; color: #263b30; line-height: 1.55; white-space: pre-wrap; }
+.agent-message p { min-width: 0; max-width: 100%; margin: 0; color: #263b30; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
 .agent-composer { display: grid; gap: 10px; }
 .agent-composer .admin-primary { justify-self: end; margin-top: 0; }
 .agent-finding-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
@@ -493,10 +505,67 @@
 .agent-finding button, .agent-draft-actions button, .agent-draft-actions a { display: inline-flex; margin-top: 12px; border: 1px solid #15803d; border-radius: 8px; padding: 9px 12px; background: white; color: #166534; font: inherit; font-size: 12px; font-weight: 800; text-decoration: none; cursor: pointer; }
 .agent-finding button { width: 100%; justify-content: center; }
 .agent-draft > img { width: min(560px, 100%); max-height: 320px; object-fit: cover; border-radius: 12px; }
+.agent-draft-missing-image { display: grid; min-height: 180px; place-items: center; border: 1px dashed #dc2626; border-radius: 12px; color: #b91c1c; background: #fff7f7; font-weight: 800; }
+.agent-draft-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+.agent-draft-details > div { padding: 13px 15px; border: 1px solid #e2ebe5; border-radius: 10px; background: #fbfdfb; }
+.agent-draft-details strong { display: block; margin-bottom: 5px; color: #166534; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+.agent-draft-details p { margin: 0; color: #31483b; line-height: 1.5; }
 .agent-draft-copy { max-width: 800px; margin-top: 18px; color: #31483b; line-height: 1.65; white-space: pre-wrap; }
+.agent-draft-copy > strong { display: block; margin-bottom: 6px; color: #0f382c; }
+.agent-draft-copy > p { margin: 0; }
+.agent-thread-preview { margin-top: 18px; padding: 14px 16px; border: 1px solid #d9eee0; border-radius: 10px; background: #f0fdf4; color: #31483b; line-height: 1.6; white-space: pre-wrap; }
+.agent-thread-preview > strong { display: block; margin-bottom: 6px; color: #166534; }
+.agent-thread-preview > p { margin: 0; }
 .agent-draft-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .agent-setup p { color: #52665b; line-height: 1.6; }
 .agent-setup code { border-radius: 5px; padding: 2px 5px; background: #edf5ef; color: #0f382c; }
+
+/* Keep the admin console usable when the browser is snapped to half-screen. */
+.agent-message p, .agent-message a { overflow-wrap: anywhere; word-break: break-word; }
+@media (max-width: 1100px) and (min-width: 621px) {
+  .admin-sidebar { width: 205px; flex-basis: 205px; padding: 20px 10px; }
+  .admin-brand { padding-inline: 6px; padding-bottom: 20px; }
+  .admin-sidebar nav { gap: 10px; }
+  .admin-sidebar nav button, .admin-signout, .admin-home-link { padding: 10px 9px; font-size: 12px; }
+  .admin-content { min-width: 0; padding: 22px 16px 32px; }
+  .admin-topbar { margin-bottom: 18px; }
+  .admin-topbar h1 { font-size: 25px; }
+
+  /* Session history becomes a compact strip above the conversation. */
+  .agent-console { grid-template-columns: 1fr; gap: 14px; }
+  .agent-session-sidebar { position: static; min-height: 0; padding: 12px; }
+  .agent-session-sidebar-head { align-items: center; margin-bottom: 9px; }
+  .agent-session-sidebar-head h3 { font-size: 14px; }
+  .agent-new-session { width: auto; padding: 8px 10px; }
+  .agent-session-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); max-height: none; margin-top: 10px; padding-bottom: 2px; overflow: hidden; }
+  .agent-session-item { min-width: 0; padding: 9px; }
+  .agent-session-item strong { font-size: 11px; }
+  .agent-session-content { gap: 14px; }
+  .agent-chat-panel, .agent-session-content > .admin-panel { padding: 16px; }
+  .agent-messages { min-height: 260px; max-height: 430px; padding: 12px; }
+  .agent-message { max-width: 88%; }
+  .agent-draft-details { grid-template-columns: 1fr 1fr; }
+  .agent-finding-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .agent-finding > div { padding: 11px; }
+  .agent-finding h3 { font-size: 14px; }
+}
+
+@media (max-width: 800px) and (min-width: 621px) {
+  .admin-sidebar { width: 178px; flex-basis: 178px; }
+  .admin-content { padding-inline: 12px; }
+  .admin-panel-heading { gap: 10px; }
+  .admin-panel-heading button { white-space: nowrap; }
+  .agent-session-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .agent-finding-grid, .agent-draft-details { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) {
+  .agent-console { grid-template-columns: 1fr; }
+  .agent-session-sidebar { position: static; min-height: 0; }
+  .agent-session-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: none; overflow: hidden; padding-bottom: 3px; }
+  .agent-session-item { min-width: 0; }
+  .agent-draft-details { grid-template-columns: 1fr; }
+}
 
 /* The news manager is built inside the dashboard at runtime. Give its direct table
    the same visual structure as every table wrapped in .admin-table-wrap. */

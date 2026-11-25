@@ -4,6 +4,7 @@ dist/
 build/
 .cache/
 .env*
+n8n/credentials.local.json
 .vite/
 vite.config.*.timestamp-*
 *.tsbuildinfo

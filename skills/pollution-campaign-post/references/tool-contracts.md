@@ -14,9 +14,9 @@ Input: `skill_name` (string, bắt buộc).
 
 ## `search_pollution_locations`
 
-Tìm và lưu các địa điểm có bằng chứng ô nhiễm gần đây trong phạm vi Hà Nội, kèm ảnh và nguồn. Ưu tiên nguồn chính thống hoặc báo chí có ngày xuất bản; không coi một nguồn cũ là trạng thái hiện tại. Trả `finding_id` ổn định cho mỗi kết quả. Ảnh Tavily trả là danh sách chung, không ghép được với từng bài viết nên không được gắn ảnh vào kết quả theo chỉ số: mọi ảnh có `source_url = null`, `license_status = unknown` và chú thích "chưa xác minh nguồn/quyền", chỉ để admin tham khảo, không dùng để xuất bản. Đây là tool chỉ đọc web nhưng có tác dụng ghi findings vào Supabase.
+Tìm và lưu đúng tối đa 3 địa điểm có bằng chứng ô nhiễm gần đây trong phạm vi Hà Nội, kèm ảnh và nguồn. Chỉ nhận kết quả có nhắc rõ Hà Nội/Hanoi; không nhận Los Angeles, California hay địa điểm ngoài Hà Nội. Ưu tiên nguồn chính thống hoặc báo chí có ngày xuất bản; không coi một nguồn cũ là trạng thái hiện tại. Trả `finding_id` ổn định cho mỗi kết quả. Ảnh Tavily trả là danh sách chung, không ghép được với từng bài viết nên không được gắn ảnh vào kết quả theo chỉ số: mọi ảnh có `source_url = null`, `license_status = unknown` và chú thích "chưa xác minh nguồn/quyền", chỉ để admin tham khảo, không dùng để xuất bản. Đây là tool chỉ đọc web nhưng có tác dụng ghi findings vào Supabase.
 
-Input: `query`, `time_range_days` (mặc định 30), `max_results` (1–10, mặc định 5).
+Input: `query`, `time_range_days` (mặc định 30), `max_results` cố định là 3; không dùng giá trị lớn hơn 3.
 
 ## `get_pollution_finding`
 
@@ -26,9 +26,9 @@ Input: `finding_id`.
 
 ## `create_cleanup_post_draft`
 
-Tạo draft mới từ finding đã chọn và dữ liệu sự kiện. `finding_id` phải thuộc thread hiện tại, nếu không trả `finding_not_found`. Bắt buộc có `cleanup_start_at`; nếu thiếu phải trả `missing_information` thay vì tự suy đoán. Lưu nội dung website, caption Threads, nguồn và ảnh thành version 1; không tạo file HTML hay `preview_url`/`file_url` (admin xem bản xem trước trên Admin Dashboard). Không duyệt, không xuất bản.
+Tạo draft mới từ finding đã chọn và dữ liệu sự kiện. `finding_id` phải thuộc thread hiện tại, nếu không trả `finding_not_found`. Bắt buộc có cả `cleanup_start_at` và `cleanup_end_at`; nếu thiếu phải trả `missing_information` thay vì tự suy đoán. Draft bắt buộc có ít nhất một ảnh URL https hợp lệ, `pollution_status`, `objective` và `support_equipment` trong `website_payload`; workflow tự chèn ngày giờ và địa điểm chính xác từ finding. Lưu nội dung website, caption Threads, nguồn và ảnh thành version 1; không tạo file HTML hay `preview_url`/`file_url` (admin xem bản xem trước trên Admin Dashboard). Không duyệt, không xuất bản.
 
-Input: `finding_id`, `cleanup_start_at`, `cleanup_end_at?`, `meeting_point?`, `contact?`, `website_payload`, `threads_payload`, `images`, `sources`. Thời gian không kèm múi giờ được hiểu là giờ Hà Nội (+07:00).
+Input: `finding_id`, `cleanup_start_at`, `cleanup_end_at`, `meeting_point?`, `contact?`, `website_payload`, `threads_payload`, `images`, `sources`. Thời gian không kèm múi giờ được hiểu là giờ Hà Nội (+07:00).
 
 ## `get_post_draft`
 

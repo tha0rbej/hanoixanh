@@ -2,25 +2,575 @@
   "id": "hnxScheduledPublisher",
   "name": "HNX - Scheduled Publisher",
   "nodes": [
-    {"parameters":{"rule":{"interval":[{"field":"minutes","minutesInterval":1}]}},"id":"3dc4acac-d198-5b38-a21d-a6488fef0000","name":"Every Minute","type":"n8n-nodes-base.scheduleTrigger","typeVersion":1.2,"position":[-660,0]},
-    {"parameters":{"operation":"getAll","tableId":"publication_jobs","limit":20,"filterType":"string","filterString":"={{ 'status=eq.scheduled&publish_at=lte.' + new Date().toISOString() }}"},"id":"8cb0d983-b341-5d93-acb2-39101f542e61","name":"Get Due Jobs","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[-440,0],"credentials":{"supabaseApi":{"id":"REPLACE_SUPABASE_CREDENTIAL_ID","name":"HNX Supabase Server"}}},
-    {"parameters":{"operation":"getAll","tableId":"content_drafts","limit":1,"filterType":"manual","matchType":"allFilters","filters":{"conditions":[{"keyName":"id","condition":"eq","keyValue":"={{ $json.draft_id }}"}]}},"id":"3b10252c-f52c-59a4-a15a-510212caa626","name":"Get Draft","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[-220,0],"credentials":{"supabaseApi":{"id":"REPLACE_SUPABASE_CREDENTIAL_ID","name":"HNX Supabase Server"}},"alwaysOutputData":true},
-    {"parameters":{"conditions":{"options":{"caseSensitive":true,"leftValue":"","typeValidation":"loose"},"conditions":[{"id":"a76ebcd6-3b3e-507d-a682-1ef164859fb1","leftValue":"={{ $('Get Due Jobs').item.json.channel === 'website' }}","rightValue":"","operator":{"type":"boolean","operation":"true","singleValue":true}}],"combinator":"and"},"options":{}},"id":"02b7e17a-9029-5393-8296-fc2e8f342f8c","name":"Is Website","type":"n8n-nodes-base.if","typeVersion":2.2,"position":[0,0]},
-    {"parameters":{"workflowId":{"__rl":true,"value":"hnxToolPublishWebsite","mode":"list","cachedResultName":"HNX Tool - Publish Website Post"},"workflowInputs":{"mappingMode":"defineBelow","value":{"thread_id":"={{ $('Get Draft').item.json.thread_id }}","admin_user_id":"={{ $('Get Due Jobs').item.json.requested_by }}","draft_id":"={{ $('Get Draft').item.json.id }}","approved_version":"={{ $('Get Due Jobs').item.json.draft_version }}","publish_at":"","publish_now":true,"confirmation_text":"scheduled-run","turn_started_at":"","trigger_source":"scheduler","job_id":"={{ $('Get Due Jobs').item.json.id }}"},"matchingColumns":[],"schema":[{"id":"thread_id","displayName":"thread_id","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"string","removed":false},{"id":"admin_user_id","displayName":"admin_user_id","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"string","removed":false},{"id":"draft_id","displayName":"draft_id","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"string","removed":false},{"id":"approved_version","displayName":"approved_version","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"number","removed":false},{"id":"publish_at","displayName":"publish_at","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"string","removed":false},{"id":"publish_now","displayName":"publish_now","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"boolean","removed":false},{"id":"confirmation_text","displayName":"confirmation_text","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"string","removed":false},{"id":"turn_started_at","displayName":"turn_started_at","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"string","removed":false},{"id":"trigger_source","displayName":"trigger_source","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"string","removed":false},{"id":"job_id","displayName":"job_id","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"string","removed":false}],"attemptToConvertTypes":false,"convertFieldsToString":false},"options":{"waitForSubWorkflow":true}},"id":"ede1d404-34a7-5def-b336-35941570c97d","name":"Run Website Publish","type":"n8n-nodes-base.executeWorkflow","typeVersion":1.3,"position":[220,-80],"onError":"continueRegularOutput"},
-    {"parameters":{"workflowId":{"__rl":true,"value":"hnxToolPublishThreads","mode":"list","cachedResultName":"HNX Tool - Publish Threads Post"},"workflowInputs":{"mappingMode":"defineBelow","value":{"thread_id":"={{ $('Get Draft').item.json.thread_id }}","admin_user_id":"={{ $('Get Due Jobs').item.json.requested_by }}","draft_id":"={{ $('Get Draft').item.json.id }}","approved_version":"={{ $('Get Due Jobs').item.json.draft_version }}","publish_at":"","publish_now":true,"confirmation_text":"scheduled-run","turn_started_at":"","trigger_source":"scheduler","job_id":"={{ $('Get Due Jobs').item.json.id }}"},"matchingColumns":[],"schema":[{"id":"thread_id","displayName":"thread_id","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"string","removed":false},{"id":"admin_user_id","displayName":"admin_user_id","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"string","removed":false},{"id":"draft_id","displayName":"draft_id","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"string","removed":false},{"id":"approved_version","displayName":"approved_version","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"number","removed":false},{"id":"publish_at","displayName":"publish_at","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"string","removed":false},{"id":"publish_now","displayName":"publish_now","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"boolean","removed":false},{"id":"confirmation_text","displayName":"confirmation_text","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"string","removed":false},{"id":"turn_started_at","displayName":"turn_started_at","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"string","removed":false},{"id":"trigger_source","displayName":"trigger_source","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"string","removed":false},{"id":"job_id","displayName":"job_id","required":false,"defaultMatch":false,"display":true,"canBeUsedToMatch":true,"type":"string","removed":false}],"attemptToConvertTypes":false,"convertFieldsToString":false},"options":{"waitForSubWorkflow":true}},"id":"b9a89bb7-e1d6-5a2d-9481-e9b6cef5ddde","name":"Run Threads Publish","type":"n8n-nodes-base.executeWorkflow","typeVersion":1.3,"position":[220,100],"onError":"continueRegularOutput"},
-    {"parameters":{"conditions":{"options":{"caseSensitive":true,"leftValue":"","typeValidation":"loose"},"conditions":[{"id":"5a6b7c8d-9e0f-4a1b-8c2d-3e4f5a6b7c01","leftValue":"={{ !!$json.error }}","rightValue":"","operator":{"type":"boolean","operation":"true","singleValue":true}}],"combinator":"and"},"options":{}},"id":"c3a1f0d2-6b4e-4c8a-9d57-0e1f2a3b4c5d","name":"Run Failed","type":"n8n-nodes-base.if","typeVersion":2.2,"position":[440,0]},
-    {"parameters":{"operation":"update","tableId":"publication_jobs","filterType":"manual","matchType":"allFilters","filters":{"conditions":[{"keyName":"id","condition":"eq","keyValue":"={{ $('Get Due Jobs').item.json.id }}"},{"keyName":"status","condition":"eq","keyValue":"scheduled"}]},"fieldsUi":{"fieldValues":[{"fieldId":"status","fieldValue":"failed"},{"fieldId":"error_message","fieldValue":"={{ String(typeof $json.error === 'string' ? $json.error : ($json.error && $json.error.message) || 'scheduled run failed').slice(0, 500) }}"},{"fieldId":"updated_at","fieldValue":"={{ $now.toISO() }}"}]}},"id":"d4b2a1e3-7c5f-4d9b-8e68-1f2a3b4c5d6e","name":"Fail Scheduled Job","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[660,-60],"credentials":{"supabaseApi":{"id":"REPLACE_SUPABASE_CREDENTIAL_ID","name":"HNX Supabase Server"}}}
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "3dc4acac-d198-5b38-a21d-a6488fef0000",
+      "name": "Every Minute",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "publication_jobs",
+        "limit": 20,
+        "filterType": "string",
+        "filterString": "={{ 'status=eq.scheduled&publish_at=lte.' + new Date().toISOString() }}"
+      },
+      "id": "8cb0d983-b341-5d93-acb2-39101f542e61",
+      "name": "Get Due Jobs",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -440,
+        0
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_SUPABASE_CREDENTIAL_ID",
+          "name": "HNX Supabase Server"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "content_drafts",
+        "limit": 1,
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.draft_id }}"
+            }
+          ]
+        }
+      },
+      "id": "3b10252c-f52c-59a4-a15a-510212caa626",
+      "name": "Get Draft",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        0
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_SUPABASE_CREDENTIAL_ID",
+          "name": "HNX Supabase Server"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "a76ebcd6-3b3e-507d-a682-1ef164859fb1",
+              "leftValue": "={{ $('Get Due Jobs').item.json.channel === 'website' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "02b7e17a-9029-5393-8296-fc2e8f342f8c",
+      "name": "Is Website",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hnxToolPublishWebsite",
+          "mode": "list",
+          "cachedResultName": "HNX Tool - Publish Website Post"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "thread_id": "={{ $('Get Draft').item.json.thread_id }}",
+            "admin_user_id": "={{ $('Get Due Jobs').item.json.requested_by }}",
+            "draft_id": "={{ $('Get Draft').item.json.id }}",
+            "approved_version": "={{ $('Get Due Jobs').item.json.draft_version }}",
+            "publish_at": "",
+            "publish_now": true,
+            "confirmation_text": "scheduled-run",
+            "turn_started_at": "",
+            "trigger_source": "scheduler",
+            "job_id": "={{ $('Get Due Jobs').item.json.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "thread_id",
+              "displayName": "thread_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "admin_user_id",
+              "displayName": "admin_user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "draft_id",
+              "displayName": "draft_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "approved_version",
+              "displayName": "approved_version",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "publish_at",
+              "displayName": "publish_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "publish_now",
+              "displayName": "publish_now",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "boolean",
+              "removed": false
+            },
+            {
+              "id": "confirmation_text",
+              "displayName": "confirmation_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "turn_started_at",
+              "displayName": "turn_started_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "trigger_source",
+              "displayName": "trigger_source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "job_id",
+              "displayName": "job_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "ede1d404-34a7-5def-b336-35941570c97d",
+      "name": "Run Website Publish",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        220,
+        -80
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hnxToolPublishThreads",
+          "mode": "list",
+          "cachedResultName": "HNX Tool - Publish Threads Post"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "thread_id": "={{ $('Get Draft').item.json.thread_id }}",
+            "admin_user_id": "={{ $('Get Due Jobs').item.json.requested_by }}",
+            "draft_id": "={{ $('Get Draft').item.json.id }}",
+            "approved_version": "={{ $('Get Due Jobs').item.json.draft_version }}",
+            "publish_at": "",
+            "publish_now": true,
+            "confirmation_text": "scheduled-run",
+            "turn_started_at": "",
+            "trigger_source": "scheduler",
+            "job_id": "={{ $('Get Due Jobs').item.json.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "thread_id",
+              "displayName": "thread_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "admin_user_id",
+              "displayName": "admin_user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "draft_id",
+              "displayName": "draft_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "approved_version",
+              "displayName": "approved_version",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "publish_at",
+              "displayName": "publish_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "publish_now",
+              "displayName": "publish_now",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "boolean",
+              "removed": false
+            },
+            {
+              "id": "confirmation_text",
+              "displayName": "confirmation_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "turn_started_at",
+              "displayName": "turn_started_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "trigger_source",
+              "displayName": "trigger_source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "job_id",
+              "displayName": "job_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "b9a89bb7-e1d6-5a2d-9481-e9b6cef5ddde",
+      "name": "Run Threads Publish",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        220,
+        100
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "5a6b7c8d-9e0f-4a1b-8c2d-3e4f5a6b7c01",
+              "leftValue": "={{ !!$json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c3a1f0d2-6b4e-4c8a-9d57-0e1f2a3b4c5d",
+      "name": "Run Failed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "publication_jobs",
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Get Due Jobs').item.json.id }}"
+            },
+            {
+              "keyName": "status",
+              "condition": "eq",
+              "keyValue": "scheduled"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "failed"
+            },
+            {
+              "fieldId": "error_message",
+              "fieldValue": "={{ String(typeof $json.error === 'string' ? $json.error : ($json.error && $json.error.message) || 'scheduled run failed').slice(0, 500) }}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ $now.toISO() }}"
+            }
+          ]
+        }
+      },
+      "id": "d4b2a1e3-7c5f-4d9b-8e68-1f2a3b4c5d6e",
+      "name": "Fail Scheduled Job",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        660,
+        -60
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_SUPABASE_CREDENTIAL_ID",
+          "name": "HNX Supabase Server"
+        }
+      }
+    }
   ],
   "connections": {
-    "Every Minute": {"main":[[{"node":"Get Due Jobs","type":"main","index":0}]]},
-    "Get Due Jobs": {"main":[[{"node":"Get Draft","type":"main","index":0}]]},
-    "Get Draft": {"main":[[{"node":"Is Website","type":"main","index":0}]]},
-    "Is Website": {"main":[[{"node":"Run Website Publish","type":"main","index":0}],[{"node":"Run Threads Publish","type":"main","index":0}]]},
-    "Run Website Publish": {"main":[[{"node":"Run Failed","type":"main","index":0}]]},
-    "Run Threads Publish": {"main":[[{"node":"Run Failed","type":"main","index":0}]]},
-    "Run Failed": {"main":[[{"node":"Fail Scheduled Job","type":"main","index":0}],[]]}
+    "Every Minute": {
+      "main": [
+        [
+          {
+            "node": "Get Due Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Due Jobs": {
+      "main": [
+        [
+          {
+            "node": "Get Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Draft": {
+      "main": [
+        [
+          {
+            "node": "Is Website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Website": {
+      "main": [
+        [
+          {
+            "node": "Run Website Publish",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Run Threads Publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Website Publish": {
+      "main": [
+        [
+          {
+            "node": "Run Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Threads Publish": {
+      "main": [
+        [
+          {
+            "node": "Run Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Failed": {
+      "main": [
+        [
+          {
+            "node": "Fail Scheduled Job",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
   },
-  "active": false,
-  "settings": {"executionOrder":"v1"},
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
   "tags": []
 }
